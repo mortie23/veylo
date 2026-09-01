@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "microsoft-IsvExpTools.powerplatform-vscode",
+    "sissel.shopify-liquid",
+    "redhat.vscode-yaml",
+    "ms-vscode.powershell"
+  ]
+}

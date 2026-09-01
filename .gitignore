@@ -1,0 +1,28 @@
+# Power Platform CLI & Portal artifacts
+.portalconfig/org*-manifest.yml.bak
+*.log
+*.tmp
+
+# Environment Variables (instance-specific config)
+.env
+.env.local
+.env.*.local
+
+# Operating System Files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE & Editor Settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node / Web Build (for future front-end tooling if used)
+node_modules/
+dist/
+build/
+.cache/

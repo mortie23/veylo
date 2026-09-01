@@ -1,0 +1,13 @@
+<div class="row sectionBlockLayout" style="display: flex; flex-wrap: wrap; padding: 80px 0; text-align: center;">
+  <div class="container">
+    <div class="col-md-8 col-md-offset-2 columnBlockLayout">
+      <h1 id="mainContent" style="font-size: 2.8rem; font-weight: 700; margin-bottom: 20px;">Hello World</h1>
+      <p class="lead" style="color: #666; margin-bottom: 30px;">
+        Welcome to <strong>Veylo</strong>. Clean baseline ready for development.
+      </p>
+      <div style="display: inline-block; padding: 12px 24px; background: #f0f4f8; border-radius: 6px; font-size: 0.95rem; color: #334e68;">
+        Logged in as: <strong>{% if user %}{{ user.fullname }}{% else %}Guest (Not signed in){% endif %}</strong>
+      </div>
+    </div>
+  </div>
+</div>

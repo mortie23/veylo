@@ -1,0 +1,24 @@
+- adx_name: File Upload
+  adx_pageid: 13841a13-25fa-4a55-85a2-906474eae1b1
+  adx_sitemarkerid: 21f21f2c-6dea-48c1-b378-17aee4211ede
+- adx_name: Organization Dashboard
+  adx_pageid: 5b0f98b6-5d99-43fc-9d53-c1c973a389fd
+  adx_sitemarkerid: 685b0064-1c13-41f6-9bab-1b3dfd63734b
+- adx_name: Access Denied
+  adx_pageid: d73467c5-2a18-4e6a-8acd-b2f8fbe10154
+  adx_sitemarkerid: 904eac83-9dea-4ac7-9c64-e4bdc9acbc5e
+- adx_name: Page Not Found
+  adx_pageid: d8393802-a11d-467e-96bf-0887b08a487a
+  adx_sitemarkerid: a8abdd10-3092-4def-951b-e530d24f76f1
+- adx_name: Profile
+  adx_pageid: 2847c4a9-5326-41da-9eaf-c7d8a5961d40
+  adx_sitemarkerid: cb102950-123a-4e64-addb-b4cf1b64e4a3
+- adx_name: Home
+  adx_pageid: 51d3d71a-84e7-4040-8cf5-7ee25935398f
+  adx_sitemarkerid: cdb96dee-022a-47d1-a71c-ca01dc21004d
+- adx_name: Search
+  adx_pageid: 8017d04c-bc6f-43a6-8774-bf54cdbcf9bb
+  adx_sitemarkerid: ced5c0b5-f919-4696-b3a2-febe9adcc47e
+- adx_name: User Login
+  adx_pageid: f6c01257-7b2a-4273-ab31-1e280c300f38
+  adx_sitemarkerid: f83557c9-933f-4e6a-b90f-4cd8f7b14cf8
