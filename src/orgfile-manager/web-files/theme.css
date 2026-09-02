@@ -2493,45 +2493,130 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:foc
     color: #ffffff !important;
 }
 
-/* Footer (au-footer & health-footer) */
-footer.footer,
-.au-footer,
-.health-footer {
-    background-color: var(--hds-primary-navy) !important;
-    border-top: 4px solid var(--hds-teal) !important;
-    color: #C1C6C8 !important;
-    padding: 48px 0 32px !important;
+/* ==========================================================================
+   Health Design System - Footer Component
+   (https://designsystem.health.gov.au/components/detail/footer.html)
+   ========================================================================== */
+.au-footer {
+    font-family: var(--au-font);
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 48px 0 !important;
+    border-top: 4px solid #808080 !important;
+    background-color: #ffffff !important;
+    color: #313131 !important;
+    position: relative;
     margin-top: 0 !important;
 }
 
-.health-footer-links {
-    margin-bottom: 18px;
-    padding-left: 0;
-}
-
-.health-footer-links li {
-    margin-right: 24px;
-    display: inline-block;
-}
-
-.health-footer-links a {
+.au-footer.au-footer--dark,
+.au-footer.au-body--dark,
+.au-body--dark.au-footer,
+footer.au-footer {
+    background-color: #313131 !important;
+    border-top: 4px solid #505050 !important;
     color: #ffffff !important;
-    font-weight: 500;
-    font-size: 0.95rem;
-    text-decoration: underline !important;
 }
 
-.health-footer-links a:hover,
-.health-footer-links a:focus {
-    color: #9ADBFF !important;
+.au-footer__navigation {
+    margin-bottom: 24px;
+}
+
+.au-footer__navigation-section {
+    margin-bottom: 24px;
+}
+
+.au-footer__navigation-section h3 {
+    font-family: var(--au-font);
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin-top: 0 !important;
+    margin-bottom: 16px !important;
+    line-height: 1.3;
+}
+
+.au-footer__navigation-section p {
+    color: #ffffff !important;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px !important;
+}
+
+.au-footer .au-link-list {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
+}
+
+.au-footer .au-link-list > li {
+    margin-bottom: 8px !important;
+    margin-left: 0 !important;
+    display: block !important;
+}
+
+.au-footer .au-link-list > li > a {
+    color: #ffffff !important;
+    font-size: 0.95rem !important;
+    font-weight: 400 !important;
+    text-decoration: underline !important;
+    line-height: 1.5 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    display: inline;
+}
+
+.au-footer .au-link-list > li > a:hover,
+.au-footer .au-link-list > li > a:focus {
+    color: #ffffff !important;
     text-decoration: none !important;
 }
 
-.health-footer-copyright {
-    font-size: 0.85rem;
-    color: #A2AAAD;
-    margin-bottom: 0;
+/* Secondary dark button for footer feedback */
+.au-footer .au-btn--secondary.au-btn--dark,
+.au-btn.au-btn--secondary.au-btn--dark {
+    background-color: transparent !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+    padding: 8px 22px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+.au-footer .au-btn--secondary.au-btn--dark:hover,
+.au-footer .au-btn--secondary.au-btn--dark:focus,
+.au-btn.au-btn--secondary.au-btn--dark:hover,
+.au-btn.au-btn--secondary.au-btn--dark:focus {
+    background-color: #ffffff !important;
+    color: #313131 !important;
+    text-decoration: none !important;
+}
+
+.standard-gap {
+    margin-top: 8px;
+}
+
+/* Footer bottom / end divider and copyright */
+.au-footer__end {
+    border-top: 1px solid #555555 !important;
+    padding-top: 16px !important;
+    margin-top: 16px !important;
+}
+
+.au-footer__end p {
+    color: #ffffff !important;
+    margin: 0 !important;
+}
+
+.au-footer__end small {
+    font-size: 0.875rem !important;
+    color: #ffffff !important;
+}
+
 
 /* Breadcrumbs */
 .breadcrumb {
