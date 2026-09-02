@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
 /*!
  * Bootstrap v3.3.6 (http://getbootstrap.com)
  * Copyright 2011-2015 Twitter, Inc.
@@ -1824,3 +1826,746 @@ h3 {
     display: flex !important;
     align-items: center;
 }
+
+/* ==========================================================================
+   Australian Government - Department of Health and Aged Care Design System
+   Alignment (https://designsystem.health.gov.au/)
+   ========================================================================== */
+
+:root {
+    /* HDS Brand Color Tokens */
+    --hds-primary-navy: #002058;
+    --hds-secondary-navy: #041E42;
+    --hds-teal: #007680;
+    --hds-teal-dark: #006269;
+    --hds-teal-light: #e6f2f3;
+    --hds-blue: #0077C8;
+    --hds-blue-dark: #0057B8;
+    --hds-blue-light: #0093B2;
+    --hds-burgundy: #910048;
+    --hds-olive: #B5BD00;
+    --hds-accent-red: #D50032;
+    --hds-accent-orange: #E86335;
+    --hds-accent-gold: #CFB500;
+
+    /* Neutrals */
+    --hds-text-dark: #313131;
+    --hds-text-muted: #5B6770;
+    --hds-border: #C1C6C8;
+    --hds-border-light: #E0E0E0;
+    --hds-bg-light: #f8f8f8;
+    --hds-bg-subtle: #f0f3f5;
+    --hds-white: #ffffff;
+    --hds-focus: #9263DE;
+
+    /* Typography */
+    --au-font: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* Power Pages System Overrides */
+    --portalThemeColor1: #007680;
+    --portalThemeColor2: #002058;
+    --portalThemeColor3: #C1C6C8;
+    --portalThemeColor4: #041E42;
+    --portalThemeColor5: #f8f8f8;
+    --portalThemeColor6: #f0f3f5;
+    --portalThemeColor7: #ffffff;
+    --portalThemeColor8: #313131;
+    --portalThemeColor9: #0077C8;
+    --portalThemeOnColor1: #ffffff;
+    --portalThemeOnColor2: #ffffff;
+    --portalThemeOnColor3: #313131;
+    --portalThemeOnColor4: #ffffff;
+    --portalThemeOnColor5: #313131;
+    --portalThemeOnColor6: #313131;
+    --portalThemeOnColor7: #313131;
+    --portalThemeOnColor8: #ffffff;
+    --portalThemeOnColor9: #ffffff;
+}
+
+/* Base Body & Typography */
+body, .au-body {
+    font-family: var(--au-font) !important;
+    color: var(--hds-text-dark) !important;
+    background-color: var(--hds-white) !important;
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--au-font) !important;
+    color: var(--hds-primary-navy) !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+
+a {
+    color: var(--hds-blue) !important;
+    text-decoration: underline;
+    transition: color 0.15s ease-in-out;
+}
+
+a:hover, a:focus {
+    color: var(--hds-teal) !important;
+    text-decoration: none;
+}
+
+/* Accessible Focus Ring */
+a:focus, button:focus, input:focus, select:focus, textarea:focus, [tabindex]:focus {
+    outline: 3px solid var(--hds-focus) !important;
+    outline-offset: 2px !important;
+}
+
+/* Skip to Content */
+.skip-to-content a {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10000;
+    background: var(--hds-primary-navy) !important;
+    color: var(--hds-white) !important;
+    padding: 10px 18px;
+    border: 2px solid var(--hds-teal);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.skip-to-content a:focus {
+    left: 16px;
+    top: 16px;
+}
+
+/* ==========================================================================
+   Australian Government Health Design System - Pillars Ribbon & Header
+   (https://designsystem.health.gov.au/components/detail/header--default.html)
+   ========================================================================== */
+
+.pillars-container {
+    --brand-colour-1: #00B2A9;
+    --brand-colour-2: #0077C8;
+    --brand-colour-3: #00A3E0;
+    --brand-colour-4: #002058;
+    --brand-primary-colour: #002058;
+    --pillars-pattern: var(--brand-colour-1) 0%,
+        var(--brand-colour-1) 9%,
+        var(--brand-colour-4) 9%,
+        var(--brand-colour-4) 21%,
+        var(--brand-colour-2) 21%,
+        var(--brand-colour-2) 33%,
+        var(--brand-colour-1) 33%,
+        var(--brand-colour-1) 39%,
+        var(--brand-colour-3) 39%,
+        var(--brand-colour-3) 46%,
+        var(--brand-colour-4) 46%,
+        var(--brand-colour-4) 66%,
+        var(--brand-colour-1) 66%,
+        var(--brand-colour-1) 72%,
+        var(--brand-colour-3) 72%,
+        var(--brand-colour-3) 92%,
+        var(--brand-colour-2) 92%,
+        var(--brand-colour-2) 100%;
+    position: relative;
+    border-top: 12px solid var(--brand-primary-colour) !important;
+}
+
+.pillars-container #pillars {
+    position: absolute;
+    top: -12px;
+    left: 0;
+    height: 12px;
+    width: 320px;
+    background: linear-gradient(to right, var(--pillars-pattern)) !important;
+    background-size: cover;
+}
+
+@media (min-width: 768px) {
+    .pillars-container #pillars {
+        width: 480px;
+    }
+}
+
+.au-header {
+    background-color: var(--hds-primary-navy) !important;
+    padding: 24px 0 20px !important;
+    color: #ffffff !important;
+}
+
+.au-header__brand-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.au-header__brand {
+    display: inline-flex !important;
+    align-items: center;
+    text-decoration: none !important;
+    color: #ffffff !important;
+}
+
+.au-header__brand:hover,
+.au-header__brand:focus {
+    text-decoration: none !important;
+    opacity: 0.95;
+    outline: 3px solid #C390F9 !important;
+    outline-offset: 2px !important;
+}
+
+.au-header__logo {
+    height: 48px;
+    width: auto;
+    margin-right: 16px;
+    vertical-align: middle;
+}
+
+.siteTitle {
+    color: #ffffff !important;
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.3px;
+    margin: 0;
+    line-height: 1.2;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   Australian Government Health Design System - Main Navigation (au-main-nav)
+   (https://designsystem.health.gov.au/components/detail/main-nav--default.html)
+   ========================================================================== */
+
+.au-main-nav {
+    font-family: var(--au-font) !important;
+    font-size: 1rem;
+    line-height: 1.5;
+    background-color: var(--hds-primary-navy) !important;
+    border-bottom: 8px solid var(--hds-teal) !important;
+    position: relative;
+    z-index: 500;
+}
+
+.au-main-nav--dark {
+    background-color: #001e38 !important;
+    border-bottom-color: #00A2AE !important;
+}
+
+/* Toggle Buttons */
+.au-main-nav__toggle {
+    background-color: transparent !important;
+    border: 0 !important;
+    color: #ffffff !important;
+    cursor: pointer;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--au-font) !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2;
+    padding: 14px 16px !important;
+    text-decoration: none !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: none !important;
+}
+
+.au-main-nav__toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
+
+.au-main-nav__toggle:focus,
+.au-main-nav a:focus {
+    outline: 3px solid #C390F9 !important;
+    outline-offset: 2px !important;
+}
+
+.au-main-nav__toggle .svg-inline--fa {
+    display: inline-block;
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+}
+
+/* Close button inside menu drawer */
+.au-main-nav__toggle--close {
+    width: 100% !important;
+    justify-content: flex-start;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+}
+
+/* Navigation Menu Drawer */
+.au-main-nav__menu {
+    background-color: #001e38 !important;
+    display: none;
+    overflow-y: auto;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -80vw;
+    width: 80vw;
+    max-width: 340px;
+    z-index: 100001;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.5);
+    transition: left 0.25s ease-out;
+}
+
+.au-main-nav__menu-inner {
+    padding: 0;
+}
+
+/* Content Open State */
+.au-main-nav__content--open .au-main-nav__menu {
+    left: 0;
+    display: block;
+}
+
+/* Overlay Backdrop */
+.au-main-nav__overlay {
+    background-color: #000000;
+    cursor: pointer;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100000;
+    opacity: 0;
+    transition: opacity 0.25s ease-out;
+}
+
+.au-main-nav__content--open .au-main-nav__overlay {
+    display: block;
+    opacity: 0.6;
+}
+
+/* Link List */
+.au-link-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.au-link-list > li {
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.au-link-list > li > a {
+    display: block;
+    padding: 14px 20px !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.au-link-list > li > a:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    text-decoration: underline !important;
+}
+
+.au-link-list > li.active > a {
+    font-weight: 700 !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.au-link-list .glyphicon {
+    margin-right: 8px;
+}
+
+/* Body scroll lock when drawer is active */
+.au-main-nav__scroll--locked {
+    overflow: hidden !important;
+}
+
+/* Desktop Styles (>= 768px) */
+@media (min-width: 768px) {
+    .au-main-nav__toggle {
+        display: none !important;
+    }
+
+    .au-main-nav__overlay {
+        display: none !important;
+    }
+
+    .au-main-nav__menu {
+        position: static !important;
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        overflow: visible !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        left: 0 !important;
+    }
+
+    .au-main-nav__menu-inner {
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .au-link-list {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        width: 100%;
+    }
+
+    .au-link-list > li {
+        border-bottom: none !important;
+        margin: 0;
+    }
+
+    .au-link-list > li.au-main-nav__utility-item:first-of-type {
+        margin-left: auto;
+    }
+
+    .au-link-list > li > a {
+        padding: 16px 20px !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        border-bottom: 4px solid transparent;
+        margin-bottom: -8px; /* align indicator with nav bottom border */
+    }
+
+    .au-link-list > li > a:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border-bottom: 4px solid #ffffff !important;
+        text-decoration: none !important;
+    }
+
+    .au-link-list > li.active > a {
+        border-bottom: 4px solid #ffffff !important;
+        font-weight: 700 !important;
+        background-color: transparent !important;
+    }
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+    background-color: #ffffff !important;
+    border: 1px solid var(--hds-border) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 4px 12px rgba(0, 32, 88, 0.15) !important;
+    padding: 8px 0 !important;
+}
+
+.dropdown-menu > li > a {
+    color: var(--hds-text-dark) !important;
+    font-weight: 500 !important;
+    padding: 10px 20px !important;
+    text-decoration: none !important;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+    background-color: var(--hds-teal-light) !important;
+    color: var(--hds-teal-dark) !important;
+}
+
+/* Health Hero Banner Component */
+.health-hero {
+    position: relative;
+    padding: 64px 0 72px;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.health-hero--bg-gradient {
+    background: linear-gradient(135deg, var(--hds-primary-navy) 0%, var(--hds-secondary-navy) 45%, var(--hds-teal) 100%) !important;
+}
+
+.health-hero__tag {
+    display: inline-block;
+    background: rgba(0, 118, 128, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: #e6f2f3;
+}
+
+.health-hero__title {
+    font-size: 3rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    line-height: 1.15 !important;
+    margin-top: 0 !important;
+    margin-bottom: 18px !important;
+}
+
+.health-hero__summary {
+    font-size: 1.25rem !important;
+    font-weight: 300 !important;
+    line-height: 1.6 !important;
+    color: #e6f2f3 !important;
+    margin-bottom: 32px !important;
+    max-width: 720px;
+}
+
+.health-hero__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.health-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    color: #ffffff;
+}
+
+.health-badge--authenticated {
+    background: rgba(0, 118, 128, 0.35);
+    border-color: rgba(0, 118, 128, 0.7);
+}
+
+/* Health Bands (Sections) */
+.health-band {
+    padding: 64px 0;
+    background-color: var(--hds-bg-light);
+    border-bottom: 1px solid var(--hds-border-light);
+}
+
+.health-band--light {
+    background-color: var(--hds-white);
+}
+
+.health-section-heading {
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    color: var(--hds-primary-navy) !important;
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+.health-section-subheading {
+    font-size: 1.15rem;
+    color: var(--hds-text-muted);
+    margin-bottom: 40px;
+}
+
+/* Health Cards Component */
+.health-card-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.health-card {
+    background: var(--hds-white);
+    border: 1px solid #E2E8F0;
+    border-top: 4px solid var(--hds-teal);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    height: calc(100% - 24px);
+    margin-bottom: 24px;
+    transition: transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.health-card--shadow {
+    box-shadow: 0 2px 8px rgba(0, 32, 88, 0.08);
+}
+
+.health-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 32, 88, 0.14);
+    border-top-color: var(--hds-blue);
+}
+
+.health-card__body {
+    padding: 30px 24px;
+}
+
+.health-card__icon {
+    font-size: 2rem;
+    color: var(--hds-teal);
+    margin-bottom: 18px;
+}
+
+.health-card__title {
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    color: var(--hds-primary-navy) !important;
+    margin-top: 0 !important;
+    margin-bottom: 12px !important;
+}
+
+.health-card__text {
+    font-size: 0.95rem;
+    color: var(--hds-text-muted);
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Callout Component (au-callout) */
+.au-callout {
+    border-left: 5px solid var(--hds-teal);
+    background-color: var(--hds-teal-light);
+    padding: 24px 28px;
+    border-radius: 0 4px 4px 0;
+    margin: 28px 0;
+}
+
+.au-callout__title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: var(--hds-primary-navy) !important;
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+}
+
+.au-callout p {
+    color: var(--hds-text-dark);
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Buttons (au-btn) */
+.au-btn,
+.btn {
+    font-family: var(--au-font) !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.au-btn--primary,
+.btn-primary {
+    background-color: var(--hds-teal) !important;
+    border: 2px solid var(--hds-teal) !important;
+    color: #ffffff !important;
+    padding: 10px 24px !important;
+    font-size: 1rem !important;
+}
+
+.au-btn--primary:hover,
+.btn-primary:hover,
+.au-btn--primary:focus,
+.btn-primary:focus {
+    background-color: var(--hds-teal-dark) !important;
+    border-color: var(--hds-teal-dark) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 98, 105, 0.4);
+}
+
+.au-btn--secondary,
+.btn-default {
+    background-color: transparent !important;
+    border: 2px solid var(--hds-teal) !important;
+    color: var(--hds-teal) !important;
+    padding: 8px 22px !important;
+    font-size: 1rem !important;
+}
+
+.au-btn--secondary:hover,
+.btn-default:hover {
+    background-color: var(--hds-teal) !important;
+    color: #ffffff !important;
+}
+
+/* Footer (au-footer & health-footer) */
+footer.footer,
+.au-footer,
+.health-footer {
+    background-color: var(--hds-primary-navy) !important;
+    border-top: 4px solid var(--hds-teal) !important;
+    color: #C1C6C8 !important;
+    padding: 48px 0 32px !important;
+    margin-top: 0 !important;
+}
+
+.health-footer-links {
+    margin-bottom: 18px;
+    padding-left: 0;
+}
+
+.health-footer-links li {
+    margin-right: 24px;
+    display: inline-block;
+}
+
+.health-footer-links a {
+    color: #ffffff !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    text-decoration: underline !important;
+}
+
+.health-footer-links a:hover,
+.health-footer-links a:focus {
+    color: #9ADBFF !important;
+    text-decoration: none !important;
+}
+
+.health-footer-copyright {
+    font-size: 0.85rem;
+    color: #A2AAAD;
+    margin-bottom: 0;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    background-color: transparent !important;
+    padding: 16px 0 !important;
+    border-radius: 0 !important;
+    margin-bottom: 16px !important;
+}
+
+.breadcrumb > li + li:before {
+    content: "›" !important;
+    color: var(--hds-text-muted) !important;
+    padding: 0 8px !important;
+}
+
+.breadcrumb > li > a {
+    color: var(--hds-blue) !important;
+    font-weight: 500;
+}
+
+.breadcrumb > .active {
+    color: var(--hds-text-dark) !important;
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .health-hero {
+        padding: 40px 0 48px;
+    }
+    .health-hero__title {
+        font-size: 2.2rem !important;
+    }
+    .health-hero__summary {
+        font-size: 1.1rem !important;
+    }
+}

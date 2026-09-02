@@ -1,6 +1,6 @@
-<a href='~/'>
-  {%- if snippets['Logo URL'] %}<img src='{{ snippets['Logo URL'] }}' alt='{{ snippets['Logo alt text'] }}' style='width: auto; height: 32px; margin: 0 10px;'>{% endif %}
+<a href='~/' class='au-header__brand' title='{{ snippets['Site name'] | default: "Veylo" }}'>
+  {%- if snippets['Logo URL'] %}<img src='{{ snippets['Logo URL'] }}' alt='{{ snippets['Logo alt text'] | default: "Veylo" }}' class='au-header__logo' style='width: auto; height: 38px; margin-right: 12px; vertical-align: middle;'>{% endif %}
   {% if snippets['Site name'] -%}
-    <h1 class='siteTitle'>{{ snippets['Site name'] }}</h1>
+    <span class='siteTitle'>{{ snippets['Site name'] }}</span>
   {%- endif %}
 </a>

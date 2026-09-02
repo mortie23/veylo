@@ -1,205 +1,134 @@
 {% assign defaultlang = settings['LanguageLocale/Code'] | default: 'en-us' %}
 {% assign homeurl = website.adx_partialurl %}
-<div class='navbar navbar-inverse navbar-static-top' role='banner'>
-  <div class='skip-to-content'>
-    <a href='#mainContent'>{{ resx.Skip_To_Content | default: 'Skip to main content' }}</a>
-  </div>
+<div class='skip-to-content'>
+  <a href='#mainContent'>{{ resx.Skip_To_Content | default: 'Skip to main content' }}</a>
+</div>
+<header class='au-header au-header--dark pillars-container' role='banner'>
   <div class='container'>
-    <div class='navbar-header'>
-      <!--
-        div class="visible-xs-block">
+    <div id='pillars'></div>
+    <div class='row'>
+      <div class='col-xs-12'>
+        <div class='au-header__brand-wrapper'>
           {% editable snippets 'Mobile Header' type: 'html' %}
-        </div
-      -->
-      <div class='visible-sm-block visible-md-block visible-lg-block visible-xs-block navbar-brand'>
-        {% editable snippets 'Mobile Header' type: 'html' %}
+        </div>
       </div>
-      <button type='button' class='navbar-toggle collapsed' title='{{ snippets["Header/Toggle Navigation"] | default: resx['Toggle_Navigation'] | h }}' data-toggle='collapse' data-target='#navbar' aria-expanded='false' onclick='setHeight();'>
-        <span class='sr-only'>{{ snippets['Header/Toggle Navigation'] | default: resx.Toggle_Navigation | h }}</span>
-        <span class='icon-bar'></span>
-        <span class='icon-bar'></span>
-        <span class='icon-bar'></span>
-      </button>
     </div>
-    <div id='navbar' class='navbar-collapse collapse'>
-      {% assign primary_nav = weblinks.Default %}
-      {% if primary_nav %}
-        <nav aria-label='{{ resx.Main_Navigation | default: "Main Navigation" }}' class='navbar-right menu-bar {% if primary_nav.editable %}xrm-entity xrm-editable-adx_weblinkset{% endif %}' data-weblinks-maxdepth='2'>
-          <ul class='nav navbar-nav weblinks'>
-            {% for link in primary_nav.weblinks %}
-              {% unless forloop.first %}
-                <li class='divider-vertical' aria-hidden='true'></li>
-              {% endunless %}
-              {% if link.display_page_child_links %}
-                {% if link.url != null %}
-                  {% assign sublinks = sitemap[link.url].children %}
-                {% endif %}
-              {% else %}
-                {% assign sublinks = link.weblinks %}
-              {% endif %}
-              <li class='weblink {% if sublinks.size > 0 %} dropdown{% endif %}'>
-                <a
-                  aria-label='{{ link.name | escape }}'
-                  {% if sublinks.size > 0 -%}
-                    href='#' role='button' class='dropdown-toggle' data-toggle='dropdown'
-                  {%- else -%}
-                    href='{{ link.url | escape }}' aria-roledescription='link'
-                  {%- endif -%}
-                  {%- if link.Open_In_New_Window %}
-                    target='_blank'
-                  {% endif -%}
-                  {%- if link.nofollow %}
-                    rel='nofollow'
-                  {% endif -%}
-                  {%- if link.tooltip %}
-                    title='{{ link.tooltip | escape }}'
-                  {% endif %}
-                >
-                  {%- if link.image -%}
-                    {%- if link.image.url -%}
-                      {%- if link.image.url.first == '.' -%}
-                        <span class='{{ link.image.url | split:'.' | join }}' aria-hidden='true'></span>
-                      {%- endif -%}
-                    {%- else -%}
-                      <img
-                        src='{{ link.image.url | escape }}'
-                        alt='{{ link.image.alternate_text | default:link.tooltip | escape }}'
-                        {% if link.image.width %}
-                          width='{{ link.image.width | escape }}'
-                        {% endif %}
-                        {% if link.image.height %}
-                          height='{{ link.image.height | escape }}'
-                        {% endif %}
-                      >
-                    {%- endif -%}
-                  {%- endif -%}
-                  {%- unless link.display_image_only -%}
-                    {{ link.name | escape }}
-                  {%- endunless -%}
-                  {%- if sublinks.size > 0 -%}
-                    <span class='caret'></span>
-                  {%- endif -%}
-                </a>
-                {% if sublinks.size > 0 %}
-                  <ul class='dropdown-menu'>
-                    {% if link.name %}
-                      <li>
-                        <a
-                          aria-label='{{ link.name | escape }}'
-                          aria-roledescription='link'
-                          href='{{ link.url }}'
-                          {% if link.Open_In_New_Window %}
-                            target='_blank'
-                          {% endif %}
-                          {% if link.nofollow %}
-                            rel='nofollow'
-                          {% endif %}
-                          {% if link.tooltip %}
-                            title='{{ link.tooltip | escape }}'
-                          {% endif %}
-                        >
-                          {{- link.name | escape -}}
-                        </a>
-                      </li>
-                      <div class='divider'></div>
+  </div>
+</header>
+<nav class='au-main-nav au-main-nav--dark' aria-label='{{ resx.Main_Navigation | default: "Main Navigation" }}'>
+  <div class='container'>
+    <div class='row'>
+      <div class='col-md-12'>
+        <div id='main-nav-default' class='au-main-nav__content'>
+          <button aria-controls='main-nav-default' class='au-main-nav__toggle au-main-nav__toggle--open' onclick='return AU.mainNav.Toggle( this )' aria-expanded='false'>
+            <span class='svg-inline--fa fa-fw' aria-hidden='true'>
+              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512' focusable='false'>
+                <path fill='currentColor' d='M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z'></path>
+              </svg>
+            </span>
+            Menu
+          </button>
+          <div class='au-main-nav__menu'>
+            <div class='au-main-nav__menu-inner'>
+              <div class='au-main-nav__focus-trap-top'></div>
+              <button aria-controls='main-nav-default' class='au-main-nav__toggle au-main-nav__toggle--close' onclick='return AU.mainNav.Toggle( this )' aria-expanded='false'>
+                <span class='svg-inline--fa fa-fw' aria-hidden='true'>
+                  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 352 512' focusable='false'>
+                    <path fill='currentColor' d='M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z'></path>
+                  </svg>
+                </span>
+                Close
+              </button>
+              <ul class='au-link-list'>
+                {% assign primary_nav = weblinks.Default %}
+                {% if primary_nav %}
+                  {% for link in primary_nav.weblinks %}
+                    {% assign is_active = false %}
+                    {% if request.path == link.url or page.url == link.url %}
+                      {% assign is_active = true %}
+                    {% elsif link.url == '/' and request.path == '/' %}
+                      {% assign is_active = true %}
                     {% endif %}
-                    {% for sublink in sublinks %}
-                      <li>
-                        <a
-                          aria-label='{{ sublink.name | default:sublink.title | escape }}'
-                          aria-roledescription='link'
-                          href='{{ sublink.url }}'
-                          {% if sublink.Open_In_New_Window %}
-                            target='_blank'
-                          {% endif %}
-                          {% if sublink.nofollow %}
-                            rel='nofollow'
-                          {% endif %}
-                          {% if sublink.tooltip %}
-                            title='{{ sublink.tooltip | escape }}'
-                          {% endif %}
-                        >
-                          {{ sublink.name | default: sublink.title | escape }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </li>
-            {% endfor %}
-            {% assign search_enabled = settings['Search/Enabled'] | boolean | default: true %}
-            {% if search_enabled %}
-              <li class='divider-vertical' aria-hidden='true'></li>
-              <li class='dropdown'>
-                <a id='search' class='navbar-icon' href='#' data-toggle='dropdown' role='button' aria-expanded='false' aria-label='{{ snippets["Header/Search/ToolTip"] | default:resx["Search_DefaultText"] | escape }}'>
-                  <span class='glyphicon glyphicon-search'></span>
-                </a>
-                <div class='dropdown-menu dropdown-search'>
-                  {% include 'Search', search_id: 'q' %}
-                </div>
-              </li>
-            {% endif %}
-
-            {% if website.languages.size > 1 %}
-              <li class='divider-vertical' aria-hidden='true'></li>
-              <li class='dropdown'>
-                <a class='dropdown-toggle' aria-roledescription='link' href='#' data-toggle='dropdown' aria-label='{{ website.selected_language.name | escape }}' aria-haspopup='true' aria-expanded='false' title='{{ website.selected_language.name | escape }}'>
-                  <span class='drop_language'>{{ website.selected_language.name | escape }}</span>
-                  <span class='caret'></span>
-                </a>
-                {% include 'Languages Dropdown' %}
-              </li>
-            {% endif %}
-
-            {% assign profile_enabled = settings['Profile/Enabled'] | boolean | default: true %}
-            {% if profile_enabled %}
-              <li class='divider-vertical' aria-hidden='true'></li>
-              {% if user %}
-                <li class='dropdown'>
-                  {% assign username = user.fullname | escape %}
-                  <a href='#' class='dropdown-toggle' aria-roledescription='link' title='{{username | default: resx['Default_Profile_name'] }}' data-toggle='dropdown' role='button' aria-expanded='false'>
-                    <span class='username'>{{ username | default: resx.Default_Profile_name }}</span>
-                    <span class='caret'></span>
-                  </a>
-                  <ul class='dropdown-menu'>
-                    {% assign show_profile_nav = settings['Header/ShowAllProfileNavigationLinks'] | boolean | default: true %}
-                    {% if show_profile_nav %}
-                      {% assign profile_nav = weblinks['Profile Navigation'] %}
-                      {% if profile_nav %}
-                        {% for link in profile_nav.weblinks %}
-                          <li>
-                            <a aria-label='{{ link.name | escape }}' aria-roledescription='link' href='{{ link.url | escape }}' title='{{ link.name | escape }}'>{{ link.name | escape }}</a>
-                          </li>
-                        {% endfor %}
-                      {% endif %}
-                    {% else %}
-                      <li>
-                        <a aria-label='{{ snippets["Profile Link Text"] | default:resx["Profile_Text"] | escape }}' aria-roledescription='link' href='{{ sitemarkers['Profile'].url | escape }}'>{{ snippets['Profile Link Text'] | default: resx.Profile_Text | escape }}</a>
-                      </li>
-                    {% endif %}
-                    <li class='divider' role='separator' aria-hidden='true'></li>
-                    <li>
-                      <a aria-label='{{ snippets["links/logout"] | default:resx["Sign_Out"] | escape }}' aria-roledescription='link' href='{% if homeurl%}/{{ homeurl }}{% endif %}{{ website.sign_out_url_substitution }}' title='{{ snippets["links/logout"] | default:resx["Sign_Out"] | escape }}'>
-                        {{ snippets['links/logout'] | default: resx.Sign_Out | escape }}
+                    <li class='{% if is_active %}active{% endif %}'>
+                      <a href='{{ link.url | escape }}' {% if is_active %}aria-current='page'{% endif %} title='{{ link.tooltip | default: link.name | escape }}'>
+                        {{ link.name | escape }}
                       </a>
                     </li>
-                  </ul>
-                </li>
-              {% else %}
-                <li>
-                  <a aria-label='{{ snippets["links/login"] | default:resx["Sign_In"] | escape }}' aria-roledescription='link' href='{% if homeurl%}/{{ homeurl }}{% endif %}{{ website.sign_in_url_substitution }}'>
-                    {{ snippets['links/login'] | default: resx.Sign_In | escape }}
-                  </a>
-                </li>
-              {% endif %}
-            {% endif %}
-          </ul>
-          {% editable primary_nav %}
-        </nav>
-      {% endif %}
+                  {% endfor %}
+                {% endif %}
+
+                {% assign search_enabled = settings['Search/Enabled'] | boolean | default: true %}
+                {% if search_enabled %}
+                  <li class='au-main-nav__utility-item au-main-nav__item-search'>
+                    <a href='{% if homeurl %}/{{ homeurl }}{% endif %}/search/' title='{{ snippets["Header/Search/ToolTip"] | default: resx["Search_DefaultText"] | escape }}'>
+                      <span class='glyphicon glyphicon-search' aria-hidden='true'></span>
+                      <span class='au-main-nav__item-text'>{{ snippets["Header/Search/ToolTip"] | default: resx["Search_DefaultText"] | escape }}</span>
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% if website.languages.size > 1 %}
+                  <li class='au-main-nav__utility-item au-main-nav__item-language dropdown'>
+                    <a class='dropdown-toggle' href='#' data-toggle='dropdown' aria-label='{{ website.selected_language.name | escape }}' aria-haspopup='true' aria-expanded='false'>
+                      <span>{{ website.selected_language.name | escape }}</span>
+                      <span class='caret'></span>
+                    </a>
+                    {% include 'Languages Dropdown' %}
+                  </li>
+                {% endif %}
+
+                {% assign profile_enabled = settings['Profile/Enabled'] | boolean | default: true %}
+                {% if profile_enabled %}
+                  {% if user %}
+                    {% assign username = user.fullname | escape %}
+                    <li class='au-main-nav__utility-item au-main-nav__item-profile dropdown'>
+                      <a href='#' class='dropdown-toggle' data-toggle='dropdown' role='button' aria-expanded='false' title='{{ username | default: resx["Default_Profile_name"] }}'>
+                        <span class='glyphicon glyphicon-user' aria-hidden='true'></span>
+                        <span class='username'>{{ username | default: resx.Default_Profile_name }}</span>
+                        <span class='caret'></span>
+                      </a>
+                      <ul class='dropdown-menu'>
+                        {% assign show_profile_nav = settings['Header/ShowAllProfileNavigationLinks'] | boolean | default: true %}
+                        {% if show_profile_nav %}
+                          {% assign profile_nav = weblinks['Profile Navigation'] %}
+                          {% if profile_nav %}
+                            {% for link in profile_nav.weblinks %}
+                              <li>
+                                <a href='{{ link.url | escape }}' title='{{ link.name | escape }}'>{{ link.name | escape }}</a>
+                              </li>
+                            {% endfor %}
+                          {% endif %}
+                        {% else %}
+                          <li>
+                            <a href='{{ sitemarkers["Profile"].url | escape }}' title='{{ snippets["Profile Link Text"] | default: resx["Profile_Text"] | escape }}'>{{ snippets["Profile Link Text"] | default: resx.Profile_Text | escape }}</a>
+                          </li>
+                        {% endif %}
+                        <li class='divider' role='separator' aria-hidden='true'></li>
+                        <li>
+                          <a href='{% if homeurl %}/{{ homeurl }}{% endif %}{{ website.sign_out_url_substitution }}' title='{{ snippets["links/logout"] | default: resx["Sign_Out"] | escape }}'>
+                            {{ snippets['links/logout'] | default: resx.Sign_Out | escape }}
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li class='au-main-nav__utility-item au-main-nav__item-login'>
+                      <a href='{% if homeurl %}/{{ homeurl }}{% endif %}{{ website.sign_in_url_substitution }}' title='{{ snippets["links/login"] | default: resx["Sign_In"] | escape }}'>
+                        {{ snippets['links/login'] | default: resx.Sign_In | escape }}
+                      </a>
+                    </li>
+                  {% endif %}
+                {% endif %}
+              </ul>
+              <div class='au-main-nav__focus-trap-bottom'></div>
+            </div>
+          </div>
+          <div class='au-main-nav__overlay' aria-controls='main-nav-default' onclick='return AU.mainNav.Toggle( this )'></div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</nav>
 {% substitution %}
 {% assign current_page = page.id %}
 {% assign sr_page = sitemarkers.Search.id %}
@@ -226,20 +155,196 @@
 {% endif %}
 {% endsubstitution %}
 <script type='text/javascript'>
-  window.onload = function () {
-    if (window.navigator.appName == 'Microsoft Internet Explorer' || window.navigator.userAgent.indexOf('Trident') > 0) {
-      var searchElement = document.getElementById('search');
-      if (searchElement != null) searchElement.setAttribute('href', '');
+  var AU = AU || {};
+  (function (AU) {
+    var animate = {};
+    function calculateAnimationSpecs(from, to, duration) {
+      if (from === to) return { stepSize: 0, steps: 0, intervalTime: 0 };
+      var diff = to - from;
+      var stepDuration = duration / Math.abs(diff);
+      var stepSize = diff < 0 ? -1 : 1;
+      var totalSteps = Math.abs(diff);
+      if (stepDuration < 1000 / 60) {
+        stepDuration = 1000 / 60;
+        stepSize = Math.ceil(Math.abs(diff / (duration / stepDuration))) * (diff < 0 ? -1 : 1);
+        totalSteps = Math.ceil(Math.abs(diff / stepSize));
+      }
+      return { stepSize: stepSize, steps: totalSteps, intervalTime: stepDuration };
     }
-  };
-  function setHeight() {
-    var windowHeight = window.innerHeight - 140;
-    var navbar = document.getElementById('navbar');
-    if (navbar) {
-      navbar.style.maxHeight = windowHeight + 'px';
+
+    animate.Stop = function (el) {
+      if (el.AUanimation) clearInterval(el.AUanimation);
+    };
+
+    animate.Run = function (options) {
+      var el = options.element;
+      var speed = options.speed || 250;
+      var callback = options.callback || function () {};
+      animate.Stop(el);
+      var current = parseInt(window.getComputedStyle(el)[options.property]) || 0;
+      var target = options.endSize;
+      var specs = calculateAnimationSpecs(current, target, speed);
+      el.AUanimation = setInterval(function () {
+        if (specs.steps <= 0) {
+          animate.Stop(el);
+          el.style[options.property] = target + 'px';
+          callback();
+        } else {
+          current += specs.stepSize;
+          el.style[options.property] = current + 'px';
+          specs.steps--;
+        }
+      }, Math.max(10, Math.abs(specs.intervalTime)));
+    };
+
+    animate.Toggle = function (options) {
+      var el = options.element;
+      var prop = options.property || 'left';
+      var speed = options.speed || 250;
+      var closeSize = options.closeSize !== undefined ? options.closeSize : -1 * el.offsetWidth;
+      var openSize = options.openSize !== undefined ? options.openSize : 0;
+      var prefunction = options.prefunction || function () {};
+      var postfunction = options.postfunction || function () {};
+
+      animate.Stop(el);
+      var current = parseInt(window.getComputedStyle(el)[prop]) || 0;
+      var isOpening = current === closeSize || el.getAttribute('data-state') === 'closing';
+      var target = isOpening ? openSize : closeSize;
+
+      prefunction();
+      animate.Run({
+        element: el,
+        property: prop,
+        endSize: target,
+        speed: speed,
+        callback: function () {
+          postfunction();
+        }
+      });
+    };
+
+    AU.animate = animate;
+
+    var mainNav = {};
+    var focusListeners = {};
+    var busy = false;
+
+    function toggleClasses(element, state, closedClass, openClass) {
+      closedClass = closedClass || 'au-main-nav__content--closed';
+      openClass = openClass || 'au-main-nav__content--open';
+      if (state === 'opening' || state === 'open') {
+        element.classList.remove(closedClass);
+        element.classList.add(openClass);
+      } else {
+        element.classList.remove(openClass);
+        element.classList.add(closedClass);
+      }
     }
-  }
-  window.addEventListener('resize', function (event) {
-    setHeight();
-  });
+
+    mainNav.Toggle = function (trigger, speed, callbacks) {
+      if (busy) return false;
+      busy = true;
+      callbacks = callbacks || {};
+
+      var navId = trigger.getAttribute('aria-controls');
+      var navContent = document.getElementById(navId);
+      if (!navContent) {
+        busy = false;
+        return false;
+      }
+
+      var menu = navContent.querySelector('.au-main-nav__menu');
+      var overlay = navContent.querySelector('.au-main-nav__overlay');
+      var closeBtn = navContent.querySelector('.au-main-nav__toggle--close');
+      var openBtn = navContent.querySelector('.au-main-nav__toggle--open');
+      var trapTop = navContent.querySelector('.au-main-nav__focus-trap-top');
+      var trapBottom = navContent.querySelector('.au-main-nav__focus-trap-bottom');
+      var focusableElements = menu.querySelectorAll('a, button, input, [tabindex]:not([tabindex="-1"])');
+
+      var isOpening = !navContent.classList.contains('au-main-nav__content--open');
+      var menuWidth = menu.offsetWidth || 300;
+      var state = isOpening ? 'opening' : 'closing';
+
+      overlay.style.display = 'block';
+
+      AU.animate.Toggle({
+        element: menu,
+        property: 'left',
+        openSize: 0,
+        closeSize: -1 * menuWidth,
+        speed: speed || 250,
+        prefunction: function () {
+          if (isOpening) {
+            menu.style.display = 'block';
+            overlay.style.left = '0';
+            overlay.style.opacity = '0.6';
+            if (typeof callbacks.onOpen === 'function') callbacks.onOpen();
+          } else {
+            overlay.style.opacity = '0';
+            if (typeof callbacks.onClose === 'function') callbacks.onClose();
+          }
+        },
+        postfunction: function () {
+          if (isOpening) {
+            if (closeBtn) {
+              closeBtn.focus();
+              closeBtn.setAttribute('aria-expanded', 'true');
+            }
+            if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+            if (trapTop) trapTop.setAttribute('tabindex', '0');
+            if (trapBottom) trapBottom.setAttribute('tabindex', '0');
+
+            focusListeners.trapTop = function () {
+              if (focusableElements.length > 0) focusableElements[focusableElements.length - 1].focus();
+            };
+            focusListeners.trapBottom = function () {
+              if (focusableElements.length > 0) focusableElements[0].focus();
+            };
+            focusListeners.escKey = function (e) {
+              if ((e.key === 'Escape' || e.keyCode === 27) && overlay.style.display === 'block') {
+                mainNav.Toggle(trigger, speed, callbacks);
+              }
+            };
+
+            if (trapTop) trapTop.addEventListener('focus', focusListeners.trapTop);
+            if (trapBottom) trapBottom.addEventListener('focus', focusListeners.trapBottom);
+            document.addEventListener('keyup', focusListeners.escKey);
+
+            if (typeof callbacks.afterOpen === 'function') callbacks.afterOpen();
+          } else {
+            if (openBtn) {
+              openBtn.focus();
+              openBtn.setAttribute('aria-expanded', 'false');
+            }
+            if (closeBtn) closeBtn.setAttribute('aria-expanded', 'false');
+            if (trapTop) {
+              trapTop.removeAttribute('tabindex');
+              trapTop.removeEventListener('focus', focusListeners.trapTop);
+            }
+            if (trapBottom) {
+              trapBottom.removeAttribute('tabindex');
+              trapBottom.removeEventListener('focus', focusListeners.trapBottom);
+            }
+            document.removeEventListener('keyup', focusListeners.escKey);
+
+            if (typeof callbacks.afterClose === 'function') callbacks.afterClose();
+          }
+
+          toggleClasses(navContent, state);
+          toggleClasses(document.body, state, 'au-main-nav__scroll--unlocked', 'au-main-nav__scroll--locked');
+
+          menu.style.display = '';
+          menu.style.left = '';
+          overlay.style.display = '';
+          overlay.style.left = '';
+          overlay.style.opacity = '';
+          busy = false;
+        }
+      });
+
+      return false;
+    };
+
+    AU.mainNav = mainNav;
+  })(window.AU = window.AU || {});
 </script>
