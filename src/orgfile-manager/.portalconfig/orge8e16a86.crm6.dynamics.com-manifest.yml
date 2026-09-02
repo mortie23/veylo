@@ -315,7 +315,7 @@ adx_sitesetting:
   IsDeleted: false
 adx_webfile:
 - RecordId: 050e11c2-9223-4dac-8971-4f22479c3279
-  DisplayName: Logo-sm-64.png
+  DisplayName: logo-veylo-64.png
   CheckSum: ed987eb5a23fd637fcbc7bf3b579e57edd12cfc92a1460664cc8e96e91da42fc
   IsDeleted: false
 - RecordId: 3125df19-bf68-4df6-8db0-0ba8e22a6c18
@@ -535,7 +535,7 @@ annotation:
   CheckSum: 8e6c8c6007941bfc94660714c685067f1eb7260a79200cf23c491885fd034179
   IsDeleted: false
 - RecordId: 842e0308-b5a5-f111-b8de-00224818094b
-  DisplayName: Logo-sm-64.png
+  DisplayName: logo-veylo-64.png
   CheckSum: e9d8d76c39cf8c373cacd92d6cc3a30b529a9572bd05df0f73dce3fce08483f8
   IsDeleted: false
 - RecordId: 852e0308-b5a5-f111-b8de-00224818094b
