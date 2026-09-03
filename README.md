@@ -78,3 +78,4 @@ This repository is **environment-agnostic** and can be deployed to any Dataverse
 
 For detailed information on the local development workflow, Liquid templating, portal caching, and security roles, see:
 - [Power Pages Development & Sync Guide](docs/POWER_PAGES_WORKFLOW.md)
+- [Local Development & Preview Environment Plan](docs/LOCAL_DEV_ENVIRONMENT_PLAN.md)
