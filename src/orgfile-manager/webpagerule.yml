@@ -7,3 +7,9 @@
 - adx_name: Grant Change to Content
   adx_right: 1
   adx_webpageaccesscontrolruleid: ccfe26d3-9d33-479c-aea8-8af01fb34884
+- adx_name: Restrict Admin to Administrators
+  adx_right: 1
+  adx_webpageaccesscontrolrule_webrole:
+  - a3468391-97d1-40d6-8f13-9ffa6bc9f379
+  adx_webpageaccesscontrolruleid: f1c7a5d6-2e8b-4c0f-d34e-b6a5f7e8c9d0
+  adx_webpageid: b7e3c1f2-8a4d-4e6b-9f0a-d2c1b3a4e5f6

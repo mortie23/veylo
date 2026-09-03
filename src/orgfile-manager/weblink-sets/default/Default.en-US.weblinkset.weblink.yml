@@ -9,3 +9,14 @@
   adx_robotsfollowlink: true
   adx_weblinkid: 559153a8-62f8-4186-8184-a4d7e289b0b5
   adx_weblinksetid: 32b7220d-8cd4-498c-9f09-4331c3b1cfa8
+- adx_disablepagevalidation: false
+  adx_displayimageonly: false
+  adx_displayorder: 2
+  adx_displaypagechildlinks: false
+  adx_name: Admin
+  adx_openinnewwindow: false
+  adx_pageid: b7e3c1f2-8a4d-4e6b-9f0a-d2c1b3a4e5f6
+  adx_publishingstateid: 8be00a48-c2ad-46bd-81c6-44fb1d885bef
+  adx_robotsfollowlink: true
+  adx_weblinkid: d9a5e3b4-0c6f-4a8d-b12c-f4e3d5c6a7b8
+  adx_weblinksetid: 32b7220d-8cd4-498c-9f09-4331c3b1cfa8

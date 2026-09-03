@@ -22,3 +22,6 @@
 - adx_name: User Login
   adx_pageid: f6c01257-7b2a-4273-ab31-1e280c300f38
   adx_sitemarkerid: f83557c9-933f-4e6a-b90f-4cd8f7b14cf8
+- adx_name: Admin
+  adx_pageid: b7e3c1f2-8a4d-4e6b-9f0a-d2c1b3a4e5f6
+  adx_sitemarkerid: e0b6f4c5-1d7a-4b9e-c23d-a5f4e6d7b8c9

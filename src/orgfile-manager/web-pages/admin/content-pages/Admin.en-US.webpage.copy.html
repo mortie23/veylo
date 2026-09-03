@@ -1,0 +1,156 @@
+{% if user %}
+  {% if user.roles contains 'Administrators' %}
+
+<div class="health-hero health-hero--bg-gradient">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-sm-10">
+        <span class="health-hero__tag">Administration</span>
+        <h1 id="mainContent" class="health-hero__title">User &amp; Organisation Management</h1>
+        <p class="health-hero__summary">
+          Manage portal users, organisations, and their memberships. Assign users to organisations to control access and file submission ownership.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="admin-panel" class="health-band">
+  <div class="container">
+
+    <!-- Status Banner -->
+    <div id="admin-status" class="admin-status" style="display:none;" role="alert"></div>
+
+    <!-- Refresh Button -->
+    <div class="row" style="margin-bottom: 20px;">
+      <div class="col-md-12 text-right">
+        <button id="admin-refresh-btn" class="au-btn au-btn--secondary" type="button">
+          <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh Data
+        </button>
+      </div>
+    </div>
+
+    <!-- Assign User to Org Form -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="health-card health-card--shadow" style="margin-bottom: 30px;">
+          <div class="health-card__accent"></div>
+          <div class="health-card__body">
+            <h2 class="health-card__title">
+              <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
+              Assign User to Organisation
+            </h2>
+            <div class="row">
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label for="admin-user-select">User</label>
+                  <select id="admin-user-select" class="form-control">
+                    <option value="">Loading users&hellip;</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-5">
+                <div class="form-group">
+                  <label for="admin-org-select">Organisation</label>
+                  <select id="admin-org-select" class="form-control">
+                    <option value="">Loading organisations&hellip;</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <label class="visible-md visible-lg">&nbsp;</label>
+                  <button id="admin-assign-btn" class="au-btn au-btn--primary" type="button" style="width: 100%;">Assign</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="health-card health-card--shadow" style="margin-bottom: 30px;">
+          <div class="health-card__accent"></div>
+          <div class="health-card__body">
+            <h2 class="health-card__title">
+              <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+              Users &amp; Organisation Memberships
+            </h2>
+            <div class="table-responsive">
+              <table class="table admin-table" aria-label="Users and their organisation memberships">
+                <thead>
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Organisation</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-tbody">
+                  <tr><td colspan="4" class="admin-empty">Loading users&hellip;</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orgs Table -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="health-card health-card--shadow" style="margin-bottom: 30px;">
+          <div class="health-card__accent"></div>
+          <div class="health-card__body">
+            <h2 class="health-card__title">
+              <span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span>
+              Organisations
+            </h2>
+            <div class="table-responsive">
+              <table class="table admin-table" aria-label="Organisations and member counts">
+                <thead>
+                  <tr>
+                    <th scope="col">Organisation Name</th>
+                    <th scope="col">Members</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-orgs-tbody">
+                  <tr><td colspan="2" class="admin-empty">Loading organisations&hellip;</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  {% else %}
+
+<div class="health-band">
+  <div class="container" style="padding: 40px 0;">
+    <div class="au-callout">
+      <h3 class="au-callout__title">Access Denied</h3>
+      <p>You do not have permission to access this page. The <strong>Administrators</strong> web role is required.</p>
+    </div>
+  </div>
+</div>
+
+  {% endif %}
+{% else %}
+
+<div class="health-band">
+  <div class="container" style="padding: 40px 0;">
+    <div class="au-callout">
+      <h3 class="au-callout__title">Authentication Required</h3>
+      <p>Please <a href="{{ website.sign_in_url_substitution }}">sign in</a> to access the administration panel.</p>
+    </div>
+  </div>
+</div>
+
+{% endif %}
