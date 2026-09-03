@@ -33,3 +33,5 @@ screenshots/
 # Dataverse Solution ZIPs
 solutions/*.zip
 
+# model files
+model/*
