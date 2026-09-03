@@ -30,7 +30,20 @@ This repository is **environment-agnostic** and can be deployed to any Dataverse
 
 4. **Sync down latest changes from Dataverse (Optional)**:
    ```powershell
+   # Sync Power Pages portal code
    .\sync-down.ps1
+
+   # Sync Dataverse tables & solution schema
+   .\solution-sync.ps1
+   ```
+
+5. **Deploy Dataverse schema changes**:
+   ```powershell
+   # Dry-run preview
+   .\solution-deploy.ps1 -WhatIf
+
+   # Deploy schema to Dataverse
+   .\solution-deploy.ps1
    ```
 
 ---
@@ -39,9 +52,13 @@ This repository is **environment-agnostic** and can be deployed to any Dataverse
 
 ```text
 ├── .env.example             # Template for local environment config
-├── deploy.ps1               # Deploy/upload script (reads .env)
-├── sync-down.ps1            # Download/sync script (reads .env)
+├── deploy.ps1               # Deploy Power Pages portal code (reads .env)
+├── sync-down.ps1            # Download Power Pages portal code (reads .env)
+├── solution-deploy.ps1      # Pack and deploy Dataverse solution schema (reads .env)
+├── solution-sync.ps1        # Export and unpack Dataverse solution schema (reads .env)
 ├── status.ps1               # Check active PAC auth & sites
+├── solutions/               # Version-controlled Dataverse solution source
+│   └── VeyloCore/           # Entities, attributes, relationships, keys, choices
 ├── src/orgfile-manager/     # Power Pages site code
 │   ├── .portalconfig/       # Manifest and site metadata
 │   ├── content-snippets/    # Localized text snippets & site name
