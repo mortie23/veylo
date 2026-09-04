@@ -1,3 +1,4 @@
+<script src='/clean-slate.js'></script>
 <link rel='stylesheet' href='/hds-all.min.css'>
 <script src='/jquery.min.js'></script>
 <script>
@@ -96,8 +97,7 @@
                     <a href='{% if homeurl %}/{{ homeurl }}{% endif %}/search/'
                       title='{{ snippets["Header/Search/ToolTip"] | default: resx["Search_DefaultText"] | escape }}'>
                       <span class='glyphicon glyphicon-search' aria-hidden='true'></span>
-                      <span class='au-main-nav__item-text'>{{ snippets["Header/Search/ToolTip"] | default:
-                        resx["Search_DefaultText"] | escape }}</span>
+                      <span class='au-main-nav__item-text'>{{ snippets["Header/Search/ToolTip"] | default: resx["Search_DefaultText"] | escape }}</span>
                     </a>
                   </li>
                   {% endif %}
@@ -124,8 +124,7 @@
                     </a>
                     <div class='au-main-nav__dropdown'>
                       <ul class='au-link-list'>
-                        {% assign show_profile_nav = settings['Header/ShowAllProfileNavigationLinks'] | boolean | default:
-                        true %}
+                        {% assign show_profile_nav = settings['Header/ShowAllProfileNavigationLinks'] | boolean | default: true %}
                         {% if show_profile_nav %}
                         {% assign profile_nav = weblinks['Profile Navigation'] %}
                         {% if profile_nav %}
@@ -137,14 +136,11 @@
                         {% endif %}
                         {% else %}
                         <li>
-                          <a href='{{ sitemarkers["Profile"].url | escape }}'
-                            title='{{ snippets["Profile Link Text"] | default: resx["Profile_Text"] | escape }}'>{{
-                            snippets["Profile Link Text"] | default: resx.Profile_Text | escape }}</a>
+                          <a href='{{ sitemarkers["Profile"].url | escape }}' title='{{ snippets["Profile Link Text"] | default: resx["Profile_Text"] | escape }}'>{{ snippets["Profile Link Text"] | default: resx.Profile_Text | escape }}</a>
                         </li>
                         {% endif %}
                         <li>
-                          <a href='{% if homeurl %}/{{ homeurl }}{% endif %}{{ website.sign_out_url_substitution }}'
-                            title='{{ snippets["links/logout"] | default: resx["Sign_Out"] | escape }}'>
+                          <a href='{% if homeurl %}/{{ homeurl }}{% endif %}{{ website.sign_out_url_substitution }}' title='{{ snippets["links/logout"] | default: resx["Sign_Out"] | escape }}'>
                             {{ snippets['links/logout'] | default: resx.Sign_Out | escape }}
                           </a>
                         </li>

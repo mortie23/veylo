@@ -4,6 +4,14 @@ Source code for the **Veylo** Power Pages portal, managed using the Microsoft Po
 
 This repository is **environment-agnostic** and can be deployed to any Dataverse instance.
 
+## Javascript
+
+⚠️ Important Admin Prerequisite: By default, Dataverse environments block .js files from being uploaded as attachments. 
+To unblock this, navigate to 
+
+- Power Platform Admin Center > Your Environment > Settings > Product > Privacy + Security 
+  - remove js from the Blocked Attachments list
+
 ---
 
 ## 🚀 Quick Start

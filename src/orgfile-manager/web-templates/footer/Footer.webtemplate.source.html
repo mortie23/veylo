@@ -41,4 +41,14 @@
   };
 </script>
 
+
+<script>
+  // Polyfill for Drupal's `once` library used by HDS.
+  // Must be defined before hds.min.js loads.
+  if (typeof once === 'undefined') {
+    var once = window.once = function (id, selector, context) {
+      return jQuery(selector, context).get();
+    };
+  }
+</script>
 <script src='/hds.min.js'></script>
