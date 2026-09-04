@@ -35,3 +35,6 @@ solutions/*.zip
 
 # model files
 model/*
+
+# Package (for external npm package health design system)
+package/

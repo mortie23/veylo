@@ -1,25 +1,31 @@
-<div class="health-hero health-hero--bg-gradient">
+<div class="health-sub-header health-sub-header--dark">
   <div class="container">
-    <div class="row">
-      <div class="col-md-8 col-sm-10">
-        <span class="health-hero__tag">Department Platform</span>
-        <h1 id="mainContent" class="health-hero__title">Welcome to Veylo</h1>
-        <p class="health-hero__summary">
-          A secure, accessible organizational file management portal designed and built in alignment with the Australian Government Health Design System.
-        </p>
-        <div class="health-hero__actions">
-          {% if user %}
-            <span class="health-badge health-badge--authenticated">
-              <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-              Logged in as <strong>{{ user.fullname }}</strong>
-            </span>
-          {% else %}
-            <a href="{% if homeurl %}/{{ homeurl }}{% endif %}{{ website.sign_in_url_substitution }}" class="au-btn au-btn--primary">Sign In</a>
-            <span class="health-badge">
-              <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
-              Public &amp; Authenticated Access
-            </span>
-          {% endif %}
+    <div class="row rs_skip">
+      <div class="col-xs-12 col-md-8">
+        <div class="region--content_top_left">
+          <div id="block-system-breadcrumb-block">
+            <nav class="au-breadcrumbs" aria-label="Breadcrumb">
+              <h2 class="au-sronly">You are here</h2>
+              <ol class="au-link-list au-link-list--inline">
+                <li>
+                  <a href="/">Home</a>
+                </li>
+              </ol>
+            </nav>
+          </div>
+          <div id="block-page-title-block">
+            <div>
+              <div class="health-sub-header__section-title">
+                <a class="au-direction-link au-direction-link--left" href="/">Home</a>
+              </div>
+              <h1>Welcome to Veylo</h1>
+              <p class="au-introduction">
+                A secure, accessible organizational file management portal designed and built in alignment with the
+                Australian
+                Government Health Design System.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -28,71 +34,44 @@
 
 <div class="health-band">
   <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        <h2 class="health-section-heading">Platform Capabilities</h2>
-        <p class="health-section-subheading">Consistent, accessible services aligned to whole-of-government digital standards.</p>
-      </div>
+    <div class="health-hero__actions">
+      {% if user %}
+      <span class="health-badge health-badge--authenticated">
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+        Logged in as <strong>{{ user.fullname }}</strong>
+      </span>
+      {% else %}
+      <a href="{% if homeurl %}/{{ homeurl }}{% endif %}{{ website.sign_in_url_substitution }}"
+        class="au-btn au-btn--primary">Sign In</a>
+      <span class="health-badge">
+        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+        Public &amp; Authenticated Access
+      </span>
+      {% endif %}
     </div>
-    <div class="row health-card-grid">
-      <div class="col-md-4 col-sm-6">
-        <div class="health-card health-card--shadow">
-          <div class="health-card__accent"></div>
-          <div class="health-card__body">
-            <div class="health-card__icon">
-              <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-            </div>
-            <h3 class="health-card__title">Organization Files</h3>
-            <p class="health-card__text">
-              Centralized storage and structured retrieval for departmental records, policies, and digital resources.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6">
-        <div class="health-card health-card--shadow">
-          <div class="health-card__accent"></div>
-          <div class="health-card__body">
-            <div class="health-card__icon">
-              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            </div>
-            <h3 class="health-card__title">Search &amp; Discovery</h3>
-            <p class="health-card__text">
-              Fast, indexed content search powered by Azure AI search to locate records and documentation across the organization.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6">
-        <div class="health-card health-card--shadow">
-          <div class="health-card__accent"></div>
-          <div class="health-card__body">
-            <div class="health-card__icon">
-              <span class="glyphicon glyphicon-shield" aria-hidden="true"></span>
-            </div>
-            <h3 class="health-card__title">Security &amp; Compliance</h3>
-            <p class="health-card__text">
-              Role-based web access controls, audit tracking, and Dataverse governance compliant with government guidelines.
-            </p>
-          </div>
-        </div>
+
+    <div class="row">
+      <div class="col-sm-8" id="content">
+
+        <nav class="au-inpage-nav-links" aria-label="On this page">
+          <div class="au-inpage-nav-links__heading">On this page</div>
+          <ul>
+            <li><a href="#description">Description</a></li>
+            <li><a href="#what-can-you-disclose">History of research</a></li>
+            <li><a href="#who-can-make-a-disclosure">Amazing facts</a></li>
+            <li><a href="#how-to-make-a-disclosure">Getting away from a Tyrannosaurus rex</a></li>
+            <li><a href="#what-happens-next">Glossary</a></li>
+            <li><a href="#contact">References</a></li>
+          </ul>
+        </nav>
+
+        <h2 id="description">Description</h2>
+        <h3>Size</h3>
+        <p>
+          Lorum ipsum
+        </p>
+
+
       </div>
     </div>
   </div>
-</div>
-
-<div class="health-band health-band--light">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-8 col-md-offset-2">
-        <div class="au-callout">
-          <h3 class="au-callout__title">Design System Alignment</h3>
-          <p>
-            This portal incorporates color schemes, responsive grid layouts, typographic scale, and accessible interaction patterns specified by the <a href="https://designsystem.health.gov.au/" target="_blank" rel="noopener noreferrer">Australian Government Department of Health and Aged Care Design System</a>.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
