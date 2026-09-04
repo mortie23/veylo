@@ -1,4 +1,5 @@
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type { Liquid } from 'liquidjs';
 import type { SiteData, WebPageRecord, RenderScope } from '../types.js';
 import { readPageContent } from '../loaders/web-pages.js';
@@ -16,6 +17,7 @@ export async function renderPage(
   page: WebPageRecord,
   scope: RenderScope,
   locale: string,
+  sitePath?: string,
 ): Promise<string> {
   // Step 1: Resolve page template
   const pageTemplate = siteData.pageTemplates.get(page.pageTemplateId);
@@ -87,7 +89,7 @@ export async function renderPage(
     customCss: content.customCss,
     customJs: content.customJs,
     toolbarHtml,
-  });
+  }, sitePath);
 }
 
 // ---------------------------------------------------------------------------
@@ -105,7 +107,7 @@ interface HtmlParts {
   toolbarHtml: string;
 }
 
-function assembleHtml(parts: HtmlParts): string {
+function assembleHtml(parts: HtmlParts, sitePath?: string): string {
   const customCssBlock = parts.customCss.trim()
     ? `<style>${parts.customCss}</style>`
     : '';
@@ -119,9 +121,6 @@ function assembleHtml(parts: HtmlParts): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(parts.title)} - ${escapeHtml(parts.siteName)}</title>
-  <link rel="stylesheet" href="/bootstrap.min.css">
-  <link rel="stylesheet" href="/theme.css">
-  <link rel="stylesheet" href="/portalbasictheme.css">
   ${customCssBlock}
 </head>
 <body>

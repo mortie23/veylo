@@ -322,18 +322,6 @@ adx_webfile:
   DisplayName: Cat-PC.png
   CheckSum: 4995227a9c5c9668916732c1a415c9be4e3c33973fbec9df80e7cab3197bdf20
   IsDeleted: false
-- RecordId: 59557c06-6f27-4370-86a4-5654fdf71359
-  DisplayName: bootstrap.min.css
-  CheckSum: d8347ca1dbc6fdf11e22f00dddebf1d0f56457f12ae5b0f6b12649419958a091
-  IsDeleted: false
-- RecordId: 7d34211e-d07a-4be6-8c25-4993c1421435
-  DisplayName: portalbasictheme.css
-  CheckSum: a3fba06d942a214d4d7d202c5eef54b6ff9710cfb02cab439b8743b21c938652
-  IsDeleted: false
-- RecordId: dd41400d-f086-4966-8623-3ba4129c867e
-  DisplayName: theme.css
-  CheckSum: ed035ebe53f1ce4832c471a417b2ea0aa42b64c087556dd65a2f526a85b9cf59
-  IsDeleted: false
 adx_weblink:
 - RecordId: 282c9fa2-129a-468b-984c-d361746c465d
   DisplayName: User Login
@@ -530,10 +518,6 @@ adx_webtemplate:
   CheckSum: e33b67562819bdddebebcbbb3544b94d1c6a810838020fe993298103485940c6
   IsDeleted: false
 annotation:
-- RecordId: 013be5a7-b5a5-f111-b8de-00224818094b
-  DisplayName: portalbasictheme.css
-  CheckSum: 8e6c8c6007941bfc94660714c685067f1eb7260a79200cf23c491885fd034179
-  IsDeleted: false
 - RecordId: 842e0308-b5a5-f111-b8de-00224818094b
   DisplayName: logo-veylo-64.png
   CheckSum: e9d8d76c39cf8c373cacd92d6cc3a30b529a9572bd05df0f73dce3fce08483f8
@@ -541,12 +525,4 @@ annotation:
 - RecordId: 852e0308-b5a5-f111-b8de-00224818094b
   DisplayName: Cat-PC.png
   CheckSum: 7f28007a024d9379a880bdeab6d8ffbc822593f953ae3543797657f4681e6d6c
-  IsDeleted: false
-- RecordId: 862e0308-b5a5-f111-b8de-00224818094b
-  DisplayName: theme.css
-  CheckSum: 434a064cfd83c2fb97bd80d005a4124893fd8b098d27f9521916c6a4fb01a7e2
-  IsDeleted: false
-- RecordId: 982e0308-b5a5-f111-b8de-00224818094b
-  DisplayName: bootstrap.min.css
-  CheckSum: 3507282f12f0501983e9a234678751f184b269a0524cf5b4aed9693453ef2940
   IsDeleted: false

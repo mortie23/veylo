@@ -185,6 +185,17 @@ export function createDevServer(config: ResolvedConfig): DevServer {
     // --- Page routing ---
     const page = siteData.routeTable.get(urlPath);
     if (!page) {
+      // Don't render full 404 HTML page for missing assets, well-known requests, or non-HTML clients
+      const hasExt = path.extname(urlPath).length > 0;
+      const isWellKnown = urlPath.startsWith('/.well-known/');
+      const acceptsNonHtml = req.headers.accept && !req.headers.accept.includes('text/html') && !req.headers.accept.includes('*/*');
+
+      if (hasExt || isWellKnown || acceptsNonHtml) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end(`404 Not Found: ${urlPath}`);
+        return;
+      }
+
       // Try the 404 page
       const notFoundMarker = siteData.siteMarkers['Page Not Found'];
       const notFoundPage = notFoundMarker
@@ -193,9 +204,9 @@ export function createDevServer(config: ResolvedConfig): DevServer {
 
       if (notFoundPage) {
         const scope = buildScope(siteData, notFoundPage, config.locale, currentRole, req);
-        let html = await renderPage(engine, siteData, notFoundPage, scope, config.locale);
+        let html = await renderPage(engine, siteData, notFoundPage, scope, config.locale, config.sitePath);
         if (vite) {
-          html = await vite.transformIndexHtml(req.url || '/', html);
+          html = await vite.transformIndexHtml('/404', html);
         }
         res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(html);
@@ -209,7 +220,7 @@ export function createDevServer(config: ResolvedConfig): DevServer {
     // Render the matched page
     try {
       const scope = buildScope(siteData, page, config.locale, currentRole, req);
-      let html = await renderPage(engine, siteData, page, scope, config.locale);
+      let html = await renderPage(engine, siteData, page, scope, config.locale, config.sitePath);
       if (vite) {
         html = await vite.transformIndexHtml(req.url || '/', html);
       }
