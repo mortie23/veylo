@@ -4,6 +4,7 @@ import { Liquid } from 'liquidjs';
 import type { WebTemplateRecord } from '../types.js';
 import { EditableTag } from './tags/editable.js';
 import { SubstitutionTag } from './tags/substitution.js';
+import { FetchXmlTag } from './tags/fetchxml.js';
 import { booleanFilter, xmlEscapeFilter, hFilter } from './filters/power-pages.js';
 
 /**
@@ -83,6 +84,7 @@ export function createLiquidEngine(
   // Register Power Pages custom tags
   engine.registerTag('editable', EditableTag as any);
   engine.registerTag('substitution', SubstitutionTag as any);
+  engine.registerTag('fetchxml', FetchXmlTag as any);
 
   // Register Power Pages custom filters
   engine.registerFilter('boolean', booleanFilter);

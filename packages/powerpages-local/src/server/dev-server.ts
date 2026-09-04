@@ -3,6 +3,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import pc from 'picocolors';
 import type { Liquid } from 'liquidjs';
+import { createServer as createViteServer, type ViteDevServer } from 'vite';
+import chokidar from 'chokidar';
 import type { ResolvedConfig } from '../config.js';
 import type { SiteData, UserRole } from '../types.js';
 import {
@@ -53,6 +55,8 @@ export interface DevServer {
 
 export function createDevServer(config: ResolvedConfig): DevServer {
   let httpServer: http.Server | null = null;
+  let vite: ViteDevServer | null = null;
+  let watcher: any | null = null; // using any to bypass chokidar type issue
   let siteData: SiteData;
   let engine: Liquid;
   let currentRole: UserRole = config.defaultRole;
@@ -142,11 +146,39 @@ export function createDevServer(config: ResolvedConfig): DevServer {
       return;
     }
 
+    // --- Deploy API ---
+    if (urlPath === '/__powerpages/deploy' && method === 'POST') {
+      import('node:child_process').then(({ exec }) => {
+        exec('npm run deploy', { cwd: path.join(config.sitePath, '..') }, (error, stdout, stderr) => {
+          if (error) {
+            console.error(`Deploy error: ${error.message}`);
+          }
+        });
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, message: 'Deployment started' }));
+      return;
+    }
+
     // --- Reload site data API ---
     if (urlPath === '/__powerpages/reload' && method === 'POST') {
       siteData = loadAllSiteData();
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ ok: true }));
+      return;
+    }
+
+    // --- Mock Web API Stubbing ---
+    if (urlPath.startsWith('/_api/')) {
+      const entity = urlPath.replace('/_api/', '').split('?')[0].replace(/\/$/, '');
+      let mockData: any = { value: [] };
+      if (entity === 'contacts') {
+        mockData = { value: [{ contactid: 'mock-1', fullname: 'Mock Contact', emailaddress1: 'mock@example.com' }] };
+      } else if (entity === 'accounts') {
+        mockData = { value: [{ accountid: 'mock-1', name: 'Mock Account' }] };
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(mockData));
       return;
     }
 
@@ -161,7 +193,10 @@ export function createDevServer(config: ResolvedConfig): DevServer {
 
       if (notFoundPage) {
         const scope = buildScope(siteData, notFoundPage, config.locale, currentRole, req);
-        const html = await renderPage(engine, siteData, notFoundPage, scope, config.locale);
+        let html = await renderPage(engine, siteData, notFoundPage, scope, config.locale);
+        if (vite) {
+          html = await vite.transformIndexHtml(req.url || '/', html);
+        }
         res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(html);
       } else {
@@ -174,7 +209,10 @@ export function createDevServer(config: ResolvedConfig): DevServer {
     // Render the matched page
     try {
       const scope = buildScope(siteData, page, config.locale, currentRole, req);
-      const html = await renderPage(engine, siteData, page, scope, config.locale);
+      let html = await renderPage(engine, siteData, page, scope, config.locale);
+      if (vite) {
+        html = await vite.transformIndexHtml(req.url || '/', html);
+      }
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
     } catch (err) {
@@ -201,15 +239,49 @@ export function createDevServer(config: ResolvedConfig): DevServer {
       const templateNameIndex = buildTemplateNameIndex(siteData.webTemplates);
       engine = createLiquidEngine(templateNameIndex);
 
-      // Create HTTP server
-      httpServer = http.createServer((req, res) => {
-        handleRequest(req, res).catch((err) => {
-          console.error(pc.red('  Unhandled error:'), err);
-          if (!res.headersSent) {
-            res.writeHead(500);
-            res.end('Internal Server Error');
-          }
+      // Create HTTP server first
+      httpServer = http.createServer();
+
+      // Create Vite server
+      vite = await createViteServer({
+        server: { 
+          middlewareMode: true,
+          hmr: { server: httpServer }
+        },
+        appType: 'custom',
+        root: config.sitePath,
+        publicDir: 'web-files',
+      });
+
+      // Add request handler to httpServer
+      httpServer.on('request', (req, res) => {
+        vite!.middlewares(req, res, () => {
+          handleRequest(req, res).catch((err) => {
+            console.error(pc.red('  Unhandled error:'), err);
+            if (!res.headersSent) {
+              res.writeHead(500);
+              res.end('Internal Server Error');
+            }
+          });
         });
+      });
+
+      // Setup watcher
+      watcher = chokidar.watch(config.sitePath, {
+        ignored: ['**/node_modules/**', '**/.git/**', '**/.vite/**'],
+        ignoreInitial: true,
+      });
+
+      watcher.on('all', (event: string, filePath: string) => {
+        console.log(pc.yellow(`  [Watcher] ${event}: ${filePath}`));
+        try {
+          siteData = loadAllSiteData();
+          const newTemplateIndex = buildTemplateNameIndex(siteData.webTemplates);
+          engine = createLiquidEngine(newTemplateIndex);
+          vite?.ws.send({ type: 'full-reload' });
+        } catch (err) {
+          console.error(pc.red('  Error reloading site data:'), err);
+        }
       });
 
       // Start listening
@@ -232,6 +304,8 @@ export function createDevServer(config: ResolvedConfig): DevServer {
     },
 
     async stop() {
+      if (watcher) await watcher.close();
+      if (vite) await vite.close();
       return new Promise<void>((resolve) => {
         if (httpServer) {
           httpServer.close(() => resolve());

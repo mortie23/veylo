@@ -25,7 +25,11 @@ export class EditableTag extends Tag {
       if (match) {
         const snippetName = match[1];
         const snippets = ctx.get(['snippets']) as Record<string, string> | undefined;
-        emitter.write(snippets?.[snippetName] ?? '');
+        const content = snippets?.[snippetName] ?? '';
+        if (content) {
+          const rendered = (yield this.liquid.parseAndRender(content, ctx.getAll())) as string;
+          emitter.write(rendered);
+        }
       }
       return;
     }

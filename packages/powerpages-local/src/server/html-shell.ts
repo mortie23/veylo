@@ -77,6 +77,7 @@ export async function renderPage(
   const content = readPageContent(page, locale);
 
   // Step 6: Assemble full HTML document
+  const toolbarHtml = generateToolbar(siteData, scope);
   return assembleHtml({
     title: content.title || page.name,
     siteName: siteData.website.name,
@@ -85,6 +86,7 @@ export async function renderPage(
     footerHtml,
     customCss: content.customCss,
     customJs: content.customJs,
+    toolbarHtml,
   });
 }
 
@@ -100,6 +102,7 @@ interface HtmlParts {
   footerHtml: string;
   customCss: string;
   customJs: string;
+  toolbarHtml: string;
 }
 
 function assembleHtml(parts: HtmlParts): string {
@@ -126,6 +129,7 @@ ${parts.headerHtml}
 ${parts.bodyHtml}
 ${parts.footerHtml}
 ${customJsBlock}
+${parts.toolbarHtml}
 </body>
 </html>`;
 }
@@ -156,4 +160,64 @@ function escapeHtml(str: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+export function generateToolbar(siteData: SiteData, scope: RenderScope): string {
+  const currentRole = scope.user?.roles?.[0] || 'anonymous';
+  let optionsHtml = '';
+  for (const [url, page] of siteData.routeTable.entries()) {
+    optionsHtml += `<option value="${url}">${escapeHtml(page.name)} (${url})</option>`;
+  }
+
+  return `
+    <style>
+      #pp-local-toolbar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: #333; color: white;
+        padding: 8px 16px;
+        display: flex; gap: 16px; align-items: center;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        z-index: 999999;
+      }
+      #pp-local-toolbar select, #pp-local-toolbar button {
+        padding: 4px 8px;
+        font-size: 14px;
+      }
+    </style>
+    <div id="pp-local-toolbar">
+      <div>
+        <label>Role:</label>
+        <select id="pp-role-switcher" onchange="
+          fetch('/__powerpages/role', {
+            method: 'POST',
+            body: JSON.stringify({ role: this.value })
+          }).then(() => window.location.reload())
+        ">
+          <option value="anonymous" ${currentRole === 'anonymous' ? 'selected' : ''}>Anonymous</option>
+          <option value="authenticated" ${currentRole === 'authenticated' ? 'selected' : ''}>Authenticated</option>
+          <option value="admin" ${currentRole === 'admin' ? 'selected' : ''}>Admin</option>
+        </select>
+      </div>
+      <div>
+        <label>Page:</label>
+        <select id="pp-page-switcher" onchange="if(this.value) window.location.href = this.value;">
+          <option value="">-- Jump to page --</option>
+          ${optionsHtml}
+        </select>
+      </div>
+      <button onclick="
+        this.disabled = true;
+        this.textContent = 'Deploying...';
+        fetch('/__powerpages/deploy', { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message);
+            this.textContent = 'Deploy';
+            this.disabled = false;
+          })
+      ">Deploy</button>
+    </div>
+  `;
 }

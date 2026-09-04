@@ -30,7 +30,7 @@ export class SubstitutionTag extends Tag {
         this.templates.push(tpl);
       })
       .on('end', () => {
-        throw this.liquid.errors.TagNotClosedError(tagToken);
+        throw new Error(`Tag ${tagToken.getText()} not closed`);
       });
 
     stream.start();
