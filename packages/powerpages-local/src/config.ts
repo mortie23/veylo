@@ -16,6 +16,8 @@ export interface PowerPagesLocalConfig {
   port?: number;
   /** Directory containing mock JSON data for /_api/ stubs */
   mockDataPath?: string;
+  /** Directory containing mock HTML templates for built-in platform pages */
+  mockTemplatesPath?: string;
   /** Shell command to execute when the Deploy button is pressed */
   deployCommand?: string;
   /** Initial user role preset (default: 'anonymous') */
@@ -27,6 +29,7 @@ export interface ResolvedConfig {
   locale: string;
   port: number;
   mockDataPath: string | null;
+  mockTemplatesPath: string | null;
   deployCommand: string | null;
   defaultRole: UserRole;
 }
@@ -35,6 +38,7 @@ const DEFAULTS: Omit<ResolvedConfig, 'sitePath'> = {
   locale: 'en-US',
   port: 3000,
   mockDataPath: null,
+  mockTemplatesPath: null,
   deployCommand: null,
   defaultRole: 'anonymous',
 };
@@ -68,6 +72,9 @@ export function resolveConfig(
     sitePath,
     mockDataPath: userConfig.mockDataPath
       ? path.resolve(cwd, userConfig.mockDataPath)
+      : null,
+    mockTemplatesPath: userConfig.mockTemplatesPath
+      ? path.resolve(cwd, userConfig.mockTemplatesPath)
       : null,
   };
 }

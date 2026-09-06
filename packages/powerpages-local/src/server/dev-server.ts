@@ -204,7 +204,7 @@ export function createDevServer(config: ResolvedConfig): DevServer {
 
       if (notFoundPage) {
         const scope = buildScope(siteData, notFoundPage, config.locale, currentRole, req);
-        let html = await renderPage(engine, siteData, notFoundPage, scope, config.locale, config.sitePath);
+        let html = await renderPage(engine, siteData, notFoundPage, scope, config.locale, config.sitePath, config.mockTemplatesPath);
         if (vite) {
           html = await vite.transformIndexHtml('/404', html);
         }
@@ -220,7 +220,7 @@ export function createDevServer(config: ResolvedConfig): DevServer {
     // Render the matched page
     try {
       const scope = buildScope(siteData, page, config.locale, currentRole, req);
-      let html = await renderPage(engine, siteData, page, scope, config.locale, config.sitePath);
+      let html = await renderPage(engine, siteData, page, scope, config.locale, config.sitePath, config.mockTemplatesPath);
       if (vite) {
         html = await vite.transformIndexHtml(req.url || '/', html);
       }

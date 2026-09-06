@@ -48,7 +48,9 @@ export interface PageTemplateRecord {
   /** GUID from adx_pagetemplateid */
   id: string;
   /** GUID reference to the web template */
-  webTemplateId: string;
+  webTemplateId?: string;
+  /** Optional rewrite URL for built-in platform pages (e.g. ~/Pages/Profile.aspx) */
+  rewriteUrl?: string;
   /** Whether to wrap with Header + Footer */
   useHeaderAndFooter: boolean;
 }

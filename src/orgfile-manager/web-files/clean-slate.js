@@ -46,10 +46,42 @@
   stripCoreStyles();
 
   // Execute on document ready to catch any late-injected core elements
-  if (typeof $ !== 'undefined' && $.fn) {
-    $(document).ready(stripCoreStyles);
+  function onReady() {
+    stripCoreStyles();
+    
+    /* 
+     * =======================================================================
+     * MICROSOFT PLATFORM SCRIPT APPEASEMENT (DUMMY POLYFILLS)
+     * =======================================================================
+     * Why is this here? We intentionally stripped Bootstrap to use our own 
+     * custom design system. However, uneditable Microsoft platform scripts 
+     * (like portal.js) run on built-in pages (Profile.aspx, Login.aspx) 
+     * and blindly attempt to call Bootstrap plugins like .carousel() or .tooltip().
+     * 
+     * Because we removed Bootstrap, these calls throw fatal TypeErrors, which 
+     * halts all JavaScript execution on the page and breaks our custom scripts.
+     * 
+     * We define these harmless "dummy" functions below to intercept those calls 
+     * and return silently. This prevents the exceptions without actually loading 
+     * any Bootstrap UI logic.
+     * =======================================================================
+     */
+    if (typeof $ !== 'undefined' && $.fn) {
+      if (!$.fn.carousel) $.fn.carousel = function () { return this; };
+      if (!$.fn.tooltip) $.fn.tooltip = function () { return this; };
+      if (!$.fn.popover) $.fn.popover = function () { return this; };
+      if (!$.fn.modal) $.fn.modal = function () { return this; };
+      if (!$.fn.tab) $.fn.tab = function () { return this; };
+      if (!$.fn.collapse) $.fn.collapse = function () { return this; };
+      if (!$.fn.dropdown) $.fn.dropdown = function () { return this; };
+      if (!$.fn.alert) $.fn.alert = function () { return this; };
+    }
+  }
+
+  if (typeof $ !== 'undefined' && $.fn && $.isReady) {
+    onReady();
   } else {
-    document.addEventListener('DOMContentLoaded', stripCoreStyles);
+    document.addEventListener('DOMContentLoaded', onReady);
   }
 
   // MutationObserver to catch dynamically injected Power Pages styles

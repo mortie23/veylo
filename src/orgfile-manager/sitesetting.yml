@@ -50,7 +50,7 @@
   adx_value: false
 - adx_name: Profile/Enabled
   adx_sitesettingid: 43e5e5b4-352d-4e90-bd84-55cf590f65d0
-  adx_value: false
+  adx_value: true
 - adx_description: Denies use of the portal to minors without parental consent. By default, it is set to false.
   adx_name: Authentication/Registration/DenyMinorsWithoutParentalConsent
   adx_sitesettingid: 46970a2c-b3a4-4923-89e4-0e0819964122

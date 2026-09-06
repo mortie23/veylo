@@ -6,7 +6,8 @@ import { readYaml } from './yaml-utils.js';
 interface PageTemplateYaml {
   adx_name: string;
   adx_pagetemplateid: string;
-  adx_webtemplateid: string;
+  adx_webtemplateid?: string;
+  adx_rewriteurl?: string;
   adx_usewebsiteheaderandfooter: boolean;
   adx_type?: number;
 }
@@ -35,6 +36,7 @@ export function loadPageTemplates(
       name: data.adx_name,
       id: data.adx_pagetemplateid,
       webTemplateId: data.adx_webtemplateid,
+      rewriteUrl: data.adx_rewriteurl,
       useHeaderAndFooter: data.adx_usewebsiteheaderandfooter ?? true,
     });
   }

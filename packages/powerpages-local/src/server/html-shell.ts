@@ -4,6 +4,8 @@ import type { Liquid } from 'liquidjs';
 import type { SiteData, WebPageRecord, RenderScope } from '../types.js';
 import { readPageContent } from '../loaders/web-pages.js';
 
+import { DEFAULT_MOCKS } from '../mocks/default-mocks.js';
+
 /**
  * Render a full HTML page by assembling the template chain.
  *
@@ -18,6 +20,7 @@ export async function renderPage(
   scope: RenderScope,
   locale: string,
   sitePath?: string,
+  mockTemplatesPath?: string | null,
 ): Promise<string> {
   // Step 1: Resolve page template
   const pageTemplate = siteData.pageTemplates.get(page.pageTemplateId);
@@ -27,21 +30,61 @@ export async function renderPage(
     );
   }
 
-  // Step 2: Resolve web template
-  const webTemplate = siteData.webTemplates.get(pageTemplate.webTemplateId);
-  if (!webTemplate) {
-    return errorPage(
-      `Web template not found for page template "${pageTemplate.name}" (webtemplateid: ${pageTemplate.webTemplateId})`,
-    );
+  // Step 2: Resolve web template (or fallback for ASPX rewrite routes)
+  let bodySource = '';
+  if (pageTemplate.webTemplateId) {
+    const webTemplate = siteData.webTemplates.get(pageTemplate.webTemplateId);
+    if (!webTemplate) {
+      return errorPage(
+        `Web template not found for page template "${pageTemplate.name}" (webtemplateid: ${pageTemplate.webTemplateId})`,
+      );
+    }
+    bodySource = fs.readFileSync(webTemplate.sourcePath, 'utf-8');
+  } else if (pageTemplate.rewriteUrl) {
+    // Resolution Waterfall for ASPX built-in pages
+    // Step A: Check user-provided mock-templates folder
+    let resolvedMock = false;
+    if (mockTemplatesPath) {
+      // e.g. ~/Pages/Profile.aspx -> Profile.html
+      const fileName = path.basename(pageTemplate.rewriteUrl).replace('.aspx', '.html');
+      const userMockPath = path.join(mockTemplatesPath, fileName);
+      if (fs.existsSync(userMockPath)) {
+        bodySource = fs.readFileSync(userMockPath, 'utf-8');
+        resolvedMock = true;
+      }
+    }
+
+    // Step B: Check package built-in defaults
+    if (!resolvedMock && DEFAULT_MOCKS[pageTemplate.rewriteUrl]) {
+      bodySource = DEFAULT_MOCKS[pageTemplate.rewriteUrl];
+      resolvedMock = true;
+    }
+
+    // Step C: Minimal raw fallback
+    if (!resolvedMock) {
+      bodySource = `
+        <div class="wrapper-body" role="main">
+          <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+            <h1>{{ page.title | escape }}</h1>
+            {{ page.copy }}
+            <div class="alert alert-info" style="margin-top: 2rem;">
+              <strong>Local Dev Note:</strong> This is a built-in platform page (<code>${pageTemplate.rewriteUrl}</code>).
+              Server-side ASP.NET components are not rendered locally.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    return errorPage(`Page template "${pageTemplate.name}" has no Web Template and no Rewrite URL.`);
   }
 
   // Step 3: Render the body web template through Liquid
-  const bodySource = fs.readFileSync(webTemplate.sourcePath, 'utf-8');
   let bodyHtml: string;
   try {
     bodyHtml = await engine.parseAndRender(bodySource, scope);
   } catch (err) {
-    return errorPage(`Liquid render error in "${webTemplate.name}": ${err}`);
+    return errorPage(`Liquid render error in page template "${pageTemplate.name}": ${err}`);
   }
 
   // Step 4: Optionally wrap with header + footer
