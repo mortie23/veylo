@@ -59,9 +59,9 @@
                   {% if primary_nav %}
                   {% for link in primary_nav.weblinks %}
                   {% assign is_active = false %}
-                  {% if request.path == link.url or page.url == link.url %}
+                  {% if link.is_sitemap_current %}
                   {% assign is_active = true %}
-                  {% elsif link.url == '/' and request.path == '/' %}
+                  {% elsif request.path == link.url or page.url == link.url %}
                   {% assign is_active = true %}
                   {% endif %}
                   {% if link.weblinks.size > 0 %}
@@ -127,12 +127,20 @@
                         {% assign show_profile_nav = settings['Header/ShowAllProfileNavigationLinks'] | boolean | default: true %}
                         {% if show_profile_nav %}
                         {% assign profile_nav = weblinks['Profile Navigation'] %}
-                        {% if profile_nav %}
+                        {% if profile_nav and profile_nav.weblinks.size > 0 %}
                         {% for link in profile_nav.weblinks %}
+                        {% assign link_url = link.url %}
+                        {% if link_url == null or link_url == '' or link_url == '#' %}
+                          {% assign link_url = sitemarkers['Profile'].url %}
+                        {% endif %}
                         <li>
-                          <a href='{{ link.url | escape }}' title='{{ link.name | escape }}'>{{ link.name | escape }}</a>
+                          <a href='{{ link_url | escape }}' title='{{ link.name | escape }}'>{{ link.name | escape }}</a>
                         </li>
                         {% endfor %}
+                        {% else %}
+                        <li>
+                          <a href='{{ sitemarkers["Profile"].url | escape }}' title='{{ snippets["Profile Link Text"] | default: resx["Profile_Text"] | escape }}'>{{ snippets["Profile Link Text"] | default: resx.Profile_Text | escape }}</a>
+                        </li>
                         {% endif %}
                         {% else %}
                         <li>
@@ -168,6 +176,69 @@
       </div>
     </div>
   </nav>
+  <script>
+    (function () {
+      function updateActiveNav() {
+        function normalizePath(p) {
+          if (!p) return '/';
+          try {
+            if (p.indexOf('://') !== -1) {
+              p = new URL(p, window.location.origin).pathname;
+            }
+          } catch (e) {}
+          var s = p.split('?')[0].split('#')[0].toLowerCase();
+          s = s.replace(/^\/[a-z]{2}(-[a-z]{2,4})?(\/|$)/i, '/');
+          return s.replace(/\/+$/, '') || '/';
+        }
+
+        var currentPath = normalizePath(window.location.pathname);
+        var navItems = document.querySelectorAll('.au-main-nav .au-link-list > li:not(.au-main-nav__utility-item)');
+        if (!navItems || !navItems.length) return;
+
+        var bestMatchLi = null;
+        var bestMatchLink = null;
+        var bestMatchScore = 0;
+
+        navItems.forEach(function (li) {
+          li.classList.remove('active');
+          var links = li.querySelectorAll('a');
+          links.forEach(function (a) {
+            a.removeAttribute('aria-current');
+            var href = a.getAttribute('href');
+            if (!href || href === '#' || href.indexOf('javascript:') === 0) return;
+
+            var linkPath = normalizePath(a.pathname || href);
+
+            if (currentPath === linkPath) {
+              bestMatchLi = li;
+              bestMatchLink = a;
+              bestMatchScore = 1000 + linkPath.length;
+            } else if (linkPath !== '/' && (currentPath + '/').indexOf(linkPath + '/') === 0) {
+              if (linkPath.length > bestMatchScore) {
+                bestMatchLi = li;
+                bestMatchLink = a;
+                bestMatchScore = linkPath.length;
+              }
+            }
+          });
+        });
+
+        if (bestMatchLi) {
+          bestMatchLi.classList.add('active');
+          if (bestMatchLink) {
+            bestMatchLink.setAttribute('aria-current', 'page');
+          }
+        }
+      }
+
+      updateActiveNav();
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateActiveNav);
+      }
+      window.addEventListener('popstate', updateActiveNav);
+      window.addEventListener('pageshow', updateActiveNav);
+    })();
+  </script>
   {% substitution %}
   {% assign current_page = page.id %}
   {% assign sr_page = sitemarkers.Search.id %}
