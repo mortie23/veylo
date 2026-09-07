@@ -202,8 +202,8 @@
       rows += '<td>' + esc(orgName) + '</td>';
       rows += '<td>';
       if (c._parentcustomerid_value) {
-        rows += '<button type="button" class="au-btn au-btn--tertiary au-btn--sm" '
-              + 'onclick="VeyloAdmin.removeFromOrg(\'' + c.contactid + '\')" '
+        rows += '<button type="button" class="au-btn au-btn--tertiary au-btn--sm js-remove-from-org-btn" '
+              + 'data-contactid="' + c.contactid + '" '
               + 'title="Remove from organisation">Remove</button>';
       }
       rows += '</td>';
@@ -305,13 +305,9 @@
 
   /** Remove a user from their current organisation. */
   function removeFromOrg(contactId) {
-    if (!confirm('Remove this user from their organisation?')) return;
-
     showStatus('Removing user from organisation\u2026', 'info');
 
-    apiRequest('PATCH', 'contacts(' + contactId + ')', {
-      'parentcustomerid_account@odata.bind': null
-    })
+    apiRequest('DELETE', 'contacts(' + contactId + ')/parentcustomerid_account/$ref')
     .then(function () {
       showStatus('User removed from organisation successfully.', 'success');
       return loadContacts();
@@ -392,14 +388,36 @@
       });
     }
 
+    var usersTbody = document.getElementById('admin-users-tbody');
+    if (usersTbody) {
+      usersTbody.addEventListener('click', function (e) {
+        var btn = e.target.closest && e.target.closest('.js-remove-from-org-btn');
+        if (btn) {
+          var contactId = btn.getAttribute('data-contactid');
+          if (contactId) {
+            if (window.jQuery && window.jQuery.fn.modal) {
+              var modal = document.getElementById('confirmDeleteModal');
+              if (modal) {
+                var confirmBtn = document.getElementById('confirmDeleteBtn');
+                confirmBtn.onclick = function() {
+                  window.jQuery(modal).modal('hide');
+                  removeFromOrg(contactId);
+                };
+                window.jQuery(modal).modal('show');
+              } else {
+                if (confirm('Remove this user from their organisation?')) removeFromOrg(contactId);
+              }
+            } else {
+              if (confirm('Remove this user from their organisation?')) removeFromOrg(contactId);
+            }
+          }
+        }
+      });
+    }
+
     // Initial data load
     loadAccounts().then(loadContacts);
   }
-
-  // Expose actions for inline onclick handlers in the rendered table
-  window.VeyloAdmin = {
-    removeFromOrg: removeFromOrg
-  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
