@@ -5,7 +5,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [string]$Path = "",
+    [string]$Path = "src",
 
     [Parameter(Position = 1)]
     [string]$WebsiteId = "",

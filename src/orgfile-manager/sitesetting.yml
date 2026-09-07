@@ -98,6 +98,10 @@
 - adx_name: Profile/ForceSignUp
   adx_sitesettingid: 9ba4df5b-810d-41e1-b797-2a088d4c0d58
   adx_value: False
+- adx_description: Enable the Power Pages Web API for the Contact table, allowing frontend JavaScript to read and write contact records via /_api/contacts.
+  adx_name: Webapi/contact/enabled
+  adx_sitesettingid: a2b3c4d5-3f9a-4d1e-e45f-c7b6a8d9e0f1
+  adx_value: true
 - adx_name: Authentication/Registration/EmailConfirmationEnabled
   adx_sitesettingid: a826d619-8ee8-4e18-a1a2-e6e2e0121370
   adx_value: true
@@ -106,6 +110,10 @@
   adx_name: Authentication/LoginThrottling/IpAddressTimeoutTimeSpan
   adx_sitesettingid: aacfba4c-e9a6-4e26-b75d-0bd1c660b514
   adx_value: 00:10:00
+- adx_description: Comma-separated list of Contact fields exposed via the Web API. Controls which columns can be read and written by portal JavaScript.
+  adx_name: Webapi/contact/fields
+  adx_sitesettingid: b3c4d5e6-4a0b-4e2f-f56a-d8c7b9e0f1a2
+  adx_value: fullname,emailaddress1,parentcustomerid,_parentcustomerid_value,parentcustomerid_account
 - adx_name: Authentication/Registration/LoginButtonAuthenticationType
   adx_sitesettingid: b4da25c1-4b88-451d-84f8-c1fb4263a2ea
   importsequencenumber: 3
@@ -117,6 +125,10 @@
   adx_name: Header/OutputCache/Enabled
   adx_sitesettingid: c34dba30-aab4-45fe-ac38-d0cc307fb276
   adx_value: True
+- adx_description: Enable the Power Pages Web API for the Account table, allowing frontend JavaScript to read account (organisation) records via /_api/accounts.
+  adx_name: Webapi/account/enabled
+  adx_sitesettingid: c4d5e6f7-5b1c-4f3a-a67b-e9d8c0f1a2b3
+  adx_value: true
 - adx_name: Header/ShowAllProfileNavigationLinks
   adx_sitesettingid: c8f1cfbf-60ea-4eea-a984-81c9bebbb5be
   adx_value: false
@@ -131,6 +143,11 @@
 - adx_name: Authentication/OpenAuth/Twitter/ConsumerSecret
   adx_sitesettingid: d473fc53-343d-44aa-a378-2c2a06b8bb5a
   importsequencenumber: 5
+- adx_description: Comma-separated list of Account fields exposed via the Web API.
+  adx_name: Webapi/account/fields
+  adx_sitesettingid: d5e6f7a8-6c2d-4a4b-b78c-f0e9d1a2b3c4
+  adx_source: 0
+  adx_value: name,accountnumber,emailaddress1,parentcustomerid,primarycontactid,_primarycontactid_value
 - adx_name: Authentication/Registration/Enabled
   adx_sitesettingid: d6c88f33-acb9-40a1-bb67-87e4cac21592
   adx_value: true
@@ -173,19 +190,3 @@
   adx_name: Authentication/LoginTrackingEnabled
   adx_sitesettingid: fb92e187-5aa0-4cbd-96f2-4085561ea098
   adx_value: False
-- adx_description: Enable the Power Pages Web API for the Contact table, allowing frontend JavaScript to read and write contact records via /_api/contacts.
-  adx_name: Webapi/contact/enabled
-  adx_sitesettingid: a2b3c4d5-3f9a-4d1e-e45f-c7b6a8d9e0f1
-  adx_value: 'true'
-- adx_description: Comma-separated list of Contact fields exposed via the Web API. Controls which columns can be read and written by portal JavaScript.
-  adx_name: Webapi/contact/fields
-  adx_sitesettingid: b3c4d5e6-4a0b-4e2f-f56a-d8c7b9e0f1a2
-  adx_value: fullname,emailaddress1,parentcustomerid,_parentcustomerid_value,parentcustomerid_account
-- adx_description: Enable the Power Pages Web API for the Account table, allowing frontend JavaScript to read account (organisation) records via /_api/accounts.
-  adx_name: Webapi/account/enabled
-  adx_sitesettingid: c4d5e6f7-5b1c-4f3a-a67b-e9d8c0f1a2b3
-  adx_value: 'true'
-- adx_description: Comma-separated list of Account fields exposed via the Web API.
-  adx_name: Webapi/account/fields
-  adx_sitesettingid: d5e6f7a8-6c2d-4a4b-b78c-f0e9d1a2b3c4
-  adx_value: name

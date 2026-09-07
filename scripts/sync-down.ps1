@@ -99,8 +99,16 @@ Write-Host "Data Model Version:   $ModelVersion" -ForegroundColor Gray
 Write-Host "`nDownloading website from Dataverse..." -ForegroundColor Cyan
 $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-pac powerpages download --path $resolvedPath --webSiteId $WebsiteId -mv $ModelVersion
+pac powerpages download --path $resolvedPath --webSiteId $WebsiteId -mv $ModelVersion -o true
 $exitCode = $LASTEXITCODE
+
+# PAC CLI strictly uses the website's adx_name (Veylo) for the folder name.
+# Automatically move it to orgfile-manager to match the repository structure.
+if ($exitCode -eq 0 -and (Test-Path "$resolvedPath/veylo")) {
+    Write-Host "`nMigrating files from 'veylo' folder to 'orgfile-manager'..." -ForegroundColor Gray
+    Copy-Item -Path "$resolvedPath/veylo\*" -Destination "$resolvedPath/orgfile-manager" -Recurse -Force
+    Remove-Item -Path "$resolvedPath/veylo" -Recurse -Force
+}
 
 $stopwatch.Stop()
 
