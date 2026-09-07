@@ -1,15 +1,32 @@
 {% if user %}
   {% if user.roles contains 'Administrators' %}
 
-<div class="health-hero health-hero--bg-gradient">
+<div class="health-sub-header health-sub-header--dark">
   <div class="container">
-    <div class="row">
-      <div class="col-md-8 col-sm-10">
-        <span class="health-hero__tag">Administration</span>
-        <h1 id="mainContent" class="health-hero__title">User &amp; Organisation Management</h1>
-        <p class="health-hero__summary">
-          Manage portal users, organisations, and their memberships. Assign users to organisations to control access and file submission ownership.
-        </p>
+    <div class="row rs_skip">
+      <div class="col-xs-12 col-md-8">
+        <div class="region--content_top_left">
+          <div id="block-system-breadcrumb-block">
+            <nav class="au-breadcrumbs" aria-label="Breadcrumb">
+              <h2 class="au-sronly">You are here</h2>
+              <ol class="au-link-list au-link-list--inline">
+                <li><a href="/">Home</a></li>
+                <li><a>Admin</a></li>
+              </ol>
+            </nav>
+          </div>
+          <div id="block-page-title-block">
+            <div>
+              <div class="health-sub-header__section-title">
+                <a class="au-direction-link au-direction-link--left" href="/">Home</a>
+              </div>
+              <h1 id="mainContent">User &amp; Organisation Management</h1>
+              <p class="au-introduction">
+                Manage portal users, organisations, and their memberships. Assign users to organisations to control access and file submission ownership.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
