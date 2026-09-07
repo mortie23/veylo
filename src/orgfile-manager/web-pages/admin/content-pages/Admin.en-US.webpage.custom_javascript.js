@@ -217,7 +217,7 @@
     if (!tbody) return;
 
     if (state.accounts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5">No organisations found. Use the form above to register one.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6">No organisations found. Use the form above to register one.</td></tr>';
       return;
     }
 
@@ -236,6 +236,12 @@
       rows += '<td>' + esc(a.emailaddress1 || '\u2014') + '</td>';
       rows += '<td>' + esc(primaryName) + '</td>';
       rows += '<td>' + memberCount + '</td>';
+      rows += '<td>';
+      rows += '<button type="button" class="au-btn au-btn--tertiary au-btn--sm js-delete-org-btn" '
+            + 'data-accountid="' + a.accountid + '" '
+            + 'data-orgname="' + esc(a.name) + '" '
+            + 'title="Delete organisation">Delete</button>';
+      rows += '</td>';
       rows += '</tr>';
     });
     tbody.innerHTML = rows;
@@ -364,6 +370,21 @@
     });
   }
 
+  /** Delete an organisation (Account) in Dataverse. */
+  function deleteOrganisation(accountId) {
+    showStatus('Deleting organisation\u2026', 'info');
+
+    apiRequest('DELETE', 'accounts(' + accountId + ')')
+    .then(function () {
+      showStatus('Organisation deleted successfully.', 'success');
+      return loadAccounts().then(loadContacts);
+    })
+    .catch(function (err) {
+      console.error('Delete organisation failed:', err);
+      showStatus('Failed to delete organisation. Check browser console for details.', 'error');
+    });
+  }
+
   // ============================================================
   // Initialisation
   // ============================================================
@@ -389,27 +410,65 @@
     }
 
     var usersTbody = document.getElementById('admin-users-tbody');
+    var orgsTbody = document.getElementById('admin-orgs-tbody');
+    var modal = document.getElementById('confirmDeleteModal');
+
+    function showConfirmModal(title, body, onConfirm) {
+      if (modal) {
+        var modalTitle = document.getElementById('confirmDeleteModalLabel');
+        var modalBody = document.getElementById('confirmDeleteModalBody');
+        var confirmBtn = document.getElementById('confirmDeleteBtn');
+        var cancelBtn = document.getElementById('cancelDeleteBtn');
+
+        if (modalTitle) modalTitle.textContent = title;
+        if (modalBody) modalBody.textContent = body;
+
+        var hideModal = function() {
+          modal.classList.remove('is-active');
+          confirmBtn.onclick = null;
+          cancelBtn.onclick = null;
+        };
+
+        confirmBtn.onclick = function() {
+          hideModal();
+          onConfirm();
+        };
+        cancelBtn.onclick = hideModal;
+
+        modal.classList.add('is-active');
+      } else {
+        if (confirm(body)) onConfirm();
+      }
+    }
+
     if (usersTbody) {
       usersTbody.addEventListener('click', function (e) {
         var btn = e.target.closest && e.target.closest('.js-remove-from-org-btn');
         if (btn) {
           var contactId = btn.getAttribute('data-contactid');
           if (contactId) {
-            if (window.jQuery && window.jQuery.fn.modal) {
-              var modal = document.getElementById('confirmDeleteModal');
-              if (modal) {
-                var confirmBtn = document.getElementById('confirmDeleteBtn');
-                confirmBtn.onclick = function() {
-                  window.jQuery(modal).modal('hide');
-                  removeFromOrg(contactId);
-                };
-                window.jQuery(modal).modal('show');
-              } else {
-                if (confirm('Remove this user from their organisation?')) removeFromOrg(contactId);
-              }
-            } else {
-              if (confirm('Remove this user from their organisation?')) removeFromOrg(contactId);
-            }
+            showConfirmModal(
+              'Confirm Removal',
+              'Are you sure you want to remove this user from their organisation?',
+              function() { removeFromOrg(contactId); }
+            );
+          }
+        }
+      });
+    }
+
+    if (orgsTbody) {
+      orgsTbody.addEventListener('click', function (e) {
+        var btn = e.target.closest && e.target.closest('.js-delete-org-btn');
+        if (btn) {
+          var accountId = btn.getAttribute('data-accountid');
+          var orgName = btn.getAttribute('data-orgname');
+          if (accountId) {
+            showConfirmModal(
+              'Confirm Deletion',
+              'Are you sure you want to permanently delete the organisation "' + orgName + '"? This cannot be undone.',
+              function() { deleteOrganisation(accountId); }
+            );
           }
         }
       });

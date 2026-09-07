@@ -173,7 +173,7 @@ export function createDevServer(config: ResolvedConfig): DevServer {
       const entity = urlPath.replace('/_api/', '').split('?')[0].replace(/\/$/, '');
       let mockData: any = { value: [] };
       if (entity === 'contacts') {
-        mockData = { value: [{ contactid: 'mock-1', fullname: 'Mock Contact', emailaddress1: 'mock@example.com' }] };
+        mockData = { value: [{ contactid: 'mock-1', fullname: 'Mock Contact', emailaddress1: 'mock@example.com', _parentcustomerid_value: 'mock-1' }] };
       } else if (entity === 'accounts') {
         mockData = { value: [{ accountid: 'mock-1', name: 'Mock Account' }] };
       }

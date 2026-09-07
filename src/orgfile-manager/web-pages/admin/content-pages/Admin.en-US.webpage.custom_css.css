@@ -13,3 +13,43 @@
 .text-right {
   text-align: right;
 }
+
+/* Custom Modal Overlay */
+.custom-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.custom-modal-overlay.is-active {
+  display: flex;
+}
+.custom-modal-dialog {
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.custom-modal-header {
+  margin-bottom: 16px;
+}
+.custom-modal-header h4 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #313131;
+}
+.custom-modal-body {
+  margin-bottom: 32px;
+  font-size: 1rem;
+  color: #313131;
+}
+.custom-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
