@@ -1,0 +1,487 @@
+/* ============================================================
+   Profile Page Styles — Veylo
+   Aligned with the Australian Government Health Design System (HDS)
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. General Layout & Background
+   ------------------------------------------------------------ */
+.row[role="main"] {
+  padding-top: 2rem;
+  padding-bottom: 3.5rem;
+}
+
+/* ------------------------------------------------------------
+   2. Profile Sidebar (Left Column)
+   ------------------------------------------------------------ */
+
+/* Profile User Card */
+.well.profile-info {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.well.profile-info img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e6f2f7;
+  box-shadow: 0 2px 8px rgba(0, 111, 176, 0.15);
+  margin: 0 auto 16px auto;
+  display: block;
+}
+
+.well.profile-info .userFullName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #313131;
+  line-height: 1.3;
+  letter-spacing: -0.2px;
+}
+
+/* Navigation Panels & List Groups */
+.weblinks.list-group,
+.panel.nav-profile {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.panel.nav-profile {
+  border: 1px solid #e0e0e0;
+}
+
+.panel.nav-profile .panel-heading {
+  background-color: #f5f5f5;
+  border-bottom: 2px solid #006fb0;
+  padding: 12px 18px;
+}
+
+.panel.nav-profile .panel-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #313131;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel.nav-profile .panel-title .fa {
+  color: #006fb0;
+  font-size: 1rem;
+}
+
+.weblinks.list-group .list-group-item,
+.panel.nav-profile .list-group-item {
+  position: relative;
+  display: block;
+  padding: 14px 18px;
+  background-color: #ffffff;
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  color: #313131;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease, border-left-color 0.15s ease;
+  border-left: 3px solid transparent;
+}
+
+.weblinks.list-group .list-group-item:first-child,
+.panel.nav-profile .list-group-item:first-child {
+  border-top: none;
+}
+
+.weblinks.list-group .list-group-item:hover,
+.panel.nav-profile .list-group-item:hover {
+  background-color: #e6f2f7;
+  color: #006fb0;
+  border-left-color: #006fb0;
+  text-decoration: none;
+}
+
+.weblinks.list-group .list-group-item:focus,
+.panel.nav-profile .list-group-item:focus {
+  outline: 3px solid #9263de;
+  outline-offset: -2px;
+}
+
+.weblinks.list-group .list-group-item.active,
+.panel.nav-profile .list-group-item.active {
+  background-color: #006fb0;
+  color: #ffffff;
+  border-left-color: #004b75;
+  font-weight: 600;
+}
+
+.profile-alert {
+  color: #c97800;
+  font-size: 1.1rem;
+  margin-top: 2px;
+}
+
+/* ------------------------------------------------------------
+   3. Main Content Area (Right Column)
+   ------------------------------------------------------------ */
+#mainContent {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  padding: 32px 36px;
+}
+
+@media (max-width: 767px) {
+  #mainContent {
+    padding: 20px 18px;
+    margin-top: 24px;
+  }
+}
+
+/* Callout Page Copy (Matches HDS au-callout) */
+.page-copy {
+  margin-bottom: 24px;
+}
+
+.page-copy .xrm-attribute-value {
+  background-color: #f5f5f5;
+  border-left: 4px solid #006fb0;
+  padding: 16px 20px;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #313131;
+}
+
+.page-copy .xrm-attribute-value p {
+  margin-bottom: 8px;
+}
+
+.page-copy .xrm-attribute-value p:last-child {
+  margin-bottom: 0;
+}
+
+/* Email Confirmation Alert (Matches HDS au-page-alerts--info) */
+#mainContent .alert.alert-info {
+  background-color: #e6f2f7;
+  border: 1px solid #b8dcec;
+  border-left: 4px solid #006fb0;
+  color: #004b75;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#mainContent .alert.alert-info .fa-exclamation-circle {
+  color: #006fb0;
+  margin-right: 6px;
+  font-size: 1.1rem;
+}
+
+#mainContent .alert.alert-info .btn-info {
+  background-color: #006fb0;
+  border: 2px solid #006fb0;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 6px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#mainContent .alert.alert-info .btn-info:hover {
+  background-color: #005080;
+  border-color: #005080;
+  color: #ffffff;
+}
+
+#mainContent .alert.alert-info .btn-info:focus {
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+/* Headings & Legends */
+#ProfileFormView fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+#ProfileFormView legend {
+  border: none;
+  width: 100%;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.profile-page-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #313131;
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #006fb0;
+  display: block;
+  letter-spacing: -0.3px;
+}
+
+h3.profile-page-heading {
+  font-size: 1.25rem;
+  margin-top: 32px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+h3.profile-page-heading small {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #636363;
+  margin-left: 8px;
+}
+
+/* ------------------------------------------------------------
+   4. Form Controls & Section Grid (HDS Form Elements)
+   ------------------------------------------------------------ */
+
+/* Responsive Modern Grid for ASP.NET Form Table */
+#ProfileFormView .tab,
+#ProfileFormView .tab-column,
+#ProfileFormView table.section,
+#ProfileFormView table.section tbody,
+#ProfileFormView table.section tr,
+#ProfileFormView table.section td {
+  border: none !important;
+}
+
+#ProfileFormView table.section {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#ProfileFormView table.section tbody {
+  display: block;
+}
+
+#ProfileFormView table.section tr {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+#ProfileFormView table.section td.form-control-cell,
+#ProfileFormView table.section td.picklist-cell {
+  display: block;
+  flex: 1 1 280px;
+  padding: 0 10px 20px 10px;
+  box-sizing: border-box;
+}
+
+#ProfileFormView table.section td.form-control-cell[colspan="2"],
+#ProfileFormView table.section td.picklist-cell[colspan="2"] {
+  flex: 1 1 100%;
+}
+
+#ProfileFormView table.section td.zero-cell,
+#ProfileFormView table.section td.cell:empty {
+  display: none !important;
+}
+
+#ProfileFormView table.section tr:empty {
+  display: none !important;
+}
+
+/* Form Labels */
+#ProfileFormView .field-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #313131;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+
+#ProfileFormView .info {
+  margin-bottom: 4px;
+}
+
+#ProfileFormView .info.required .field-label::after {
+  content: " *";
+  color: #d60000;
+  font-weight: 700;
+}
+
+#ProfileFormView .validators {
+  display: inline-block;
+}
+
+#ProfileFormView .validators span {
+  color: #d60000;
+  font-weight: 700;
+}
+
+/* Input Fields, Picklists, Textareas */
+#ProfileFormView .form-control {
+  background-color: #ffffff;
+  border: 2px solid #636363;
+  border-radius: 4px;
+  color: #313131;
+  font-size: 1rem;
+  height: 44px;
+  padding: 8px 14px;
+  box-shadow: none;
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#ProfileFormView .form-control:hover {
+  border-color: #313131;
+}
+
+#ProfileFormView .form-control:focus {
+  border-color: #006fb0;
+  outline: 3px solid #9263de;
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+#ProfileFormView textarea.form-control {
+  height: auto;
+  min-height: 120px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+#ProfileFormView select.form-control.picklist {
+  height: 44px;
+  cursor: pointer;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23313131' width='16' height='16' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 18px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* ------------------------------------------------------------
+   5. Marketing Options Panel (Checkboxes)
+   ------------------------------------------------------------ */
+#ContentContainer_MainContent_MainContent_ContentBottom_MarketingOptionsPanel {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin-top: 16px;
+  margin-bottom: 28px;
+}
+
+#ContentContainer_MainContent_MainContent_ContentBottom_MarketingOptionsPanel .checkbox {
+  margin: 10px 0;
+}
+
+#ContentContainer_MainContent_MainContent_ContentBottom_MarketingOptionsPanel .checkbox label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #313131;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding-left: 0;
+}
+
+#ContentContainer_MainContent_MainContent_ContentBottom_MarketingOptionsPanel .checkbox input[type="checkbox"] {
+  position: static;
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  accent-color: #006fb0;
+  cursor: pointer;
+}
+
+#ContentContainer_MainContent_MainContent_ContentBottom_MarketingOptionsPanel .checkbox input[type="checkbox"]:focus {
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   6. Form Actions & Submit Button (Matches HDS au-btn)
+   ------------------------------------------------------------ */
+#mainContent .actions {
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+#mainContent .actions input.btn-primary,
+#mainContent .actions button.btn-primary {
+  background-color: #006fb0;
+  border: 3px solid #006fb0;
+  color: #ffffff;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 32px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+#mainContent .actions input.btn-primary:hover,
+#mainContent .actions button.btn-primary:hover {
+  background-color: #005080;
+  border-color: #005080;
+  color: #ffffff;
+}
+
+#mainContent .actions input.btn-primary:focus,
+#mainContent .actions button.btn-primary:focus {
+  background-color: #005080;
+  border-color: #005080;
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+#mainContent .actions input.btn-primary:active,
+#mainContent .actions button.btn-primary:active {
+  background-color: #003859;
+  border-color: #003859;
+}
+
+/* Validation Alert Summary (HDS au-page-alerts--error) */
+#mainContent .alert.validation-summary {
+  background-color: #fdf2f2;
+  border: 1px solid #f5c6cb;
+  border-left: 4px solid #d60000;
+  color: #a60000;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
