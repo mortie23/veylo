@@ -36,7 +36,35 @@
   <div class="container">
 
     <!-- Status Banner -->
-    <div id="admin-status" class="admin-status" style="display:none;" role="alert"></div>
+    <div id="admin-status" class="au-page-alerts" style="display:none;" role="alert"></div>
+
+    <!-- Dashboard metrics -->
+    <div class="row" style="margin-bottom: 30px;">
+      <div class="col-sm-6 col-md-4">
+         <div class="health-card health-card--shadow" style="text-align: center; height: 100%;">
+           <div class="health-card__body">
+             <h3>Total Users</h3>
+             <h2 id="metric-total-users" style="font-size: 3rem; color: #006fb0; margin: 0;">-</h2>
+           </div>
+         </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+         <div class="health-card health-card--shadow" style="text-align: center; height: 100%;">
+           <div class="health-card__body">
+             <h3>Total Orgs</h3>
+             <h2 id="metric-total-orgs" style="font-size: 3rem; color: #006fb0; margin: 0;">-</h2>
+           </div>
+         </div>
+      </div>
+      <div class="col-sm-6 col-md-4">
+         <div class="health-card health-card--shadow" style="text-align: center; height: 100%;">
+           <div class="health-card__body">
+             <h3>Assigned Users</h3>
+             <h2 id="metric-assigned-users" style="font-size: 3rem; color: #0b996c; margin: 0;">-</h2>
+           </div>
+         </div>
+      </div>
+    </div>
 
     <!-- Refresh Button -->
     <div class="row" style="margin-bottom: 20px;">
@@ -47,43 +75,69 @@
       </div>
     </div>
 
-    <!-- Assign User to Org Form -->
-    <div class="row">
-      <div class="col-md-12">
-        <div class="health-card health-card--shadow" style="margin-bottom: 30px;">
+    <!-- Action Cards: Assign User + Register Org side by side -->
+    <div class="row" style="margin-bottom: 30px;">
+
+      <!-- Assign User to Org -->
+      <div class="col-md-6">
+        <div class="health-card health-card--shadow" style="height: 100%;">
           <div class="health-card__accent"></div>
           <div class="health-card__body">
             <h2 class="health-card__title">
               <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
               Assign User to Organisation
             </h2>
-            <div class="row">
-              <div class="col-md-5">
-                <div class="form-group">
-                  <label for="admin-user-select">User</label>
-                  <select id="admin-user-select" class="form-control">
-                    <option value="">Loading users&hellip;</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-5">
-                <div class="form-group">
-                  <label for="admin-org-select">Organisation</label>
-                  <select id="admin-org-select" class="form-control">
-                    <option value="">Loading organisations&hellip;</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-2">
-                <div class="form-group">
-                  <label class="visible-md visible-lg">&nbsp;</label>
-                  <button id="admin-assign-btn" class="au-btn au-btn--primary" type="button" style="width: 100%;">Assign</button>
-                </div>
-              </div>
+            <p class="au-body">Select a portal user and an organisation, then click Assign to grant them membership.</p>
+            <div class="au-form__item">
+              <label for="admin-user-select">User</label>
+              <select id="admin-user-select" class="au-select au-select--block">
+                <option value="">Loading users&hellip;</option>
+              </select>
             </div>
+            <div class="au-form__item">
+              <label for="admin-org-select">Organisation</label>
+              <select id="admin-org-select" class="au-select au-select--block">
+                <option value="">Loading organisations&hellip;</option>
+              </select>
+            </div>
+            <button id="admin-assign-btn" class="au-btn au-btn--primary" type="button">Assign</button>
           </div>
         </div>
       </div>
+
+      <!-- Register New Organisation -->
+      <div class="col-md-6">
+        <div class="health-card health-card--shadow" style="height: 100%;">
+          <div class="health-card__accent"></div>
+          <div class="health-card__body">
+            <h2 class="health-card__title">
+              <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+              Register New Organisation
+            </h2>
+            <p class="au-body">Create a new organisation record. Once registered, it will appear in the assign dropdown above.</p>
+            <div class="au-form__item">
+              <label for="admin-org-name">Organisation Name <span aria-hidden="true" style="color:#d60000;">*</span></label>
+              <input id="admin-org-name" class="au-text-input au-text-input--block" type="text" placeholder="e.g. Acme Health Services" required />
+            </div>
+            <div class="au-form__item">
+              <label for="admin-org-abn">ABN / Registration Number</label>
+              <input id="admin-org-abn" class="au-text-input au-text-input--block" type="text" placeholder="e.g. 12 345 678 901" />
+            </div>
+            <div class="au-form__item">
+              <label for="admin-org-email">Organisation Email</label>
+              <input id="admin-org-email" class="au-text-input au-text-input--block" type="email" placeholder="e.g. contact@orgname.com.au" />
+            </div>
+            <div class="au-form__item">
+              <label for="admin-org-primary-contact">Primary Contact (optional)</label>
+              <select id="admin-org-primary-contact" class="au-select au-select--block">
+                <option value="">— No primary contact —</option>
+              </select>
+            </div>
+            <button id="admin-create-org-btn" class="au-btn au-btn--primary" type="button">Register Organisation</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Users Table -->
@@ -96,8 +150,8 @@
               <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
               Users &amp; Organisation Memberships
             </h2>
-            <div class="table-responsive">
-              <table class="table admin-table" aria-label="Users and their organisation memberships">
+            <div class="health-table__responsive">
+              <table aria-label="Users and their organisation memberships">
                 <thead>
                   <tr>
                     <th scope="col">Name</th>
@@ -107,7 +161,7 @@
                   </tr>
                 </thead>
                 <tbody id="admin-users-tbody">
-                  <tr><td colspan="4" class="admin-empty">Loading users&hellip;</td></tr>
+                  <tr><td colspan="4">Loading users&hellip;</td></tr>
                 </tbody>
               </table>
             </div>
@@ -126,16 +180,19 @@
               <span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span>
               Organisations
             </h2>
-            <div class="table-responsive">
-              <table class="table admin-table" aria-label="Organisations and member counts">
+            <div class="health-table__responsive">
+              <table aria-label="Organisations and member counts">
                 <thead>
                   <tr>
                     <th scope="col">Organisation Name</th>
+                    <th scope="col">ABN</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Primary Contact</th>
                     <th scope="col">Members</th>
                   </tr>
                 </thead>
                 <tbody id="admin-orgs-tbody">
-                  <tr><td colspan="2" class="admin-empty">Loading organisations&hellip;</td></tr>
+                  <tr><td colspan="5">Loading organisations&hellip;</td></tr>
                 </tbody>
               </table>
             </div>

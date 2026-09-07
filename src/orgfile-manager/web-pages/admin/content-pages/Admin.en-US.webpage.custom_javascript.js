@@ -4,12 +4,13 @@
  * Calls the Power Pages Web API (/_api/) to manage Contact ↔ Account
  * relationships. Requires the following site settings to be enabled:
  *   - Webapi/contact/enabled = true
- *   - Webapi/contact/fields = fullname,emailaddress1,parentcustomerid
+ *   - Webapi/contact/fields = fullname,emailaddress1,_parentcustomerid_value
  *   - Webapi/account/enabled = true
- *   - Webapi/account/fields = name
+ *   - Webapi/account/fields = name,accountnumber,emailaddress1,_primarycontactid_value
  *
- * Also requires Table Permissions granting the Administrators web role
- * read/write access to the Contact and Account tables.
+ * Also requires Table Permissions granting the Administrators web role:
+ *   - Contact: Read, Write
+ *   - Account:  Read, Write, Create
  */
 (function () {
   'use strict';
@@ -25,25 +26,31 @@
   var state = {
     contacts: [],
     accounts: [],
-    accountMap: {} // accountid → name
+    accountMap: {}, // accountid → name (for fast lookups in users table)
+    contactMap: {}  // contactid → fullname (for primary contact display)
   };
 
   // ============================================================
   // Helpers
   // ============================================================
 
-  /** Get the Power Pages anti-forgery token for write operations. */
-  function getToken() {
-    var el = document.querySelector('input[name="__RequestVerificationToken"]');
-    return el ? el.value : '';
-  }
-
   /** Display a status message in the admin panel. */
   function showStatus(message, type) {
     var el = document.getElementById('admin-status');
     if (!el) return;
     el.textContent = message;
-    el.className = 'admin-status admin-status--' + (type || 'info');
+    
+    // Map type to HDS page-alerts modifier
+    var hdsType = 'info'; // default for au-page-alerts
+    if (type === 'success' || type === 'warning' || type === 'error') {
+      hdsType = type;
+    }
+    
+    el.className = 'au-page-alerts';
+    if (hdsType !== 'info') {
+      el.className += ' au-page-alerts--' + hdsType;
+    }
+    
     el.style.display = 'block';
     if (type === 'success') {
       setTimeout(function () { el.style.display = 'none'; }, 4000);
@@ -68,15 +75,35 @@
       'OData-MaxVersion': '4.0',
       'OData-Version': '4.0'
     };
+
+    var tokenPromise = Promise.resolve('');
+
     if (method !== 'GET') {
       headers['Content-Type'] = 'application/json';
-      headers['__RequestVerificationToken'] = getToken();
+      // Use the official Power Pages shell object to get the token
+      if (window.shell && window.shell.getTokenDeferred) {
+        tokenPromise = new Promise(function(resolve) {
+          window.shell.getTokenDeferred().done(function(token) {
+            resolve(token);
+          });
+        });
+      } else {
+        // Fallback for isolated environments where shell might not exist
+        var el = document.querySelector('input[name="__RequestVerificationToken"]');
+        tokenPromise = Promise.resolve(el ? el.value : '');
+      }
     }
-    var opts = { method: method, headers: headers };
-    if (body) {
-      opts.body = JSON.stringify(body);
-    }
-    return fetch(API_BASE + endpoint, opts).then(function (response) {
+
+    return tokenPromise.then(function(token) {
+      if (token) {
+        headers['__RequestVerificationToken'] = token;
+      }
+      var opts = { method: method, headers: headers };
+      if (body) {
+        opts.body = JSON.stringify(body);
+      }
+      return fetch(API_BASE + endpoint, opts);
+    }).then(function (response) {
       if (!response.ok) {
         return response.text().then(function (text) {
           throw new Error('API ' + response.status + ': ' + text);
@@ -92,7 +119,7 @@
   // ============================================================
 
   function loadAccounts() {
-    return apiRequest('GET', 'accounts?$select=name&$orderby=name')
+    return apiRequest('GET', 'accounts?$select=name,accountnumber,emailaddress1,_primarycontactid_value&$orderby=name')
       .then(function (data) {
         state.accounts = data.value || [];
         state.accountMap = {};
@@ -114,9 +141,16 @@
     return apiRequest('GET', 'contacts?$select=fullname,emailaddress1,_parentcustomerid_value&$orderby=fullname')
       .then(function (data) {
         state.contacts = data.value || [];
+        // Build a contactid → name lookup for primary contact display in orgs table
+        state.contactMap = {};
+        state.contacts.forEach(function (c) {
+          state.contactMap[c.contactid] = c.fullname || c.emailaddress1 || c.contactid;
+        });
         renderUsersTable();
         renderOrgsTable();
         populateUserDropdown();
+        populatePrimaryContactDropdown();
+        updateDashboard();
       })
       .catch(function (err) {
         console.error('Failed to load contacts:', err);
@@ -125,6 +159,23 @@
           'error'
         );
       });
+  }
+
+  function updateDashboard() {
+    var elUsers = document.getElementById('metric-total-users');
+    var elOrgs = document.getElementById('metric-total-orgs');
+    var elAssigned = document.getElementById('metric-assigned-users');
+    
+    if (elUsers) elUsers.textContent = state.contacts.length;
+    if (elOrgs) elOrgs.textContent = state.accounts.length;
+    
+    if (elAssigned) {
+      var assignedCount = 0;
+      state.contacts.forEach(function (c) {
+        if (c._parentcustomerid_value) assignedCount++;
+      });
+      elAssigned.textContent = assignedCount;
+    }
   }
 
   // ============================================================
@@ -166,19 +217,25 @@
     if (!tbody) return;
 
     if (state.accounts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="2" class="admin-empty">No organisations found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5">No organisations found. Use the form above to register one.</td></tr>';
       return;
     }
 
     var rows = '';
     state.accounts.forEach(function (a) {
-      var count = 0;
+      var memberCount = 0;
       state.contacts.forEach(function (c) {
-        if (c._parentcustomerid_value === a.accountid) count++;
+        if (c._parentcustomerid_value === a.accountid) memberCount++;
       });
+      var primaryName = a._primarycontactid_value
+        ? (state.contactMap[a._primarycontactid_value] || '\u2014')
+        : '\u2014';
       rows += '<tr>';
       rows += '<td>' + esc(a.name) + '</td>';
-      rows += '<td>' + count + '</td>';
+      rows += '<td>' + esc(a.accountnumber || '\u2014') + '</td>';
+      rows += '<td>' + esc(a.emailaddress1 || '\u2014') + '</td>';
+      rows += '<td>' + esc(primaryName) + '</td>';
+      rows += '<td>' + memberCount + '</td>';
       rows += '</tr>';
     });
     tbody.innerHTML = rows;
@@ -202,6 +259,18 @@
     var html = '<option value="">\u2014 Select an organisation \u2014</option>';
     state.accounts.forEach(function (a) {
       html += '<option value="' + a.accountid + '">' + esc(a.name) + '</option>';
+    });
+    sel.innerHTML = html;
+  }
+
+  function populatePrimaryContactDropdown() {
+    var sel = document.getElementById('admin-org-primary-contact');
+    if (!sel) return;
+    var html = '<option value="">\u2014 No primary contact \u2014</option>';
+    state.contacts.forEach(function (c) {
+      html += '<option value="' + c.contactid + '">'
+            + esc(c.fullname || c.emailaddress1 || c.contactid)
+            + '</option>';
     });
     sel.innerHTML = html;
   }
@@ -253,6 +322,52 @@
     });
   }
 
+  /** Register a new organisation (Account) in Dataverse. */
+  function createOrganisation() {
+    var name = (document.getElementById('admin-org-name').value || '').trim();
+    var abn  = (document.getElementById('admin-org-abn').value || '').trim();
+    var email = (document.getElementById('admin-org-email').value || '').trim();
+    var primaryContactId = document.getElementById('admin-org-primary-contact').value;
+
+    if (!name) {
+      showStatus('Organisation Name is required.', 'warning');
+      document.getElementById('admin-org-name').focus();
+      return;
+    }
+
+    var payload = { name: name };
+    if (abn)   payload['accountnumber'] = abn;
+    if (email) payload['emailaddress1'] = email;
+    if (primaryContactId) {
+      payload['primarycontactid@odata.bind'] = '/contacts(' + primaryContactId + ')';
+    }
+
+    showStatus('Registering organisation\u2026', 'info');
+
+    // Disable button to prevent double-submit
+    var btn = document.getElementById('admin-create-org-btn');
+    if (btn) btn.disabled = true;
+
+    apiRequest('POST', 'accounts', payload)
+    .then(function () {
+      showStatus('Organisation "' + name + '" registered successfully.', 'success');
+      // Clear the form
+      document.getElementById('admin-org-name').value = '';
+      document.getElementById('admin-org-abn').value = '';
+      document.getElementById('admin-org-email').value = '';
+      document.getElementById('admin-org-primary-contact').value = '';
+      // Reload accounts first (so new org appears in dropdown + table), then contacts
+      return loadAccounts().then(loadContacts);
+    })
+    .catch(function (err) {
+      console.error('Create organisation failed:', err);
+      showStatus('Failed to register organisation. Check browser console for details.', 'error');
+    })
+    .then(function () {
+      if (btn) btn.disabled = false;
+    });
+  }
+
   // ============================================================
   // Initialisation
   // ============================================================
@@ -263,6 +378,9 @@
 
     var assignBtn = document.getElementById('admin-assign-btn');
     if (assignBtn) assignBtn.addEventListener('click', assignToOrg);
+
+    var createOrgBtn = document.getElementById('admin-create-org-btn');
+    if (createOrgBtn) createOrgBtn.addEventListener('click', createOrganisation);
 
     var refreshBtn = document.getElementById('admin-refresh-btn');
     if (refreshBtn) {
