@@ -3,11 +3,11 @@ adx_enabletracking: false
 adx_excludefromsearch: false
 adx_hiddenfromsitemap: true
 adx_isroot: true
-adx_name: Redeem
-adx_pagetemplateid: e1536760-2013-4528-9a8a-bce1e87d39d9
+adx_name: SignIn
+adx_pagetemplateid: bd536760-2013-4528-9a8a-bce1e87d39d9
 adx_parentpageid: 51d3d71a-84e7-4040-8cf5-7ee25935398f
-adx_partialurl: Register
+adx_partialurl: SignIn
 adx_publishingstateid: 8be00a48-c2ad-46bd-81c6-44fb1d885bef
 adx_sharedpageconfiguration: false
-adx_title: Redeem invitation
-adx_webpageid: a13aafce-6d35-43c2-b608-c5e2454929b4
+adx_title: Sign In
+adx_webpageid: ea3aafce-6d35-43c2-b608-c5e2454929b4

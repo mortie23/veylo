@@ -79,6 +79,18 @@ adx_pagetemplate:
   DisplayName: Access Denied
   CheckSum: 55b3999bd078d917c08a22ee61f1bffe5fb638a32267644c602969a24f558f5a
   IsDeleted: false
+- RecordId: bd536760-2013-4528-9a8a-bce1e87d39d9
+  DisplayName: Sign In
+  CheckSum: 662f057c15393688561de2a09c0d4f8dd09843abc1178fcf23ca52e18a57109a
+  IsDeleted: false
+- RecordId: c1536760-2013-4528-9a8a-bce1e87d39d9
+  DisplayName: Register
+  CheckSum: d031b7850bc6d39b33c749dd7b50d0b9bc34688a03d30dc9b6716b6cea3ced68
+  IsDeleted: false
+- RecordId: e1536760-2013-4528-9a8a-bce1e87d39d9
+  DisplayName: Redeem
+  CheckSum: b640422ba721c65b8b000a8eb1d09dfe47ab7cf07c22e1ac240506caaf5fd5d4
+  IsDeleted: false
 - RecordId: f4c4b9c5-a197-46d9-abf4-42f2be779379
   DisplayName: Search
   CheckSum: 1b551ae8b5c94505c928ce97a4c5f77b43c08a07ba9ff70082f3abe06bda4a85
@@ -356,6 +368,10 @@ adx_webfile:
   DisplayName: logo-veylo-64.png
   CheckSum: e28dc7b50a2b97b8249e51731dd602733dd3af980aa826fc610948808c40d583
   IsDeleted: false
+- RecordId: 0faa96d2-fd26-422f-b4e3-bf2528f90dc3
+  DisplayName: powerpages-auth.css
+  CheckSum: 4ffd526cd78d44e90f5b72a45c4fd636ff04718fc57e1a7e26018d14032228c9
+  IsDeleted: false
 - RecordId: 59557c06-6f27-4370-86a4-5654fdf71359
   DisplayName: bootstrap.min.css
   CheckSum: d8347ca1dbc6fdf11e22f00dddebf1d0f56457f12ae5b0f6b12649419958a091
@@ -409,7 +425,7 @@ adx_weblinkset:
 adx_webpage:
 - RecordId: 0c2b7aec-7b7d-424c-8a0a-f4044e4db0d7
   DisplayName: Home
-  CheckSum: 4cafa5ddd3b0402ee37b2ca9ca1d160bd5670578aa4c9aa99024c8aa0c2b3844
+  CheckSum: b49c73036ad98446562735ade232adb1535dc8a0c898b7095f041fa73787332c
   IsDeleted: false
 - RecordId: 1c355785-3ece-4141-9446-cf5fa9db48c1
   DisplayName: Profile
@@ -427,9 +443,25 @@ adx_webpage:
   DisplayName: Home
   CheckSum: 43d78a21a634aa6aa5d73e3a907cf27acbf487ded6420e31976836746597c8ee
   IsDeleted: false
+- RecordId: 6bb757d1-3e05-4110-926b-500429ba18bb
+  DisplayName: SignIn
+  CheckSum: 407aecc80eb016c12e07bc242da1be522d3fabb4cffc1074aadba4d80c85c9e6
+  IsDeleted: false
+- RecordId: 71b757d1-3e05-4110-926b-500429ba18bb
+  DisplayName: Register
+  CheckSum: 1634d2ce6a32a3c56a9a6a43c5ecdf3f0419346ee2b2d8a6c9cab907488d2980
+  IsDeleted: false
 - RecordId: 8017d04c-bc6f-43a6-8774-bf54cdbcf9bb
   DisplayName: Search
   CheckSum: 940e0a62088482e5cab01589aebc2724a185170178eda497f3d32a77c86ae70f
+  IsDeleted: false
+- RecordId: 81b757d1-3e05-4110-926b-500429ba18bb
+  DisplayName: Redeem
+  CheckSum: f72ae95c8895290f4be0e94ff6d228cf6bea40d181a73f51b87cb93fa09d0e4b
+  IsDeleted: false
+- RecordId: a13aafce-6d35-43c2-b608-c5e2454929b4
+  DisplayName: Redeem
+  CheckSum: 3f278086704f45a00cae47d7581dbcd1e3eafc54a7cc2316e0ca0b5a0987ae64
   IsDeleted: false
 - RecordId: b7e3c1f2-8a4d-4e6b-9f0a-d2c1b3a4e5f6
   DisplayName: Admin
@@ -450,6 +482,14 @@ adx_webpage:
 - RecordId: d8393802-a11d-467e-96bf-0887b08a487a
   DisplayName: Page Not Found
   CheckSum: a8f98d1721f72140ab5f57497cecfe51a993b41a3f25412784750daccedde88e
+  IsDeleted: false
+- RecordId: ea3aafce-6d35-43c2-b608-c5e2454929b4
+  DisplayName: SignIn
+  CheckSum: 3bad48c607e77aba726f3afd8f34f3472cb53624f9277fe47f52d82c36e03962
+  IsDeleted: false
+- RecordId: f13aafce-6d35-43c2-b608-c5e2454929b4
+  DisplayName: Register
+  CheckSum: 226c18174141f19a1fdca9c884a275dfeb8d10fbf0fdf8308e78d1e6b7687be9
   IsDeleted: false
 - RecordId: f975b2b6-9496-4f44-85ef-3afc6f7b9c33
   DisplayName: Access Denied
@@ -541,7 +581,7 @@ adx_webtemplate:
   IsDeleted: false
 - RecordId: a4e83f03-88e5-4164-9f18-6fe7d463dfd0
   DisplayName: Header
-  CheckSum: cd6ee02510e12d9a6833e54555667acbe4ea02930c700cf87e445350719aeffe
+  CheckSum: 8c9bda61a80616dc9cdd601342ccfd1cfa5bed72a282919b7d46aae94c21bd6d
   IsDeleted: false
 - RecordId: aa24c4ec-4964-4fcc-83ae-a7cfd68b1e09
   DisplayName: Page Copy
@@ -567,6 +607,10 @@ annotation:
 - RecordId: 013be5a7-b5a5-f111-b8de-00224818094b
   DisplayName: portalbasictheme.css
   CheckSum: 8e6c8c6007941bfc94660714c685067f1eb7260a79200cf23c491885fd034179
+  IsDeleted: false
+- RecordId: 6406dc88-3cab-f111-aaac-00224818094b
+  DisplayName: powerpages-auth.css
+  CheckSum: 34fd6c6159785f7abb8ac3c1558ecee9158c48256ae4b62c3d8afb471cd0fb28
   IsDeleted: false
 - RecordId: 982e0308-b5a5-f111-b8de-00224818094b
   DisplayName: bootstrap.min.css
