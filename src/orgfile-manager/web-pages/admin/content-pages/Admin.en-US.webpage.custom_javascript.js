@@ -374,7 +374,23 @@
   function deleteOrganisation(accountId) {
     showStatus('Deleting organisation\u2026', 'info');
 
-    apiRequest('DELETE', 'accounts(' + accountId + ')')
+    // In Dataverse, deleting an Account can cascade-delete its Contacts (parental relationship).
+    // To prevent deleting the Users, we must first unlink all members from the organisation.
+    var memberContacts = state.contacts.filter(function(c) {
+      return c._parentcustomerid_value === accountId;
+    });
+
+    var unlinkPromises = memberContacts.map(function(c) {
+      return apiRequest('DELETE', 'contacts(' + c.contactid + ')/parentcustomerid_account/$ref')
+        .catch(function(err) {
+          console.warn('Failed to unlink contact ' + c.contactid + ' before account deletion:', err);
+        });
+    });
+
+    Promise.all(unlinkPromises)
+    .then(function() {
+      return apiRequest('DELETE', 'accounts(' + accountId + ')');
+    })
     .then(function () {
       showStatus('Organisation deleted successfully.', 'success');
       return loadAccounts().then(loadContacts);
