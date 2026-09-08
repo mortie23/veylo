@@ -1,0 +1,116 @@
+<div id="content-container" class="container wrapper-body" role="main">
+    <div id="content">
+        <ul class="nav nav-tabs nav-account" role="tablist" onkeydown="navigation(event)">
+            <li role="none" class=""><a role="tab" aria-selected="false" href="/SignIn?returnUrl=%2F"
+                    aria-label="Sign in" tabindex="-1" title="Sign in"><span class="fa fa-sign-in"
+                        aria-hidden="true"></span> Sign in</a></li>
+            <li role="none" class="">
+                <a role="tab" aria-selected="false" href="/Account/Login/Register?returnUrl=%2F" aria-label="Register"
+                    title="Register" tabindex="-1">Register</a>
+            </li>
+            <li role="none" class="active"><a role="tab" href="javascript:void(0)" aria-label="Redeem invitation"
+                    title="Redeem invitation">Redeem invitation</a></li>
+        </ul>
+        <script type="text/javascript" nonce="">
+            const keyCodes = {
+                END: 35,
+                HOME: 36,
+                LEFT: 37,
+                RIGHT: 39,
+                SPACE: 32
+            };
+            $(document).ready(function () {
+                //make the tabindex='0' for active tab and -1 for others
+                $(".nav.nav-tabs.nav-account > li > a").attr("tabindex", "-1");
+                $(".nav.nav-tabs.nav-account > li > a").attr("aria-selected", "false");
+                $(".nav.nav-tabs.nav-account > li.active > a").attr("tabindex", "0");
+                $(".nav.nav-tabs.nav-account > li.active > a").trigger("focus");
+                $(".nav.nav-tabs.nav-account > li.active > a").attr("aria-selected", "true");
+            });
+            function navigation(e) {
+                //change tabindex dynamically for all the tabs on key press of left-right navigation keys or home/end keys
+                var tabs = $(".nav.nav-tabs.nav-account > li > a");
+                if (e.keyCode === keyCodes.END || e.keyCode === keyCodes.HOME || e.keyCode === keyCodes.LEFT || e.keyCode === keyCodes.RIGHT) {
+                    var currentTab = $(document.activeElement);
+                    for (index = 0; index < tabs.length; index++) {
+                        if ($(tabs[index]).text() === currentTab.text()) {
+                            e.keyCode === keyCodes.LEFT || e.keyCode === keyCodes.END ? (index == 0 || e.keyCode === keyCodes.END ? $(tabs[tabs.length - 1]).trigger("focus") :
+                                $(tabs[index - 1]).trigger("focus")) : (index == (tabs.length - 1) || e.keyCode === keyCodes.HOME ? $(tabs[0]).focus() : $(tabs[index + 1]).trigger("focus"));
+                        }
+                    }
+                }
+                //open tab on click of SPACE key
+                if (e.keyCode == keyCodes.SPACE) {
+                    e.preventDefault();
+                    $(document.activeElement)[0].click();
+                    tabs.attr("tabindex", "-1").attr("aria-selected", "false");
+                }
+            }
+        </script>
+        <div class="page-content" id="mainContent">
+            <div class="xrm-editable-html xrm-attribute no-value page-copy">
+                <div class="xrm-attribute-value"></div>
+            </div>
+            <form action="" method="post">
+                <input name="__RequestVerificationToken" type="hidden"
+                    value="bD74xispxfpAevtMwjnAFcgQUpK-KTlY4Gs0N_VkXHSVxFPxcKbK4JUOqbXo0jHIfb91c4zAQ5QtkTT4yWS-V8hDTBjup0QwznP681GP06c1">
+                <div class="form-horizontal">
+                    <h2 class="login-heading-section"><span class="xrm-editable-text xrm-attribute"><span
+                                class="xrm-attribute-value-encoded xrm-attribute-value">Sign up with an invitation
+                                code</span></span></h2>
+                    <div class="validation-summary-valid listStyleTypeNone alert alert-block alert-danger"
+                        data-valmsg-summary="true" id="redeemInvitation-validation-summary" tabindex="0">
+                        <ul role="presentation">
+                            <li style="display:none"><a href="#InvitationCode"></a></li>
+                        </ul>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label required" for="InvitationCode"><span
+                                class="xrm-editable-text xrm-attribute"><span
+                                    class="xrm-attribute-value-encoded xrm-attribute-value">Invitation
+                                    code</span></span></label>
+                        <div class="col-sm-10">
+                            <input aria-label="Invitation code is a required field." class="form-control"
+                                data-val="true" data-val-required="Invitation code is a required field. "
+                                id="InvitationCode" name="InvitationCode" title="Invitation code is a required field."
+                                type="text" value="" aria-required="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input data-val="true" data-val-required="The RedeemByLogin field is required."
+                                        id="RedeemByLogin" name="RedeemByLogin" type="checkbox" value="true"><input
+                                        name="RedeemByLogin" type="hidden" value="false">
+                                    <span class="xrm-editable-text xrm-attribute"><span
+                                            class="xrm-attribute-value-encoded xrm-attribute-value">I have an existing
+                                            account</span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button id="submit-redeem-invitation" title="Register"
+                                class="btn btn-primary">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <script type="text/javascript" nonce="">
+                $(function () {
+                    $("#submit-redeem-invitation").on("click", function () {
+                        $.blockUI({ message: null, overlayCSS: { opacity: .3 } });
+                    });
+                });
+                $(document).ready(function () {
+                    document.querySelector('title').innerHTML = ($('.nav-tabs > li.active').text() + "");
+                    if (portal) {
+                        portal.UpdateValidationSummary("redeemInvitation-validation-summary");
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</div>

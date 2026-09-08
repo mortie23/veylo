@@ -183,7 +183,27 @@ export function createDevServer(config: ResolvedConfig): DevServer {
     }
 
     // --- Page routing ---
-    const page = siteData.routeTable.get(urlPath);
+    let page = siteData.routeTable.get(urlPath);
+    if (!page) {
+      for (const [route, p] of siteData.routeTable.entries()) {
+        if (route.toLowerCase() === urlPath.toLowerCase()) {
+          page = p;
+          break;
+        }
+      }
+    }
+    if (!page && urlPath.toLowerCase().startsWith('/account/login/')) {
+      const subPath = '/' + urlPath.slice('/account/login/'.length);
+      page = siteData.routeTable.get(subPath);
+      if (!page) {
+        for (const [route, p] of siteData.routeTable.entries()) {
+          if (route.toLowerCase() === subPath.toLowerCase()) {
+            page = p;
+            break;
+          }
+        }
+      }
+    }
     if (!page) {
       // Don't render full 404 HTML page for missing assets, well-known requests, or non-HTML clients
       const hasExt = path.extname(urlPath).length > 0;

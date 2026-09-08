@@ -51,7 +51,7 @@ adx_contentsnippet:
 adx_entitypermission:
 - RecordId: 3123db11-193c-4fe7-9434-14a44b215876
   DisplayName: Admin - Account Management
-  CheckSum: f4d2268bfd6d84038400e54967bbac15247142dce15fd30c06fedc79c27ef551
+  CheckSum: d99cf6f69a9f60a33981d49619bf892803979dc854b371b76cfc90aa90ff7145
   IsDeleted: false
 - RecordId: 57a5bcaa-2f33-4bd1-bcc7-2d0c04feb884
   DisplayName: Admin - Contact Read/Write
@@ -441,7 +441,7 @@ adx_webpage:
   IsDeleted: false
 - RecordId: c8f4d2a3-9b5e-4f7c-a01b-e3d2c4b5f6a7
   DisplayName: Admin
-  CheckSum: 5af6be41c76b25860661accc85358e48ffbd749bc309c1e017852a884cc1a9eb
+  CheckSum: 7fea04c144ed8e28d01ea5604a2efc05a3932810cdf3ea2b753d0783f4eceb62
   IsDeleted: false
 - RecordId: d73467c5-2a18-4e6a-8acd-b2f8fbe10154
   DisplayName: Access Denied

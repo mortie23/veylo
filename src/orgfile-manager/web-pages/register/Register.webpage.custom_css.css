@@ -1,0 +1,414 @@
+/* ============================================================
+   Register Page Styles — Veylo
+   Aligned with the Australian Government Health Design System (HDS)
+   and themed consistently with the Profile & Sign In pages.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. General Layout & Centering
+   ------------------------------------------------------------ */
+#content {
+  max-width: 1140px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2.5rem 15px 4rem 15px;
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------
+   2. Navigation Tabs (Sign in / Register / Redeem invitation)
+   ------------------------------------------------------------ */
+.nav.nav-tabs.nav-account {
+  border-bottom: 2px solid #006fb0;
+  margin-bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.nav.nav-tabs.nav-account > li {
+  margin-bottom: -2px;
+}
+
+.nav.nav-tabs.nav-account > li > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  color: #313131;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  line-height: 1.4;
+}
+
+.nav.nav-tabs.nav-account > li > a:hover {
+  background-color: #e6f2f7;
+  color: #006fb0;
+  text-decoration: none;
+}
+
+.nav.nav-tabs.nav-account > li.active > a,
+.nav.nav-tabs.nav-account > li.active > a:hover,
+.nav.nav-tabs.nav-account > li.active > a:focus {
+  background-color: #ffffff;
+  color: #006fb0;
+  border: 2px solid #006fb0;
+  border-bottom: 2px solid #ffffff;
+  font-weight: 700;
+  cursor: default;
+  position: relative;
+}
+
+.nav.nav-tabs.nav-account > li > a:focus {
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+.nav.nav-tabs.nav-account > li > a .fa {
+  color: #006fb0;
+  font-size: 1.05rem;
+}
+
+/* ------------------------------------------------------------
+   3. Main Content Card
+   ------------------------------------------------------------ */
+.page-content#mainContent {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0 4px 4px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 36px 40px;
+  margin-top: 0;
+}
+
+@media (max-width: 767px) {
+  .page-content#mainContent {
+    padding: 24px 18px;
+    border-radius: 4px;
+  }
+}
+
+/* ------------------------------------------------------------
+   4. Headings
+   ------------------------------------------------------------ */
+.login-heading-section {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #313131;
+  margin: 0 0 24px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #006fb0;
+  display: block;
+  letter-spacing: -0.3px;
+}
+
+/* ------------------------------------------------------------
+   5. Two-Column Layout (Local Registration vs External Login)
+   ------------------------------------------------------------ */
+@media (min-width: 992px) {
+  #ContentContainer_MainContent_MainContent_SecureRegister .row,
+  #mainContent > form > div > .row,
+  #mainContent .row:has(#ContentContainer_MainContent_MainContent_LocalLogin) {
+    display: flex;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  #ContentContainer_MainContent_MainContent_LocalLogin,
+  #ContentContainer_MainContent_MainContent_ExternalLogin {
+    flex: 1 1 50%;
+    max-width: 50%;
+  }
+
+  #ContentContainer_MainContent_MainContent_LocalLogin .col-md-6,
+  #ContentContainer_MainContent_MainContent_ExternalLogin .col-md-6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    padding: 0 !important;
+  }
+
+  #ContentContainer_MainContent_MainContent_LocalLogin {
+    padding-right: 48px;
+    border-right: 1px solid #e0e0e0;
+  }
+
+  #ContentContainer_MainContent_MainContent_ExternalLogin {
+    padding-left: 48px;
+  }
+}
+
+@media (max-width: 991px) {
+  #ContentContainer_MainContent_MainContent_LocalLogin {
+    margin-bottom: 36px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  #ContentContainer_MainContent_MainContent_LocalLogin .col-md-6,
+  #ContentContainer_MainContent_MainContent_ExternalLogin .col-md-6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* ------------------------------------------------------------
+   6. Form Controls & Labels (Label ABOVE input per HDS)
+   ------------------------------------------------------------ */
+.form-horizontal .form-group {
+  display: block;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 24px;
+}
+
+/* Override Bootstrap col-sm-4 / col-sm-8 horizontal grid */
+.form-horizontal .control-label.col-sm-4,
+.form-horizontal .col-sm-4,
+.form-horizontal .col-sm-8 {
+  float: none !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-align: left !important;
+}
+
+.form-horizontal .col-sm-offset-4 {
+  margin-left: 0 !important;
+}
+
+/* Form Labels */
+.form-horizontal .control-label {
+  display: block !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #313131 !important;
+  margin-bottom: 8px !important;
+  padding-top: 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Mandatory Star (*) in Red */
+.form-horizontal .control-label.required::after,
+.form-horizontal label.required::after {
+  content: " *";
+  color: #d60000;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Input Fields (Matches HDS au-text-input & Profile form-control) */
+.form-horizontal .form-control {
+  background-color: #ffffff;
+  border: 2px solid #636363;
+  border-radius: 4px;
+  color: #313131;
+  font-size: 1rem;
+  height: 44px;
+  padding: 8px 14px;
+  box-shadow: none;
+  box-sizing: border-box;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-horizontal .form-control:hover {
+  border-color: #313131;
+}
+
+.form-horizontal .form-control:focus {
+  border-color: #006fb0;
+  outline: 3px solid #9263de;
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------
+   7. CAPTCHA Control (Telerik RadCaptcha Styling)
+   ------------------------------------------------------------ */
+.RadCaptcha {
+  margin: 4px 0 16px 0;
+}
+
+.RadCaptcha img {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.RadCaptcha a.rcRefreshImage,
+.RadCaptcha a.rcCaptchaAudioLink {
+  color: #006fb0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-top: 4px;
+  display: inline-block;
+  margin-right: 14px;
+  transition: color 0.15s ease;
+}
+
+.RadCaptcha a.rcRefreshImage:hover,
+.RadCaptcha a.rcCaptchaAudioLink:hover {
+  color: #005080;
+  text-decoration: underline;
+}
+
+.RadCaptcha a.rcRefreshImage:focus,
+.RadCaptcha a.rcCaptchaAudioLink:focus {
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+/* Reorder Captcha label to be above the input */
+.RadCaptcha p {
+  margin-top: 16px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.RadCaptcha p label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #313131;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.RadCaptcha p input[type="text"] {
+  background-color: #ffffff;
+  border: 2px solid #636363;
+  border-radius: 4px;
+  color: #313131;
+  font-size: 1rem;
+  height: 44px;
+  padding: 8px 14px;
+  box-shadow: none;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 240px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.RadCaptcha p input[type="text"]:hover {
+  border-color: #313131;
+}
+
+.RadCaptcha p input[type="text"]:focus {
+  border-color: #006fb0;
+  outline: 3px solid #9263de;
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------
+   8. Buttons (Matches HDS au-btn & Profile Page)
+   ------------------------------------------------------------ */
+/* Primary Register Button */
+.btn.btn-primary,
+button.btn-primary,
+input[type="submit"].btn.btn-primary,
+#SubmitButton {
+  background-color: #006fb0;
+  border: 3px solid #006fb0;
+  color: #ffffff;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 10px 32px;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn.btn-primary:hover,
+button.btn-primary:hover,
+input[type="submit"].btn.btn-primary:hover,
+#SubmitButton:hover {
+  background-color: #005080;
+  border-color: #005080;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.btn.btn-primary:focus,
+button.btn-primary:focus,
+input[type="submit"].btn.btn-primary:focus,
+#SubmitButton:focus {
+  background-color: #005080;
+  border-color: #005080;
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+.btn.btn-primary:active,
+button.btn-primary:active,
+input[type="submit"].btn.btn-primary:active,
+#SubmitButton:active {
+  background-color: #003859;
+  border-color: #003859;
+}
+
+/* External Login Button (Microsoft Entra ID) */
+.btn.btn-primary.btn-line {
+  background-color: #ffffff;
+  color: #006fb0;
+  border: 2px solid #006fb0;
+  width: 100%;
+  max-width: 340px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn.btn-primary.btn-line:hover {
+  background-color: #e6f2f7;
+  border-color: #005080;
+  color: #005080;
+}
+
+.btn.btn-primary.btn-line:focus {
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------
+   9. Validation & Alerts (HDS Error Alert)
+   ------------------------------------------------------------ */
+.alert.alert-danger {
+  background-color: #fdf2f2;
+  border: 1px solid #f5c6cb;
+  border-left: 4px solid #d60000;
+  color: #a60000;
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  font-size: 0.95rem;
+}
+
+.alert.validation-summary-valid {
+  display: none !important;
+}

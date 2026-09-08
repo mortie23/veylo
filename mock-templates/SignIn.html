@@ -1,0 +1,153 @@
+<div id="content">
+    <ul class="nav nav-tabs nav-account" role="tablist" onkeydown="navigation(event)">
+        <li role="none" class="active"><a role="tab" href="javascript:void(0)" aria-label="Sign in"
+                title="Sign in"><span class="fa fa-sign-in" aria-hidden="true"></span> Sign in</a></li>
+        <li role="none" class="">
+            <a role="tab" aria-selected="false" href="/Account/Login/Register?returnUrl=%2Fadmin%2F"
+                aria-label="Register" title="Register" tabindex="-1">Register</a>
+        </li>
+        <li role="none" class=""><a role="tab" aria-selected="false" href="/Register?returnUrl=%2Fadmin%2F"
+                aria-label="Redeem invitation" title="Redeem invitation" tabindex="-1">Redeem invitation</a></li>
+    </ul>
+    <script type="text/javascript" nonce="">
+        const keyCodes = {
+            END: 35,
+            HOME: 36,
+            LEFT: 37,
+            RIGHT: 39,
+            SPACE: 32
+        };
+        $(document).ready(function () {
+            //make the tabindex='0' for active tab and -1 for others
+            $(".nav.nav-tabs.nav-account > li > a").attr("tabindex", "-1");
+            $(".nav.nav-tabs.nav-account > li > a").attr("aria-selected", "false");
+            $(".nav.nav-tabs.nav-account > li.active > a").attr("tabindex", "0");
+            $(".nav.nav-tabs.nav-account > li.active > a").trigger("focus");
+            $(".nav.nav-tabs.nav-account > li.active > a").attr("aria-selected", "true");
+        });
+        function navigation(e) {
+            //change tabindex dynamically for all the tabs on key press of left-right navigation keys or home/end keys
+            var tabs = $(".nav.nav-tabs.nav-account > li > a");
+            if (e.keyCode === keyCodes.END || e.keyCode === keyCodes.HOME || e.keyCode === keyCodes.LEFT || e.keyCode === keyCodes.RIGHT) {
+                var currentTab = $(document.activeElement);
+                for (index = 0; index < tabs.length; index++) {
+                    if ($(tabs[index]).text() === currentTab.text()) {
+                        e.keyCode === keyCodes.LEFT || e.keyCode === keyCodes.END ? (index == 0 || e.keyCode === keyCodes.END ? $(tabs[tabs.length - 1]).trigger("focus") :
+                            $(tabs[index - 1]).trigger("focus")) : (index == (tabs.length - 1) || e.keyCode === keyCodes.HOME ? $(tabs[0]).focus() : $(tabs[index + 1]).trigger("focus"));
+                    }
+                }
+            }
+            //open tab on click of SPACE key
+            if (e.keyCode == keyCodes.SPACE) {
+                e.preventDefault();
+                $(document.activeElement)[0].click();
+                tabs.attr("tabindex", "-1").attr("aria-selected", "false");
+            }
+        }
+    </script>
+    <div class="page-content" id="mainContent">
+        <div class="xrm-editable-html xrm-attribute no-value page-copy">
+            <div class="xrm-attribute-value"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <form action="/SignIn?ReturnUrl=%2Fadmin%2F" method="post">
+                    <input name="__RequestVerificationToken" type="hidden"
+                        value="ppn578cMJ7YwdS8-WHLmh1WV6F3NqTe7Oaw19CH27FWqeN6Pzr3jKZeJ8nXvq67R-nCTueoGjJAuJzn360LMI9R8xzYL_u00rZEn9WndUOI1">
+                    <div class="form-horizontal">
+                        <h2 class="login-heading-section" id="local-login-heading">
+                            <span class="xrm-editable-text xrm-attribute"><span
+                                    class="xrm-attribute-value-encoded xrm-attribute-value">Sign in with a local
+                                    account</span></span>
+                        </h2>
+                        <div class="validation-summary-valid listStyleTypeNone alert alert-block alert-danger"
+                            data-valmsg-summary="true" id="loginValidationSummary" tabindex="0">
+                            <ul role="presentation">
+                                <li style="display:none"><a href="#Username"></a></li>
+                            </ul>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label required" for="Username"><span
+                                    class="xrm-editable-text xrm-attribute"><span
+                                        class="xrm-attribute-value-encoded xrm-attribute-value">Username</span></span></label>
+                            <div class="col-sm-8">
+                                <input class="form-control" id="Username" name="Username" type="text" value=""
+                                    aria-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label required" for="PasswordValue"><span
+                                    class="xrm-editable-text xrm-attribute"><span
+                                        class="xrm-attribute-value-encoded xrm-attribute-value">Password</span></span></label>
+                            <div class="col-sm-8">
+                                <input autocomplete="new-password" class="form-control" id="PasswordValue"
+                                    name="PasswordValue" type="password" aria-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                                <div class="checkbox">
+                                    <label>
+                                        <input data-val="true" data-val-required="The RememberMe field is required."
+                                            id="RememberMe" name="RememberMe" type="checkbox" value="true"><input
+                                            name="RememberMe" type="hidden" value="false">
+                                        <span class="xrm-editable-text xrm-attribute"><span
+                                                class="xrm-attribute-value-encoded xrm-attribute-value">Remember
+                                                me?</span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                                <button id="submit-signin-local" class="btn btn-primary" title="Sign in">Sign
+                                    in</button>
+                                <a class="btn btn-default" role="link" href="/Account/Login/ForgotPassword"
+                                    title="Forgot your password?">Forgot your password?</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <script type="text/javascript" nonce="">
+                    $(function () {
+                        $("#submit-signin-local").on("click", function () {
+                            $.blockUI({ message: null, overlayCSS: { opacity: .3 } });
+                        });
+                    });
+                    $(document).ready(function () {
+                        if (portal) {
+                            portal.UpdateValidationSummary("loginValidationSummary");
+                        }
+                    });
+                </script>
+            </div>
+            <div class="col-md-6">
+                <form action="/Account/Login/ExternalLogin?ReturnUrl=%2Fadmin%2F" method="post">
+                    <input name="__RequestVerificationToken" type="hidden"
+                        value="ppn578cMJ7YwdS8-WHLmh1WV6F3NqTe7Oaw19CH27FWqeN6Pzr3jKZeJ8nXvq67R-nCTueoGjJAuJzn360LMI9R8xzYL_u00rZEn9WndUOI1">
+                    <div class="form-horizontal">
+                        <!-- Check if external login is enabled -->
+                        <h2 class="login-heading-section" id="external-login-heading">
+                            <span class="xrm-editable-text xrm-attribute"><span
+                                    class="xrm-attribute-value-encoded xrm-attribute-value">Sign in with an external
+                                    account</span></span>
+                        </h2>
+                        <div id="6_ctl00_AzureADRebrandDisclaimer">
+                        </div>
+                        <button name="provider" type="submit" class="btn btn-primary btn-line"
+                            id="https://login.windows.net/d63e78bd-9ee3-4a7d-a868-738824c13bd1/"
+                            title="Sign in with your Microsoft Entra ID account."
+                            value="https://login.windows.net/d63e78bd-9ee3-4a7d-a868-738824c13bd1/">Microsoft Entra ID
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript" nonce="">
+            $(document).ready(function () {
+                document.querySelector('title').innerHTML = ($('.nav-tabs > li.active').text() + "");
+                shell.refreshToken();
+            });
+        </script>
+    </div>
+</div>
