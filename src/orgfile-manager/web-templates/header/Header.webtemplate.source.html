@@ -1,5 +1,9 @@
 <script src='/clean-slate.js'></script>
 <link rel='stylesheet' href='/hds-all.min.css'>
+{% assign req_path = request.path | downcase %}
+{% if req_path contains 'signin' or req_path contains 'register' or req_path contains 'account/login' %}
+<link rel='stylesheet' href='/powerpages-auth.css'>
+{% endif %}
 <script src='/jquery.min.js'></script>
 <script>
   document.body.classList.add('au-grid');

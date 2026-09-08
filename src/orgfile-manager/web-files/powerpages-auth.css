@@ -1,12 +1,14 @@
 /* ============================================================
-   Sign In Page Styles — Veylo
+   Power Pages Auth Forms Styles — Veylo
    Aligned with the Australian Government Health Design System (HDS)
    and themed consistently with the Profile page.
+   Applies to Sign In, Register, and Redeem Invitation.
    ============================================================ */
 
 /* ------------------------------------------------------------
    1. General Layout & Centering
    ------------------------------------------------------------ */
+#content-container,
 #content {
   max-width: 1140px;
   margin-left: auto;
@@ -111,38 +113,62 @@
 }
 
 /* ------------------------------------------------------------
-   5. Two-Column Layout (Local Login vs External Login)
+   5. Two-Column Layout (Local vs External Login)
    ------------------------------------------------------------ */
 @media (min-width: 992px) {
-  #mainContent > .row {
+  #mainContent > .row,
+  #ContentContainer_MainContent_MainContent_SecureRegister .row,
+  #mainContent > form > div > .row,
+  #mainContent .row:has(#ContentContainer_MainContent_MainContent_LocalLogin) {
     display: flex;
     margin-left: 0;
     margin-right: 0;
   }
 
-  #mainContent > .row > .col-md-6 {
+  #mainContent > .row > .col-md-6,
+  #ContentContainer_MainContent_MainContent_LocalLogin,
+  #ContentContainer_MainContent_MainContent_ExternalLogin {
     flex: 1 1 50%;
     max-width: 50%;
     float: none;
   }
 
-  #mainContent > .row > .col-md-6:first-child {
+  #ContentContainer_MainContent_MainContent_LocalLogin .col-md-6,
+  #ContentContainer_MainContent_MainContent_ExternalLogin .col-md-6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    padding: 0 !important;
+  }
+
+  #mainContent > .row > .col-md-6:first-child,
+  #ContentContainer_MainContent_MainContent_LocalLogin {
     padding-right: 48px;
     padding-left: 0;
     border-right: 1px solid #e0e0e0;
   }
 
-  #mainContent > .row > .col-md-6:last-child {
+  #mainContent > .row > .col-md-6:last-child,
+  #ContentContainer_MainContent_MainContent_ExternalLogin {
     padding-left: 48px;
     padding-right: 0;
   }
 }
 
 @media (max-width: 991px) {
-  #mainContent > .row > .col-md-6:first-child {
+  #mainContent > .row > .col-md-6:first-child,
+  #ContentContainer_MainContent_MainContent_LocalLogin {
     margin-bottom: 36px;
     padding-bottom: 36px;
     border-bottom: 1px solid #e0e0e0;
+  }
+  
+  #ContentContainer_MainContent_MainContent_LocalLogin .col-md-6,
+  #ContentContainer_MainContent_MainContent_ExternalLogin .col-md-6 {
+    width: 100% !important;
+    max-width: 100% !important;
+    float: none !important;
+    padding: 0 !important;
   }
 }
 
@@ -156,10 +182,13 @@
   margin-bottom: 24px;
 }
 
-/* Override Bootstrap col-sm-4 / col-sm-8 horizontal grid */
+/* Override Bootstrap grid for forms */
+.form-horizontal .control-label.col-sm-2,
 .form-horizontal .control-label.col-sm-4,
+.form-horizontal .col-sm-2,
 .form-horizontal .col-sm-4,
-.form-horizontal .col-sm-8 {
+.form-horizontal .col-sm-8,
+.form-horizontal .col-sm-10 {
   float: none !important;
   width: 100% !important;
   padding-left: 0 !important;
@@ -167,6 +196,7 @@
   text-align: left !important;
 }
 
+.form-horizontal .col-sm-offset-2,
 .form-horizontal .col-sm-offset-4 {
   margin-left: 0 !important;
 }
@@ -191,7 +221,7 @@
   font-size: 1.1rem;
 }
 
-/* Input Fields (Matches HDS au-text-input & Profile form-control) */
+/* Input Fields */
 .form-horizontal .form-control {
   background-color: #ffffff;
   border: 2px solid #636363;
@@ -203,6 +233,7 @@
   box-shadow: none;
   box-sizing: border-box;
   width: 100%;
+  max-width: 520px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -218,7 +249,7 @@
 }
 
 /* ------------------------------------------------------------
-   7. Checkbox (Remember Me)
+   7. Checkbox (Remember Me / Existing account)
    ------------------------------------------------------------ */
 .form-horizontal .checkbox {
   margin: 8px 0 24px 0;
@@ -252,12 +283,97 @@
 }
 
 /* ------------------------------------------------------------
-   8. Buttons (Matches HDS au-btn & Profile Page)
+   8. CAPTCHA Control (Telerik RadCaptcha Styling)
+   ------------------------------------------------------------ */
+.RadCaptcha {
+  margin: 4px 0 16px 0;
+}
+
+.RadCaptcha img {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.RadCaptcha a.rcRefreshImage,
+.RadCaptcha a.rcCaptchaAudioLink {
+  color: #006fb0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-top: 4px;
+  display: inline-block;
+  margin-right: 14px;
+  transition: color 0.15s ease;
+}
+
+.RadCaptcha a.rcRefreshImage:hover,
+.RadCaptcha a.rcCaptchaAudioLink:hover {
+  color: #005080;
+  text-decoration: underline;
+}
+
+.RadCaptcha a.rcRefreshImage:focus,
+.RadCaptcha a.rcCaptchaAudioLink:focus {
+  outline: 3px solid #9263de;
+  outline-offset: 2px;
+}
+
+/* Reorder Captcha label to be above the input */
+.RadCaptcha p {
+  margin-top: 16px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.RadCaptcha p label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #313131;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.RadCaptcha p input[type="text"] {
+  background-color: #ffffff;
+  border: 2px solid #636363;
+  border-radius: 4px;
+  color: #313131;
+  font-size: 1rem;
+  height: 44px;
+  padding: 8px 14px;
+  box-shadow: none;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 240px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.RadCaptcha p input[type="text"]:hover {
+  border-color: #313131;
+}
+
+.RadCaptcha p input[type="text"]:focus {
+  border-color: #006fb0;
+  outline: 3px solid #9263de;
+  outline-offset: 1px;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------
+   9. Buttons (Matches HDS au-btn & Profile Page)
    ------------------------------------------------------------ */
 /* Primary Submit Button */
 .btn.btn-primary,
 button.btn-primary,
-#submit-signin-local {
+input[type="submit"].btn.btn-primary,
+#submit-signin-local,
+#SubmitButton,
+#submit-redeem-invitation {
   background-color: #006fb0;
   border: 3px solid #006fb0;
   color: #ffffff;
@@ -275,7 +391,10 @@ button.btn-primary,
 
 .btn.btn-primary:hover,
 button.btn-primary:hover,
-#submit-signin-local:hover {
+input[type="submit"].btn.btn-primary:hover,
+#submit-signin-local:hover,
+#SubmitButton:hover,
+#submit-redeem-invitation:hover {
   background-color: #005080;
   border-color: #005080;
   color: #ffffff;
@@ -284,7 +403,10 @@ button.btn-primary:hover,
 
 .btn.btn-primary:focus,
 button.btn-primary:focus,
-#submit-signin-local:focus {
+input[type="submit"].btn.btn-primary:focus,
+#submit-signin-local:focus,
+#SubmitButton:focus,
+#submit-redeem-invitation:focus {
   background-color: #005080;
   border-color: #005080;
   outline: 3px solid #9263de;
@@ -293,7 +415,10 @@ button.btn-primary:focus,
 
 .btn.btn-primary:active,
 button.btn-primary:active,
-#submit-signin-local:active {
+input[type="submit"].btn.btn-primary:active,
+#submit-signin-local:active,
+#SubmitButton:active,
+#submit-redeem-invitation:active {
   background-color: #003859;
   border-color: #003859;
 }
@@ -357,7 +482,7 @@ button.btn-primary:active,
 }
 
 /* ------------------------------------------------------------
-   9. Validation & Alerts (HDS Error Alert)
+   10. Validation & Alerts (HDS Error Alert)
    ------------------------------------------------------------ */
 .alert.alert-danger {
   background-color: #fdf2f2;
