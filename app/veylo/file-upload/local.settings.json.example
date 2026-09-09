@@ -1,0 +1,18 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
+    "STORAGE_ACCOUNT_NAME": "stveyportaldev01",
+    "BLOB_CONTAINER_NAME": "submissions",
+    "DATAVERSE_URL": "https://org123.crm.dynamics.com",
+    "ENTRA_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+    "API_AUDIENCE": "api://func-vey-portal-dev",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": ""
+  },
+  "Host": {
+    "CORS": "http://localhost:3000",
+    "CORSCredentials": true
+  }
+}

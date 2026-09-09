@@ -1,0 +1,34 @@
+# -----------------------------------------------------------------------------
+# Development Environment Variables (dev)
+# -----------------------------------------------------------------------------
+# Copy to dev.tfvars and customize:
+#   terraform plan -var-file=environments/dev.tfvars
+# -----------------------------------------------------------------------------
+
+environment                     = "dev"
+location                        = "australiaeast"
+app_name                        = "portal"
+workload_unit                   = "up"
+instance_seq                    = "01"
+storage_account_tier            = "Standard"
+storage_account_replication_type = "LRS"
+container_name                  = "submissions"
+
+# Power Pages Local / Dev Portal URLs
+powerpages_origin               = "http://localhost:3000"
+powerpages_dev_subdomain        = ""
+allowed_cors_origins            = [
+  "http://localhost:3000"
+]
+
+# Target Dataverse environment URL (e.g., https://org123.crm.dynamics.com)
+dataverse_url                   = "https://org123.crm.dynamics.com"
+
+# Optional: Entra ID Tenant ID (leave empty to use current az login context)
+entra_tenant_id                 = ""
+
+tags = {
+  Environment = "dev"
+  CostCenter  = "Engineering"
+  Project     = "Veylo"
+}

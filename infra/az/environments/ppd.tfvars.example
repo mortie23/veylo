@@ -1,0 +1,24 @@
+# -----------------------------------------------------------------------------
+# Pre-Production Environment Variables (ppd)
+# -----------------------------------------------------------------------------
+environment                     = "ppd"
+location                        = "australiaeast"
+app_name                        = "portal"
+workload_unit                   = "up"
+instance_seq                    = "01"
+storage_account_tier            = "Standard"
+storage_account_replication_type = "GRS"
+container_name                  = "submissions"
+
+powerpages_origin               = "https://your-portal-test.powerappsportals.com"
+powerpages_dev_subdomain        = "your-portal-test"
+allowed_cors_origins            = []
+
+dataverse_url                   = "https://org123.crm.dynamics.com"
+entra_tenant_id                 = ""
+
+tags = {
+  Environment = "ppd"
+  CostCenter  = "Engineering"
+  Project     = "Veylo"
+}
