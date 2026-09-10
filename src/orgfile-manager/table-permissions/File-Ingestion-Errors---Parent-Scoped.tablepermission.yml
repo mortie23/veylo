@@ -1,7 +1,5 @@
-adx_accountrelationship: 
 adx_append: false
 adx_appendto: false
-adx_contactrelationship: 
 adx_create: false
 adx_delete: false
 adx_entitylogicalname: vey_fileingestionerror

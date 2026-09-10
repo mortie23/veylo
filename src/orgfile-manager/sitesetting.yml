@@ -6,10 +6,8 @@
   adx_sitesettingid: 01fa974b-ab9a-49e3-b82f-9ecf2194a30a
 - adx_name: Authentication/OpenAuth/Facebook/AppSecret
   adx_sitesettingid: 1152d8d0-7248-4cfe-a0a0-f67f145c6f4f
-  importsequencenumber: 5
 - adx_name: Authentication/OpenAuth/Twitter/ConsumerKey
   adx_sitesettingid: 12544667-8f2d-4398-bf8a-fe2745410267
-  importsequencenumber: 5
 - adx_description: 'The default number of unauthenticated login attempts from an IP address before the IP address is blocked for Authentication/LoginThrottling/IpAddressTimeoutTimeSpan if the attempts occur within Authentication/LoginThrottling/MaxAttemptsTimeLimitTimeSpan amount of time. Default: 1000'
   adx_name: Authentication/LoginThrottling/MaxInvaildAttemptsFromIPAddress
   adx_sitesettingid: 15e2c1ee-3760-403b-ba11-e5e2ad175902
@@ -22,7 +20,6 @@
   adx_name: Authentication/Registration/ProfileRedirectEnabled
   adx_sitesettingid: 1a6f0c65-08c4-4519-bf67-3d4e264eb6a0
   adx_value: true
-  importsequencenumber: 3
 - adx_name: ThemeFeature
   adx_sitesettingid: 1ca5f712-a225-4ab0-81c9-87ad706f268f
 - adx_description: A date/time value in GMT format to represent the effective date of the current published terms and conditions. If the terms agreement is enabled, portal users that have not accepted the terms after this date will be asked to accept them the next time they sign in. If the date is not provided, and the terms agreement is enabled, the terms will be presented every time portal users sign in.
@@ -34,7 +31,6 @@
   adx_value: false
 - adx_name: Authentication/OpenAuth/Microsoft/ClientSecret
   adx_sitesettingid: 3c5a7640-9e8b-4594-9d4d-7ae0c900b2a9
-  importsequencenumber: 5
 - adx_description: 'The amount of time the Authentication/LoginThrottling/MaxInvaildAttemptsFromIPAddress are to be within before the IP address has to wait Authentication/LoginThrottling/IpAddressTimeoutTimeSpan. Default: 00:03:00 (3 mins)'
   adx_name: Authentication/LoginThrottling/MaxAttemptsTimeLimitTimeSpan
   adx_sitesettingid: 3caa50d8-f0ba-40eb-ac7e-5baabfed5fcc
@@ -43,7 +39,6 @@
   adx_name: Authentication/Registration/AzureADLoginEnabled
   adx_sitesettingid: 3ebdfc61-7474-4027-90d4-4482ba42c489
   adx_value: true
-  importsequencenumber: 3
 - adx_description: A true or false value. If set to true, the portal will display the terms and conditions of the site. Users must agree to the terms and conditions before they are considered authenticated and can use the site.
   adx_name: Authentication/Registration/TermsAgreementEnabled
   adx_sitesettingid: 3f5fb0d8-6b26-44a4-8db2-d7e5892bfe56
@@ -55,12 +50,15 @@
   adx_name: Authentication/Registration/DenyMinorsWithoutParentalConsent
   adx_sitesettingid: 46970a2c-b3a4-4923-89e4-0e0819964122
   adx_value: false
+- adx_description: Disable internal security OData filter for File Ingestion Error table to prevent server error on parent-scoped lookup queries.
+  adx_name: Webapi/vey_fileingestionerror/disableodatafilter
+  adx_sitesettingid: 5ad43276-9de6-4235-9219-d541c8584215
+  adx_value: true
 - adx_name: Search/IndexQueryName
   adx_sitesettingid: 5c47710a-fd07-4073-9d78-1d3622ec7c7f
   adx_value: Portal Search
 - adx_name: Authentication/OpenAuth/Facebook/AppId
   adx_sitesettingid: 662b81a3-c033-4fbb-b6fa-98c7ea080a99
-  importsequencenumber: 5
 - adx_description: 'Override query for site search, to apply additional weights and filters. @Query is the query text entered by a user. Lucene query syntax reference: http://lucene.apache.org/core/old_versioned_docs/versions/2_9_1/queryparsersyntax.html'
   adx_name: search/query
   adx_sitesettingid: 6f049d92-9f04-43fe-8faf-78d8e5ef32f0
@@ -72,7 +70,6 @@
   adx_value: False
 - adx_name: Authentication/OpenAuth/Microsoft/ClientId
   adx_sitesettingid: 85aab4a1-e28b-44ef-b2ba-3769d11aa37f
-  importsequencenumber: 5
 - adx_description: Determines if faceted search is used for this portal.
   adx_name: Search/FacetedView
   adx_sitesettingid: 864fdb7c-59fa-43af-8c1b-084c7cf131dd
@@ -80,7 +77,6 @@
 - adx_name: Authentication/Registration/OpenRegistrationEnabled
   adx_sitesettingid: 86a123f6-b144-4b70-a315-f6e4649ddd67
   adx_value: true
-  importsequencenumber: 3
 - adx_description: Set whether the footer web template is output cached.
   adx_name: Footer/OutputCache/Enabled
   adx_sitesettingid: 871f62e5-ad0f-4c37-ad2c-ac90c95f3873
@@ -105,7 +101,10 @@
 - adx_name: Authentication/Registration/EmailConfirmationEnabled
   adx_sitesettingid: a826d619-8ee8-4e18-a1a2-e6e2e0121370
   adx_value: true
-  importsequencenumber: 3
+- adx_description: Enable the Power Pages Web API for the File Ingestion Error table.
+  adx_name: Webapi/vey_fileingestionerror/enabled
+  adx_sitesettingid: a8b9c0d1-9f5a-7d7e-ea0f-13c4d5e6f7a8
+  adx_value: true
 - adx_description: 'The amount of time the IP address will have to wait if Authentication/LoginThrottling/MaxInvaildAttemptsFromIPAddress occur within Authentication/LoginThrottling/MaxAttemptsTimeLimitTimeSpan amount of time. Default: 00:10:00 (10 mins)'
   adx_name: Authentication/LoginThrottling/IpAddressTimeoutTimeSpan
   adx_sitesettingid: aacfba4c-e9a6-4e26-b75d-0bd1c660b514
@@ -116,7 +115,10 @@
   adx_value: contactid,fullname,emailaddress1,_parentcustomerid_value
 - adx_name: Authentication/Registration/LoginButtonAuthenticationType
   adx_sitesettingid: b4da25c1-4b88-451d-84f8-c1fb4263a2ea
-  importsequencenumber: 3
+- adx_description: Comma-separated list of File Ingestion Error fields exposed via the Web API.
+  adx_name: Webapi/vey_fileingestionerror/fields
+  adx_sitesettingid: b9c0d1e2-0a6b-8e8f-fb1a-24d5e6f7a8b9
+  adx_value: vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon,vey_filesubmission,_vey_filesubmission_value
 - adx_description: Denies use of the portal to minors. By default, it is set to false.
   adx_name: Authentication/Registration/DenyMinors
   adx_sitesettingid: bc106268-f3d4-41c9-9cc6-afea2bdbdfd9
@@ -142,36 +144,17 @@
   adx_value: 3
 - adx_name: Authentication/OpenAuth/Twitter/ConsumerSecret
   adx_sitesettingid: d473fc53-343d-44aa-a378-2c2a06b8bb5a
-  importsequencenumber: 5
 - adx_description: Comma-separated list of Account fields exposed via the Web API.
   adx_name: Webapi/account/fields
   adx_sitesettingid: d5e6f7a8-6c2d-4a4b-b78c-f0e9d1a2b3c4
   adx_source: 0
   adx_value: accountid,name,accountnumber,emailaddress1,_primarycontactid_value
-- adx_description: Enable the Power Pages Web API for the File Submission table, allowing frontend JavaScript to read and write file submissions.
-  adx_name: Webapi/vey_filesubmission/enabled
-  adx_sitesettingid: e6f7a8b9-7d3e-5b5c-c89d-f1a2b3c4d5e6
-  adx_value: true
-- adx_description: Comma-separated list of File Submission fields exposed via the Web API.
-  adx_name: Webapi/vey_filesubmission/fields
-  adx_sitesettingid: f7a8b9c0-8e4f-6c6d-d9ae-02b3c4d5e6f7
-  adx_value: vey_filesubmissionid,vey_filename,vey_submissionreference,vey_filesizebytes,vey_filehash,vey_schemaversion,vey_submissionstatus,vey_reportingperiodstart,vey_reportingperiodend,createdon,_vey_submittedby_value,_vey_organization_value,vey_storageuri
-- adx_description: Enable the Power Pages Web API for the File Ingestion Error table.
-  adx_name: Webapi/vey_fileingestionerror/enabled
-  adx_sitesettingid: a8b9c0d1-9f5a-7d7e-ea0f-13c4d5e6f7a8
-  adx_value: true
-- adx_description: Comma-separated list of File Ingestion Error fields exposed via the Web API.
-  adx_name: Webapi/vey_fileingestionerror/fields
-  adx_sitesettingid: b9c0d1e2-0a6b-8e8f-fb1a-24d5e6f7a8b9
-  adx_value: vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon,_vey_filesubmission_value
 - adx_name: Authentication/Registration/Enabled
   adx_sitesettingid: d6c88f33-acb9-40a1-bb67-87e4cac21592
   adx_value: true
-  importsequencenumber: 5
 - adx_name: Authentication/Registration/InvitationEnabled
   adx_sitesettingid: d7d1b19b-ad13-45a1-9390-0b4610714ef4
   adx_value: true
-  importsequencenumber: 3
 - adx_name: OnlineDomains
   adx_sitesettingid: dcc0c480-b2bf-44f4-b5a1-784707e3b2c5
   adx_value: sharepoint.com;microsoftonline.com
@@ -182,10 +165,13 @@
   adx_name: MultiLanguage/DisplayLanguageCodeInURL
   adx_sitesettingid: e53de72d-2729-4761-b151-4693fa7a0a67
   adx_value: False
+- adx_description: Enable the Power Pages Web API for the File Submission table, allowing frontend JavaScript to read and write file submissions.
+  adx_name: Webapi/vey_filesubmission/enabled
+  adx_sitesettingid: e6f7a8b9-7d3e-5b5c-c89d-f1a2b3c4d5e6
+  adx_value: true
 - adx_name: Authentication/Registration/ExternalLoginEnabled
   adx_sitesettingid: ef6799ed-34ba-458b-9645-2646c257e3d3
   adx_value: true
-  importsequencenumber: 3
 - adx_description: >-
     A collection of search logical name filter options. Defining a value here will add dropdown filter options to site-wide search.
 
@@ -196,12 +182,20 @@
 - adx_name: HTTP/X-Frame-Options
   adx_sitesettingid: f5a3a03b-8a0b-42bc-a743-452199c4ce61
   adx_value: SAMEORIGIN
+- adx_description: Comma-separated list of File Submission fields exposed via the Web API.
+  adx_name: Webapi/vey_filesubmission/fields
+  adx_sitesettingid: f7a8b9c0-8e4f-6c6d-d9ae-02b3c4d5e6f7
+  adx_value: vey_filesubmissionid,vey_filename,vey_submissionreference,vey_filesizebytes,vey_filehash,vey_schemaversion,vey_submissionstatus,vey_reportingperiodstart,vey_reportingperiodend,createdon,_vey_submittedby_value,_vey_organization_value,vey_storageuri
 - adx_name: Profile/ShowMarketingOptionsPanel
   adx_sitesettingid: fa78801d-99b7-4d5f-a216-6c5f3def6602
   adx_value: True
 - adx_name: Search/IndexNotesAttachments
   adx_sitesettingid: fb421ae2-f8db-4ade-972c-707d2d28a2c9
   adx_value: false
+- adx_description: Enable inner error details for Web API errors to aid debugging.
+  adx_name: Webapi/error/innererror
+  adx_sitesettingid: fb7dd862-0767-4441-9624-6aea1126289b
+  adx_value: true
 - adx_description: A true or false value. If set to true, the Last Successful Login field on the portal user’s contact will be updated with the date and time when they successfully signed in.
   adx_name: Authentication/LoginTrackingEnabled
   adx_sitesettingid: fb92e187-5aa0-4cbd-96f2-4085561ea098
