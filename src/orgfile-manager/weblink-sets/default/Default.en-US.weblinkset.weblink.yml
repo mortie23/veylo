@@ -13,6 +13,17 @@
   adx_displayimageonly: false
   adx_displayorder: 2
   adx_displaypagechildlinks: false
+  adx_name: File Manager
+  adx_openinnewwindow: false
+  adx_pageid: d4e5f6a7-1234-4567-89ab-cdef01234567
+  adx_publishingstateid: 8be00a48-c2ad-46bd-81c6-44fb1d885bef
+  adx_robotsfollowlink: true
+  adx_weblinkid: a1b2c3d4-e5f6-7890-1234-56789abcdef0
+  adx_weblinksetid: 32b7220d-8cd4-498c-9f09-4331c3b1cfa8
+- adx_disablepagevalidation: false
+  adx_displayimageonly: false
+  adx_displayorder: 3
+  adx_displaypagechildlinks: false
   adx_name: Admin
   adx_openinnewwindow: false
   adx_pageid: b7e3c1f2-8a4d-4e6b-9f0a-d2c1b3a4e5f6

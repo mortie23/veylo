@@ -148,6 +148,22 @@
   adx_sitesettingid: d5e6f7a8-6c2d-4a4b-b78c-f0e9d1a2b3c4
   adx_source: 0
   adx_value: name,accountnumber,emailaddress1,parentcustomerid,primarycontactid,_primarycontactid_value
+- adx_description: Enable the Power Pages Web API for the File Submission table, allowing frontend JavaScript to read and write file submissions.
+  adx_name: Webapi/vey_filesubmission/enabled
+  adx_sitesettingid: e6f7a8b9-7d3e-5b5c-c89d-f1a2b3c4d5e6
+  adx_value: true
+- adx_description: Comma-separated list of File Submission fields exposed via the Web API.
+  adx_name: Webapi/vey_filesubmission/fields
+  adx_sitesettingid: f7a8b9c0-8e4f-6c6d-d9ae-02b3c4d5e6f7
+  adx_value: vey_filesubmissionid,vey_name,vey_filename,vey_submissionreference,vey_filesizebytes,vey_filehash,vey_schemaversion,vey_submissionstatus,vey_reportingperiodstart,vey_reportingperiodend,createdon,_vey_submittedby_value,_vey_organization_value,vey_storageuri
+- adx_description: Enable the Power Pages Web API for the File Ingestion Error table.
+  adx_name: Webapi/vey_fileingestionerror/enabled
+  adx_sitesettingid: a8b9c0d1-9f5a-7d7e-ea0f-13c4d5e6f7a8
+  adx_value: true
+- adx_description: Comma-separated list of File Ingestion Error fields exposed via the Web API.
+  adx_name: Webapi/vey_fileingestionerror/fields
+  adx_sitesettingid: b9c0d1e2-0a6b-8e8f-fb1a-24d5e6f7a8b9
+  adx_value: vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon,_vey_filesubmission_value
 - adx_name: Authentication/Registration/Enabled
   adx_sitesettingid: d6c88f33-acb9-40a1-bb67-87e4cac21592
   adx_value: true

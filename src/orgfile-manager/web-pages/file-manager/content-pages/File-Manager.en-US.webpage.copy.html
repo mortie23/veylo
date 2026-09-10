@@ -1,0 +1,357 @@
+{% if user %}
+
+<div class="health-sub-header health-sub-header--dark">
+  <div class="container">
+    <div class="row rs_skip">
+      <div class="col-xs-12 col-md-8">
+        <div class="region--content_top_left">
+          <div id="block-system-breadcrumb-block">
+            <nav class="au-breadcrumbs" aria-label="Breadcrumb">
+              <h2 class="au-sronly">You are here</h2>
+              <ol class="au-link-list au-link-list--inline">
+                <li><a href="/">Home</a></li>
+                <li><a>File Manager</a></li>
+              </ol>
+            </nav>
+          </div>
+          <div id="block-page-title-block">
+            <div>
+              <div class="health-sub-header__section-title">
+                <a class="au-direction-link au-direction-link--left" href="/">Home</a>
+              </div>
+              <h1 id="mainContent">File Manager &amp; Submissions</h1>
+              <p class="au-introduction">
+                Securely transfer, validate, and manage B2B organizational files with direct cloud storage offloading and data contract verification.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="health-band">
+  <div class="container">
+
+    <!-- Active Organisation & User Badge Banner -->
+    <div class="row" style="margin-bottom: 24px;">
+      <div class="col-md-12">
+        <div class="health-card health-card--shadow" style="background-color: #f8fafc;">
+          <div class="health-card__body" style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <span class="glyphicon glyphicon-briefcase" aria-hidden="true" style="color: #006fb0; margin-right: 6px;"></span>
+              Organisation: <strong id="fm-current-org-name">Loading organisation&hellip;</strong>
+            </div>
+            <div>
+              <span class="glyphicon glyphicon-user" aria-hidden="true" style="color: #0b996c; margin-right: 6px;"></span>
+              Signed in as: <strong>{{ user.fullname | default: user.emailaddress1 }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Alert Banner -->
+    <div id="fm-status" class="au-page-alerts" style="display:none; margin-bottom: 24px;" role="alert"></div>
+
+    <!-- Navigation Tabs (HDS Aligned) -->
+    <div class="fm-tabs" role="tablist">
+      <button class="fm-tab-btn is-active" id="tab-btn-history" role="tab" aria-selected="true" aria-controls="fm-panel-history">
+        <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> Submissions History
+      </button>
+      <button class="fm-tab-btn" id="tab-btn-upload" role="tab" aria-selected="false" aria-controls="fm-panel-upload">
+        <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload New File
+      </button>
+    </div>
+
+    <!-- ============================================================
+         PANEL 1: Submissions History
+         ============================================================ -->
+    <div id="fm-panel-history" role="tabpanel" aria-labelledby="tab-btn-history">
+      
+      <!-- Filter Toolbar -->
+      <div class="fm-toolbar">
+        <div class="fm-toolbar__group">
+          <label for="fm-search-input" class="au-sronly">Search submissions</label>
+          <input id="fm-search-input" class="au-text-input" type="text" placeholder="Search reference or filename&hellip;" style="min-width: 260px;" />
+          
+          <label for="fm-status-filter" class="au-sronly">Filter by status</label>
+          <select id="fm-status-filter" class="au-select">
+            <option value="">All Statuses</option>
+            <option value="948740000">Uploaded</option>
+            <option value="948740001">Validating</option>
+            <option value="948740002">Processed</option>
+            <option value="948740003">Partial Success</option>
+            <option value="948740004">Failed</option>
+          </select>
+        </div>
+
+        <div class="fm-toolbar__group">
+          <button id="fm-refresh-btn" class="au-btn au-btn--secondary au-btn--sm" type="button">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Submissions Table Card -->
+      <div class="health-card health-card--shadow" style="margin-bottom: 40px;">
+        <div class="health-card__accent"></div>
+        <div class="health-card__body">
+          <h2 class="health-card__title">
+            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+            Organisation File Lodgments
+          </h2>
+          <p class="au-body">
+            All files submitted across your organisation. Click any row to inspect complete metadata, row-level validation logs, or download the original file.
+          </p>
+
+          <div class="health-table__responsive">
+            <table aria-label="Organisation File Submissions">
+              <thead>
+                <tr>
+                  <th scope="col">Submission Reference</th>
+                  <th scope="col">File Name</th>
+                  <th scope="col">Schema</th>
+                  <th scope="col">Size</th>
+                  <th scope="col">Reporting Period</th>
+                  <th scope="col">Submitted</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="fm-submissions-tbody">
+                <tr><td colspan="8" class="text-center" style="padding: 24px;">Loading submissions&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================
+         PANEL 2: Upload New File
+         ============================================================ -->
+    <div id="fm-panel-upload" role="tabpanel" aria-labelledby="tab-btn-upload" style="display: none;">
+      
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          
+          <div class="health-card health-card--shadow" style="margin-bottom: 40px;">
+            <div class="health-card__accent"></div>
+            <div class="health-card__body">
+              
+              <h2 class="health-card__title">
+                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+                Submit a File
+              </h2>
+              <p class="au-body">
+                Upload business data files directly to secure Azure Blob Storage. Supported formats: PDF, Word, Excel (XLSX), CSV, Images, Text, ZIP (Max 50 MB).
+              </p>
+
+              <!-- Drag & Drop Zone -->
+              <div id="fm-dropzone" class="fm-dropzone" tabindex="0" role="button" aria-label="Click or drag and drop files here to upload">
+                <div class="fm-dropzone__icon">
+                  <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+                </div>
+                <div class="fm-dropzone__title">Drag and drop file here, or click to browse</div>
+                <div class="fm-dropzone__hint">Files up to 50 MB are streamed directly to cloud storage.</div>
+                <input id="fm-file-input" type="file" />
+              </div>
+
+              <!-- Selected File Summary Chip -->
+              <div id="fm-file-chip" class="fm-file-chip" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <div id="fm-chip-name" class="fm-file-chip__name">filename.csv</div>
+                    <div id="fm-chip-meta" class="fm-file-chip__meta">Size: 1.2 MB &bull; Type: text/csv</div>
+                    <div style="margin-top: 6px;">
+                      <span class="fm-file-chip__hash" id="fm-chip-hash">SHA-256: Computing checksum&hellip;</span>
+                    </div>
+                  </div>
+                  <button id="fm-chip-remove" class="au-btn au-btn--tertiary au-btn--sm" type="button" title="Remove file">&times; Remove</button>
+                </div>
+              </div>
+
+              <!-- Upload Metadata Form -->
+              <form id="fm-upload-form" style="margin-top: 24px;" onsubmit="return false;">
+                
+                <!-- Submission Reference (Required) -->
+                <div class="au-form__item">
+                  <label for="fm-input-reference">
+                    Submission Reference <span aria-hidden="true" style="color:#d60000;">*</span>
+                  </label>
+                  <span class="au-form__hint">A distinct label or tracking reference for this upload (e.g. Q3-2026-Admissions).</span>
+                  <input id="fm-input-reference" class="au-text-input au-text-input--block" type="text" placeholder="e.g. Q3-2026-Admissions-Summary" required />
+                </div>
+
+                <!-- Schema Validation Option -->
+                <div class="au-form__item" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 16px; margin-top: 18px;">
+                  <label style="cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 0;">
+                    <input id="fm-schema-toggle" type="checkbox" style="width: 18px; height: 18px;" />
+                    Validate against a Data Standard / Schema
+                  </label>
+                  
+                  <div id="fm-schema-options" style="display: none; margin-top: 14px;">
+                    <label for="fm-schema-select">Target Schema Version</label>
+                    <select id="fm-schema-select" class="au-select au-select--block">
+                      <option value="">-- Select Schema Contract --</option>
+                      <option value="v1.0">Healthcare Admissions Standard v1.0</option>
+                      <option value="v2.1">Clinical Encounters &amp; Discharges v2.1</option>
+                      <option value="v1.2">Financial &amp; Billing Registry v1.2</option>
+                      <option value="__custom__">Custom Schema Version...</option>
+                    </select>
+
+                    <div id="fm-schema-custom-wrapper" style="display: none; margin-top: 10px;">
+                      <label for="fm-schema-custom">Enter Schema Version Code</label>
+                      <input id="fm-schema-custom" class="au-text-input au-text-input--block" type="text" placeholder="e.g. v2026.3-beta" />
+                    </div>
+
+                    <div class="au-callout au-callout--alt" style="margin-top: 12px; margin-bottom: 0;">
+                      <p style="margin: 0; font-size: 0.9rem;">
+                        <strong>Downstream Verification:</strong> When a schema version is specified, the file will be strictly verified against column data types, mandatory fields, and formatting contracts upon ingestion into BigQuery.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reporting Period (Dates) -->
+                <div class="row" style="margin-top: 18px;">
+                  <div class="col-sm-6">
+                    <div class="au-form__item">
+                      <label for="fm-input-period-start">Reporting Period Start (optional)</label>
+                      <input id="fm-input-period-start" class="au-text-input au-text-input--block" type="date" />
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div class="au-form__item">
+                      <label for="fm-input-period-end">Reporting Period End (optional)</label>
+                      <input id="fm-input-period-end" class="au-text-input au-text-input--block" type="date" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="fm-progress-container" class="fm-progress-container">
+                  <div id="fm-progress-bar" class="fm-progress-bar"></div>
+                  <div id="fm-progress-label" class="fm-progress-label">0%</div>
+                </div>
+
+                <!-- Submit Action Buttons -->
+                <div style="margin-top: 28px; display: flex; gap: 12px; align-items: center;">
+                  <button id="fm-submit-btn" class="au-btn au-btn--primary" type="button" disabled>
+                    <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Upload File
+                  </button>
+                  <button id="fm-cancel-btn" class="au-btn au-btn--secondary" type="button" style="display: none;">Cancel</button>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     Submission Inspection & Ingestion Errors Modal
+     ============================================================ -->
+<div class="custom-modal-overlay" id="fm-details-modal" role="dialog" aria-modal="true" aria-labelledby="fm-modal-title">
+  <div class="custom-modal-dialog custom-modal-dialog--lg">
+    
+    <div class="custom-modal-header">
+      <h4 id="fm-modal-title">Submission Details</h4>
+    </div>
+
+    <div class="custom-modal-body">
+      
+      <!-- Key Metadata Grid -->
+      <div class="fm-meta-grid">
+        <div class="fm-meta-item">
+          <label>Submission Reference</label>
+          <div id="fm-modal-ref">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>Status</label>
+          <div id="fm-modal-status">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>File Name</label>
+          <div id="fm-modal-filename">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>File Size</label>
+          <div id="fm-modal-filesize">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>Schema Version</label>
+          <div id="fm-modal-schema">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>Reporting Period</label>
+          <div id="fm-modal-period">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>Submitted At</label>
+          <div id="fm-modal-createdon">-</div>
+        </div>
+        <div class="fm-meta-item">
+          <label>SHA-256 Checksum</label>
+          <div id="fm-modal-hash" style="font-family: monospace; font-size: 0.85rem;">-</div>
+        </div>
+      </div>
+
+      <!-- Ingestion Errors Section (from vey_FileIngestionError) -->
+      <div id="fm-modal-errors-section" style="display: none; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 18px;">
+        <h5 style="color: #991b1b; margin-top: 0; font-size: 1.1rem;">
+          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+          Ingestion &amp; Schema Validation Errors (<span id="fm-modal-error-count">0</span>)
+        </h5>
+        <p style="font-size: 0.9rem; color: #555555; margin-bottom: 12px;">
+          The downstream BigQuery validation engine flagged the following row issues during contract verification:
+        </p>
+        <div class="health-table__responsive" style="max-height: 220px; overflow-y: auto;">
+          <table class="fm-errors-table">
+            <thead>
+              <tr>
+                <th scope="col" style="width: 80px;">Row #</th>
+                <th scope="col" style="width: 180px;">Error Code</th>
+                <th scope="col">Message</th>
+                <th scope="col">Raw Payload</th>
+              </tr>
+            </thead>
+            <tbody id="fm-modal-errors-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="custom-modal-footer">
+      <button id="fm-modal-download-btn" class="au-btn au-btn--primary" type="button">
+        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download File
+      </button>
+      <button id="fm-modal-close-btn" class="au-btn au-btn--secondary" type="button">Close</button>
+    </div>
+
+  </div>
+</div>
+
+{% else %}
+
+<div class="health-band">
+  <div class="container" style="padding: 40px 0;">
+    <div class="au-callout">
+      <h3 class="au-callout__title">Authentication Required</h3>
+      <p>Please <a href="{{ website.sign_in_url_substitution }}">sign in</a> to access your organisation's file manager and submission history.</p>
+    </div>
+  </div>
+</div>
+
+{% endif %}

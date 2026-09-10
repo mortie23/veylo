@@ -5,6 +5,9 @@
 <link rel='stylesheet' href='/powerpages-auth.css'>
 {% endif %}
 <script src='/jquery.min.js'></script>
+{% if req_path contains 'file-manager' or req_path contains 'submissions' %}
+<script src='/msal-browser.min.js'></script>
+{% endif %}
 <script>
   document.body.classList.add('au-grid');
   var once = window.once = window.once || function (id, selector, context) {
