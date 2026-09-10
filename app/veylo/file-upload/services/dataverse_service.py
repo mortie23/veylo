@@ -53,24 +53,42 @@ class DataverseClient:
         file_hash: str,
         storage_uri: str,
         organization_id: Optional[str] = None,
-        submitted_by_contact_id: Optional[str] = None
+        submitted_by_contact_id: Optional[str] = None,
+        submission_reference: Optional[str] = None,
+        schema_version: Optional[str] = None,
+        reporting_period_start: Optional[str] = None,
+        reporting_period_end: Optional[str] = None,
+        idempotency_key: Optional[str] = None
     ) -> Dict[str, Any]:
         """Create a draft vey_FileSubmission record in Dataverse."""
-        record = {
+        sub_ref = submission_reference or filename
+        record: Dict[str, Any] = {
             "vey_filesubmissionid": submission_id,
-            "vey_name": filename,
+            "vey_name": sub_ref,
             "vey_filename": filename,
+            "vey_submissionreference": sub_ref,
             "vey_filesizebytes": file_size,
             "vey_filehash": file_hash,
             "vey_storageuri": storage_uri,
-            "vey_submissionstatus": "Draft",
+            "vey_submissionstatus": 948740000,  # Uploaded
             "statuscode": 1
         }
 
+        if schema_version:
+            record["vey_schemaversion"] = schema_version
+        if reporting_period_start:
+            record["vey_reportingperiodstart"] = reporting_period_start
+        if reporting_period_end:
+            record["vey_reportingperiodend"] = reporting_period_end
+        if idempotency_key:
+            record["vey_idempotencykey"] = idempotency_key
+
         if organization_id:
-            record["vey_organizationid"] = organization_id
+            record["vey_Organization@odata.bind"] = f"/accounts({organization_id})"
+            record["_vey_organization_value"] = organization_id
         if submitted_by_contact_id:
-            record["vey_submittedbyid"] = submitted_by_contact_id
+            record["vey_SubmittedBy@odata.bind"] = f"/contacts({submitted_by_contact_id})"
+            record["_vey_submittedby_value"] = submitted_by_contact_id
 
         # Fallback to local in-memory store for local testing
         if not self.dataverse_url:

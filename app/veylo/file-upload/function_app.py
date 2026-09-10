@@ -110,6 +110,12 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
         submission_id = str(uuid.uuid4())
         blob_name = f"raw/{submission_id}/{safe_filename}"
 
+        submission_reference = data.get("submissionReference", "").strip() or safe_filename
+        schema_version = data.get("schemaVersion", "").strip() or None
+        reporting_period_start = data.get("reportingPeriodStart") or None
+        reporting_period_end = data.get("reportingPeriodEnd") or None
+        idempotency_key = data.get("idempotencyKey", "").strip() or None
+
         # 3. Create Draft Record in Dataverse (vey_FileSubmission)
         blob_url = f"https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{CONTAINER_NAME}/{blob_name}"
         dataverse_client.create_file_submission(
@@ -119,7 +125,12 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
             file_hash=file_hash,
             storage_uri=blob_url,
             organization_id=organization_id,
-            submitted_by_contact_id=user_claims.get("contact_id")
+            submitted_by_contact_id=user_claims.get("contact_id"),
+            submission_reference=submission_reference,
+            schema_version=schema_version,
+            reporting_period_start=reporting_period_start,
+            reporting_period_end=reporting_period_end,
+            idempotency_key=idempotency_key
         )
 
         # 4. Generate User Delegation SAS (Write-only, 15 min TTL)
