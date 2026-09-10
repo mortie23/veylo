@@ -341,7 +341,7 @@
       }
 
       rows += '<tr style="cursor: pointer;" data-id="' + s.vey_filesubmissionid + '">';
-      rows += '<td><strong>' + esc(s.vey_submissionreference || s.vey_name) + '</strong></td>';
+      rows += '<td><strong>' + esc(s.vey_submissionreference || s.vey_filename || '—') + '</strong></td>';
       rows += '<td>' + esc(s.vey_filename) + '</td>';
       rows += '<td>' + (s.vey_schemaversion ? '<span class="au-tag">' + esc(s.vey_schemaversion) + '</span>' : '\u2014') + '</td>';
       rows += '<td>' + formatBytes(s.vey_filesizebytes) + '</td>';
@@ -623,7 +623,7 @@
 
     var statusObj = STATUS_LABELS[sub.vey_submissionstatus] || { text: 'Uploaded', cls: 'fm-status-pill--uploaded' };
 
-    document.getElementById('fm-modal-ref').textContent = sub.vey_submissionreference || sub.vey_name || '\u2014';
+    document.getElementById('fm-modal-ref').textContent = sub.vey_submissionreference || sub.vey_filename || '\u2014';
     document.getElementById('fm-modal-status').innerHTML = '<span class="fm-status-pill ' + statusObj.cls + '">' + esc(statusObj.text) + '</span>';
     document.getElementById('fm-modal-filename').textContent = sub.vey_filename || '\u2014';
     document.getElementById('fm-modal-filesize').textContent = formatBytes(sub.vey_filesizebytes);

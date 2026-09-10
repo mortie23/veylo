@@ -30,7 +30,10 @@ param(
     [int]$ModelVersion = 0,
 
     [Parameter()]
-    [string]$Environment = ""
+    [string]$Environment = "",
+
+    [Parameter()]
+    [switch]$Force = $true
 )
 
 $ErrorActionPreference = "Stop"
@@ -101,6 +104,9 @@ Write-Host "Data Model Version: $ModelVersion" -ForegroundColor Gray
 
 # 5. Execute Upload
 $uploadArgs = @("powerpages", "upload", "--path", $resolvedPath, "-mv", "$ModelVersion")
+if ($Force) {
+    $uploadArgs += "-f"
+}
 
 if ($PSCmdlet.ShouldProcess($resolvedPath, "Upload Power Pages site to Dataverse via PAC CLI")) {
     Write-Host "`nUploading website to Dataverse..." -ForegroundColor Cyan

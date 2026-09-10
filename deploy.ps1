@@ -12,7 +12,10 @@ param(
     [int]$ModelVersion = 0,
 
     [Parameter()]
-    [string]$Environment = ""
+    [string]$Environment = "",
+
+    [Parameter()]
+    [switch]$Force = $true
 )
 
-& "$PSScriptRoot/scripts/deploy.ps1" -Path $Path -ModelVersion $ModelVersion -Environment $Environment -WhatIf:$WhatIfPreference
+& "$PSScriptRoot/scripts/deploy.ps1" -Path $Path -ModelVersion $ModelVersion -Environment $Environment -Force:$Force -WhatIf:$WhatIfPreference

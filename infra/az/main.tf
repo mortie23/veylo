@@ -110,6 +110,7 @@ resource "azurerm_linux_function_app" "function" {
     "DATAVERSE_URL"                         = var.dataverse_url
     "ENTRA_TENANT_ID"                       = local.tenant_id
     "API_AUDIENCE"                          = local.api_identifier_uri
+    "BACKEND_API_CLIENT_ID"                 = azuread_application.upload_api.client_id
     "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.appinsights.connection_string
   }
 

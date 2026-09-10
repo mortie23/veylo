@@ -27,11 +27,25 @@ locals {
     )) : trimsuffix(origin, "/")
   ])
 
+  # Portal routes where MSAL.js executes authentication
+  spa_route_paths = [
+    "",
+    "/file-manager",
+    "/file-manager/",
+    "/submissions",
+    "/submissions/"
+  ]
+
   # Entra ID SPA redirect URIs require a trailing slash when there is no path segment (RFC 3986)
-  spa_redirect_uris = distinct([
-    for origin in local.cors_origins :
-    can(regex("^https?://[^/]+$", origin)) ? "${origin}/" : origin
-  ])
+  spa_redirect_uris = distinct(flatten([
+    for origin in local.cors_origins : [
+      for path in local.spa_route_paths : (
+        path == "" ? (
+          can(regex("^https?://[^/]+$", origin)) ? "${origin}/" : origin
+        ) : "${origin}${path}"
+      )
+    ]
+  ]))
 
   common_tags = merge(
     var.tags,

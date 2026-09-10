@@ -174,14 +174,18 @@ class DataverseClient:
         endpoint = f"{self.dataverse_url}/api/data/v9.2/vey_filesubmissions"
         response = requests.post(endpoint, headers=self._headers(), json=record, timeout=15)
         
-        # If binding failed (e.g. invalid account or contact reference), retry without bindings to avoid blocking upload
-        if response.status_code in (400, 404) and ("@odata.bind" in str(response.content)):
-            logger.warning(f"Dataverse lookup bind failed ({response.text}); retrying without lookups.")
+        # If binding failed (e.g. invalid account/contact reference or missing AppendTo permissions), retry without bindings to avoid blocking upload
+        if response.status_code in (400, 403, 404) and ("@odata.bind" in str(record)):
+            logger.warning(f"Dataverse create returned {response.status_code} ({response.text}); retrying without lookups.")
             record.pop("vey_Organization@odata.bind", None)
             record.pop("vey_SubmittedBy@odata.bind", None)
             response = requests.post(endpoint, headers=self._headers(), json=record, timeout=15)
 
-        response.raise_for_status()
+        if not response.ok:
+            error_body = response.text
+            logger.error(f"Dataverse create vey_filesubmissions failed ({response.status_code}): {error_body}")
+            raise RuntimeError(f"Dataverse API {response.status_code}: {error_body}")
+
         return response.json() if response.content else record
 
     def update_submission_status(
