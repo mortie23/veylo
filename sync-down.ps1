@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Convenience wrapper to sync down Power Pages changes from Dataverse.

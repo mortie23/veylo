@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Convenience wrapper to pack and deploy Dataverse solution changes.

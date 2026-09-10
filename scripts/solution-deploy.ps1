@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Packages and deploys (imports) local Dataverse solution changes to a target environment.

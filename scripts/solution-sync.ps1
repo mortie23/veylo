@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Downloads and unpacks the latest Dataverse solution changes into local Git source files.

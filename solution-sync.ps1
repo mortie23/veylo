@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Convenience wrapper to download and unpack Dataverse solution changes.

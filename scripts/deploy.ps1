@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
     Deploys (uploads) local Power Pages website changes to Dataverse using PAC CLI.
