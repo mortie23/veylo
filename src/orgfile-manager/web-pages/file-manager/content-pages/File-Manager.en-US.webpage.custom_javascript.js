@@ -132,8 +132,12 @@
       return Promise.resolve('dev-mock-token');
     }
 
+    if (!state.msalInstance && typeof msal !== 'undefined') {
+      initMsal();
+    }
+
     if (!state.msalInstance) {
-      return Promise.reject(new Error('MSAL instance is not initialized.'));
+      return Promise.reject(new Error('MSAL library is not initialized. Please ensure msal-browser.min.js is loaded.'));
     }
 
     var accounts = state.msalInstance.getAllAccounts();
@@ -144,9 +148,17 @@
 
     return state.msalInstance.acquireTokenSilent(tokenRequest).then(function (res) {
       return res.accessToken;
-    }).catch(function () {
+    }).catch(function (silentErr) {
+      console.info('Silent token acquisition failed, prompting with popup:', silentErr);
       return state.msalInstance.acquireTokenPopup(tokenRequest).then(function (res) {
         return res.accessToken;
+      }).catch(function (popupErr) {
+        var msg = popupErr.errorMessage || popupErr.message || String(popupErr);
+        throw new Error(
+          'Entra ID authentication required. ' +
+          'Direct Azure upload requires an active Microsoft Entra ID session. ' +
+          'Users registered via standard portal accounts must sign in or link their account with Microsoft Entra ID. (' + msg + ')'
+        );
       });
     });
   }
@@ -216,6 +228,22 @@
   // Data Loading: User Organization & Submissions
   // ============================================================
   function loadCurrentUserAndOrg() {
+    var ctx = document.getElementById('fm-portal-context');
+    if (ctx) {
+      state.currentContactId = ctx.getAttribute('data-contact-id') || '';
+      state.currentOrgId = ctx.getAttribute('data-org-id') || '';
+      state.currentOrgName = ctx.getAttribute('data-org-name') || '';
+
+      if (state.currentOrgName) {
+        var el = document.getElementById('fm-current-org-name');
+        if (el) el.textContent = state.currentOrgName;
+      }
+
+      if (state.currentContactId) {
+        return Promise.resolve();
+      }
+    }
+
     return apiRequest('GET', 'contacts?$select=contactid,fullname,emailaddress1,_parentcustomerid_value&$top=1')
       .then(function (data) {
         var contact = (data.value && data.value[0]) || {};
@@ -237,14 +265,13 @@
       .catch(function (err) {
         console.warn('Failed to load user org info:', err);
         var el = document.getElementById('fm-current-org-name');
-        if (el) el.textContent = 'Default Organisation';
+        if (el && !state.currentOrgName) el.textContent = 'Default Organisation';
       });
   }
 
   function loadSubmissions() {
     var selectFields = [
       'vey_filesubmissionid',
-      'vey_name',
       'vey_filename',
       'vey_submissionreference',
       'vey_filesizebytes',
@@ -254,8 +281,6 @@
       'vey_reportingperiodstart',
       'vey_reportingperiodend',
       'createdon',
-      '_vey_submittedby_value',
-      '_vey_organization_value',
       'vey_storageuri'
     ].join(',');
 
@@ -461,6 +486,7 @@
           mimeType: file.type || 'application/octet-stream',
           fileHash: state.selectedFileHash,
           organizationId: state.currentOrgId,
+          contactId: state.currentContactId,
           submissionReference: submissionReference,
           schemaVersion: schemaVersion || null,
           reportingPeriodStart: periodStart,

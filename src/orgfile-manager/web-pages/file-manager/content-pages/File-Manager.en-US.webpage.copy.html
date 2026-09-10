@@ -1,5 +1,7 @@
 {% if user %}
 
+<script src="/msal-browser.min.js"></script>
+
 <div class="health-sub-header health-sub-header--dark">
   <div class="container">
     <div class="row rs_skip">
@@ -33,6 +35,14 @@
 
 <div class="health-band">
   <div class="container">
+
+    <!-- Liquid Portal Context -->
+    <div id="fm-portal-context"
+         data-contact-id="{{ user.id }}"
+         data-contact-name="{{ user.fullname | escape }}"
+         data-org-id="{{ user.parentcustomerid.id }}"
+         data-org-name="{{ user.parentcustomerid.name | escape }}"
+         style="display:none;"></div>
 
     <!-- Active Organisation & User Badge Banner -->
     <div class="row" style="margin-bottom: 24px;">

@@ -119,7 +119,7 @@
   // ============================================================
 
   function loadAccounts() {
-    return apiRequest('GET', 'accounts?$select=name,accountnumber,emailaddress1,_primarycontactid_value&$orderby=name')
+    return apiRequest('GET', 'accounts?$select=accountid,name,accountnumber,emailaddress1,_primarycontactid_value&$orderby=name')
       .then(function (data) {
         state.accounts = data.value || [];
         state.accountMap = {};
@@ -138,7 +138,7 @@
   }
 
   function loadContacts() {
-    return apiRequest('GET', 'contacts?$select=fullname,emailaddress1,_parentcustomerid_value&$orderby=fullname')
+    return apiRequest('GET', 'contacts?$select=contactid,fullname,emailaddress1,_parentcustomerid_value&$orderby=fullname')
       .then(function (data) {
         state.contacts = data.value || [];
         // Build a contactid → name lookup for primary contact display in orgs table
