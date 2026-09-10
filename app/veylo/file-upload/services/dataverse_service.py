@@ -1,11 +1,30 @@
 import logging
 import os
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 from azure.identity import DefaultAzureCredential
 import requests
 
 logger = logging.getLogger(__name__)
+
+
+class SubmissionStatus:
+    UPLOADED = 948740000
+    VALIDATING = 948740001
+    PROCESSED = 948740002
+    PARTIAL_SUCCESS = 948740003
+    FAILED = 948740004
+
+
+STATUS_NAME_TO_CODE = {
+    "uploaded": SubmissionStatus.UPLOADED,
+    "submitted": SubmissionStatus.UPLOADED,  # Alias
+    "validating": SubmissionStatus.VALIDATING,
+    "processed": SubmissionStatus.PROCESSED,
+    "partial_success": SubmissionStatus.PARTIAL_SUCCESS,
+    "partial success": SubmissionStatus.PARTIAL_SUCCESS,
+    "failed": SubmissionStatus.FAILED,
+}
 
 # In-memory store for local testing when Dataverse URL is not configured
 _LOCAL_MOCK_STORE: Dict[str, Dict[str, Any]] = {}
@@ -45,6 +64,61 @@ class DataverseClient:
             "Prefer": "return=representation"
         }
 
+    def resolve_contact_id(
+        self,
+        identifier: Optional[str] = None,
+        email: Optional[str] = None
+    ) -> Optional[str]:
+        """
+        Resolve a Dataverse contactid from a contact GUID, an Entra ID OID (via adx_externalidentities),
+        or the user's email address.
+        """
+        if not self.dataverse_url or (not identifier and not email):
+            return identifier
+
+        headers = self._headers()
+
+        # 1. Check if identifier is already a valid contact ID
+        if identifier:
+            try:
+                endpoint = f"{self.dataverse_url}/api/data/v9.2/contacts({identifier})?$select=contactid"
+                res = requests.get(endpoint, headers=headers, timeout=10)
+                if res.ok:
+                    return res.json().get("contactid")
+            except Exception as ex:
+                logger.debug(f"Direct contact lookup failed: {ex}")
+
+            # 2. Check adx_externalidentities (links Entra ID OID to Contact)
+            try:
+                endpoint = (
+                    f"{self.dataverse_url}/api/data/v9.2/adx_externalidentities"
+                    f"?$filter=adx_username eq '{identifier}'&$select=_adx_contactid_value&$top=1"
+                )
+                res = requests.get(endpoint, headers=headers, timeout=10)
+                if res.ok:
+                    items = res.json().get("value", [])
+                    if items and items[0].get("_adx_contactid_value"):
+                        return items[0]["_adx_contactid_value"]
+            except Exception as ex:
+                logger.debug(f"External identity lookup failed: {ex}")
+
+        # 3. Fallback: Lookup by email address
+        if email:
+            try:
+                endpoint = (
+                    f"{self.dataverse_url}/api/data/v9.2/contacts"
+                    f"?$filter=emailaddress1 eq '{email}'&$select=contactid&$top=1"
+                )
+                res = requests.get(endpoint, headers=headers, timeout=10)
+                if res.ok:
+                    items = res.json().get("value", [])
+                    if items and items[0].get("contactid"):
+                        return items[0]["contactid"]
+            except Exception as ex:
+                logger.debug(f"Email contact lookup failed: {ex}")
+
+        return None
+
     def create_file_submission(
         self,
         submission_id: str,
@@ -54,6 +128,7 @@ class DataverseClient:
         storage_uri: str,
         organization_id: Optional[str] = None,
         submitted_by_contact_id: Optional[str] = None,
+        user_email: Optional[str] = None,
         submission_reference: Optional[str] = None,
         schema_version: Optional[str] = None,
         reporting_period_start: Optional[str] = None,
@@ -64,13 +139,12 @@ class DataverseClient:
         sub_ref = submission_reference or filename
         record: Dict[str, Any] = {
             "vey_filesubmissionid": submission_id,
-            "vey_name": sub_ref,
             "vey_filename": filename,
             "vey_submissionreference": sub_ref,
             "vey_filesizebytes": file_size,
             "vey_filehash": file_hash,
             "vey_storageuri": storage_uri,
-            "vey_submissionstatus": 948740000,  # Uploaded
+            "vey_submissionstatus": SubmissionStatus.UPLOADED,
             "statuscode": 1
         }
 
@@ -83,12 +157,13 @@ class DataverseClient:
         if idempotency_key:
             record["vey_idempotencykey"] = idempotency_key
 
+        # Resolve contact ID (from direct ID, Entra OID, or email)
+        resolved_contact_id = self.resolve_contact_id(submitted_by_contact_id, user_email)
+
         if organization_id:
             record["vey_Organization@odata.bind"] = f"/accounts({organization_id})"
-            record["_vey_organization_value"] = organization_id
-        if submitted_by_contact_id:
-            record["vey_SubmittedBy@odata.bind"] = f"/contacts({submitted_by_contact_id})"
-            record["_vey_submittedby_value"] = submitted_by_contact_id
+        if resolved_contact_id:
+            record["vey_SubmittedBy@odata.bind"] = f"/contacts({resolved_contact_id})"
 
         # Fallback to local in-memory store for local testing
         if not self.dataverse_url:
@@ -98,19 +173,33 @@ class DataverseClient:
 
         endpoint = f"{self.dataverse_url}/api/data/v9.2/vey_filesubmissions"
         response = requests.post(endpoint, headers=self._headers(), json=record, timeout=15)
+        
+        # If binding failed (e.g. invalid account or contact reference), retry without bindings to avoid blocking upload
+        if response.status_code in (400, 404) and ("@odata.bind" in str(response.content)):
+            logger.warning(f"Dataverse lookup bind failed ({response.text}); retrying without lookups.")
+            record.pop("vey_Organization@odata.bind", None)
+            record.pop("vey_SubmittedBy@odata.bind", None)
+            response = requests.post(endpoint, headers=self._headers(), json=record, timeout=15)
+
         response.raise_for_status()
         return response.json() if response.content else record
 
-    def update_submission_status(self, submission_id: str, status: str = "Submitted") -> bool:
+    def update_submission_status(
+        self,
+        submission_id: str,
+        status: Union[int, str] = SubmissionStatus.UPLOADED
+    ) -> bool:
         """Update the status of a vey_FileSubmission record."""
+        status_code = status if isinstance(status, int) else STATUS_NAME_TO_CODE.get(str(status).lower(), SubmissionStatus.UPLOADED)
+
         if not self.dataverse_url:
             if submission_id in _LOCAL_MOCK_STORE:
-                _LOCAL_MOCK_STORE[submission_id]["vey_submissionstatus"] = status
+                _LOCAL_MOCK_STORE[submission_id]["vey_submissionstatus"] = status_code
                 return True
             return False
 
         endpoint = f"{self.dataverse_url}/api/data/v9.2/vey_filesubmissions({submission_id})"
-        payload = {"vey_submissionstatus": status}
+        payload = {"vey_submissionstatus": status_code}
         response = requests.patch(endpoint, headers=self._headers(), json=payload, timeout=15)
         response.raise_for_status()
         return True

@@ -6,7 +6,7 @@ import uuid
 import azure.functions as func
 
 from services.auth_service import validate_jwt_token
-from services.dataverse_service import DataverseClient
+from services.dataverse_service import DataverseClient, SubmissionStatus
 from services.storage_service import StorageService
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -59,10 +59,11 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing upload ticket request.")
 
     # 1. Authenticate Entra ID Bearer Token
-    user_claims = validate_jwt_token(req.headers.get("Authorization"))
+    user_claims, auth_error = validate_jwt_token(req.headers.get("Authorization"))
     if not user_claims:
+        logging.warning(f"Upload request rejected: {auth_error}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Unauthorized"}),
+            body=json.dumps({"error": "Unauthorized", "detail": auth_error}),
             mimetype="application/json",
             status_code=401
         )
@@ -110,14 +111,16 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
         submission_id = str(uuid.uuid4())
         blob_name = f"raw/{submission_id}/{safe_filename}"
 
-        submission_reference = data.get("submissionReference", "").strip() or safe_filename
-        schema_version = data.get("schemaVersion", "").strip() or None
+        submission_reference = (data.get("submissionReference") or "").strip() or safe_filename
+        schema_version = (data.get("schemaVersion") or "").strip() or None
         reporting_period_start = data.get("reportingPeriodStart") or None
         reporting_period_end = data.get("reportingPeriodEnd") or None
-        idempotency_key = data.get("idempotencyKey", "").strip() or None
+        idempotency_key = (data.get("idempotencyKey") or "").strip() or None
 
         # 3. Create Draft Record in Dataverse (vey_FileSubmission)
         blob_url = f"https://{STORAGE_ACCOUNT_NAME}.blob.core.windows.net/{CONTAINER_NAME}/{blob_name}"
+        contact_id = data.get("contactId") or user_claims.get("contact_id")
+        user_email = user_claims.get("preferred_username") or user_claims.get("email") or user_claims.get("upn")
         dataverse_client.create_file_submission(
             submission_id=submission_id,
             filename=safe_filename,
@@ -125,7 +128,8 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
             file_hash=file_hash,
             storage_uri=blob_url,
             organization_id=organization_id,
-            submitted_by_contact_id=user_claims.get("contact_id"),
+            submitted_by_contact_id=contact_id,
+            user_email=user_email,
             submission_reference=submission_reference,
             schema_version=schema_version,
             reporting_period_start=reporting_period_start,
@@ -149,14 +153,14 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
     except ValueError as ex:
         logging.warning(f"Invalid request payload: {ex}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Invalid request body format."}),
+            body=json.dumps({"error": "Invalid request body format.", "detail": str(ex)}),
             mimetype="application/json",
             status_code=400
         )
     except Exception as ex:
         logging.exception(f"Failed to generate upload ticket: {ex}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Internal server error."}),
+            body=json.dumps({"error": "Internal server error.", "detail": str(ex)}),
             mimetype="application/json",
             status_code=500
         )
@@ -170,10 +174,11 @@ def complete_upload(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing upload complete notification.")
 
     # 1. Authenticate Entra ID Bearer Token
-    user_claims = validate_jwt_token(req.headers.get("Authorization"))
+    user_claims, auth_error = validate_jwt_token(req.headers.get("Authorization"))
     if not user_claims:
+        logging.warning(f"Complete upload rejected: {auth_error}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Unauthorized"}),
+            body=json.dumps({"error": "Unauthorized", "detail": auth_error}),
             mimetype="application/json",
             status_code=401
         )
@@ -188,8 +193,8 @@ def complete_upload(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=400
             )
 
-        # 2. Mark Dataverse record as Submitted
-        success = dataverse_client.update_submission_status(submission_id, status="Submitted")
+        # 2. Mark Dataverse record as Uploaded
+        success = dataverse_client.update_submission_status(submission_id, status=SubmissionStatus.UPLOADED)
         if not success:
             return func.HttpResponse(
                 body=json.dumps({"error": f"Submission '{submission_id}' not found."}),
@@ -198,7 +203,7 @@ def complete_upload(req: func.HttpRequest) -> func.HttpResponse:
             )
 
         return func.HttpResponse(
-            body=json.dumps({"status": "Submitted", "submissionId": submission_id}),
+            body=json.dumps({"status": "Uploaded", "submissionId": submission_id}),
             mimetype="application/json",
             status_code=200
         )
@@ -219,10 +224,11 @@ def download_file(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing secure download request.")
 
     # 1. Authenticate Entra ID Bearer Token
-    user_claims = validate_jwt_token(req.headers.get("Authorization"))
+    user_claims, auth_error = validate_jwt_token(req.headers.get("Authorization"))
     if not user_claims:
+        logging.warning(f"Download rejected: {auth_error}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Unauthorized"}),
+            body=json.dumps({"error": "Unauthorized", "detail": auth_error}),
             mimetype="application/json",
             status_code=401
         )

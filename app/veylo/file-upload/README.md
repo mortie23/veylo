@@ -10,21 +10,28 @@ Serverless Azure Function app (Python v2 programming model) coordinating direct-
 
 ## Local Development & Testing
 
-1. Create and activate a Python 3.11 virtual environment:
+This project uses [`uv`](https://github.com/astral-sh/uv) for fast, deterministic Python environment management and testing:
+
+1. **Run Unit Tests (Offline)**:
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
+   uv run pytest -v
    ```
 
-2. Configure local settings:
+2. **Add Dependencies**:
    ```bash
-   cp local.settings.json.example local.settings.json
+   uv add <package-name>
+   uv add --dev <test-tool>
    ```
 
-3. Run Azure Functions Core Tools:
+3. **Export Locked Requirements for Azure Deployment**:
    ```bash
-   func start
+   uv export --no-hashes --no-dev -o requirements.txt
+   ```
+
+4. **Deploy to Azure**:
+   From the repository root:
+   ```bash
+   ./deploy-func.sh
    ```
 
 ## Cloud Infrastructure
