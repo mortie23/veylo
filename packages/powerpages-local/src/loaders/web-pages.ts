@@ -105,12 +105,18 @@ export function readPageContent(
   const rootPrefix = `${baseName}.webpage`;
 
   function resolve(suffix: string): string {
+    const names = [baseName, baseName.replace(/\s+/g, '-'), baseName.replace(/-/g, ' ')];
     if (fs.existsSync(contentDir)) {
-      const localePath = path.join(contentDir, `${localePrefix}.${suffix}`);
-      if (fs.existsSync(localePath)) return readTextFile(localePath);
+      for (const name of names) {
+        const localePath = path.join(contentDir, `${name}.${locale}.webpage.${suffix}`);
+        if (fs.existsSync(localePath)) return readTextFile(localePath);
+      }
     }
-    const rootPath = path.join(page.dirPath, `${rootPrefix}.${suffix}`);
-    return readTextFile(rootPath);
+    for (const name of names) {
+      const rootPath = path.join(page.dirPath, `${name}.webpage.${suffix}`);
+      if (fs.existsSync(rootPath)) return readTextFile(rootPath);
+    }
+    return '';
   }
 
   return {

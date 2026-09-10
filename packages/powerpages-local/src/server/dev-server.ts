@@ -176,6 +176,68 @@ export function createDevServer(config: ResolvedConfig): DevServer {
         mockData = { value: [{ contactid: 'mock-1', fullname: 'Mock Contact', emailaddress1: 'mock@example.com', _parentcustomerid_value: 'mock-1' }] };
       } else if (entity === 'accounts') {
         mockData = { value: [{ accountid: 'mock-1', name: 'Mock Account' }] };
+      } else if (entity === 'vey_filesubmissions') {
+        mockData = {
+          value: [
+            {
+              vey_filesubmissionid: 'sub-001',
+              vey_name: 'Q3-2026-Admissions-Summary',
+              vey_submissionreference: 'Q3-2026-Admissions-Summary',
+              vey_filename: 'admissions_q3_2026.csv',
+              vey_filesizebytes: 1458290,
+              vey_filehash: 'a1b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcdef0',
+              vey_schemaversion: 'v1.0',
+              vey_submissionstatus: 948740002, // Processed
+              vey_reportingperiodstart: '2026-07-01T00:00:00Z',
+              vey_reportingperiodend: '2026-09-30T00:00:00Z',
+              createdon: '2026-09-08T10:30:00Z',
+              _vey_submittedby_value: 'mock-1',
+              _vey_organization_value: 'mock-1',
+              vey_storageuri: 'https://stveyportaldev01.blob.core.windows.net/submissions/raw/sub-001/admissions_q3_2026.csv'
+            },
+            {
+              vey_filesubmissionid: 'sub-002',
+              vey_name: 'Monthly-Discharge-Aug2026',
+              vey_submissionreference: 'Monthly-Discharge-Aug2026',
+              vey_filename: 'discharges_august.csv',
+              vey_filesizebytes: 3847291,
+              vey_filehash: 'b2c3d4e5f6a10718293a4b5c6d7e8f90123456789abcdef0123456789abcdef1',
+              vey_schemaversion: 'v2.1',
+              vey_submissionstatus: 948740003, // Partial Success
+              vey_reportingperiodstart: '2026-08-01T00:00:00Z',
+              vey_reportingperiodend: '2026-08-31T00:00:00Z',
+              createdon: '2026-09-09T14:15:00Z',
+              _vey_submittedby_value: 'mock-1',
+              _vey_organization_value: 'mock-1',
+              vey_storageuri: 'https://stveyportaldev01.blob.core.windows.net/submissions/raw/sub-002/discharges_august.csv'
+            }
+          ]
+        };
+      } else if (entity === 'vey_fileingestionerrors') {
+        mockData = {
+          value: [
+            {
+              vey_fileingestionerrorid: 'err-001',
+              vey_rownumber: 142,
+              vey_errorcode: 'ERR_INVALID_DATE_FORMAT',
+              vey_errormessage: "Value '31/02/2026' in column 'AdmissionDate' is not a valid ISO-8601 date.",
+              vey_errorreference: 'SCHEMA_FIELD_VALIDATION',
+              vey_rawpayload: '142,P104928,31/02/2026,DISCHARGED,DEPT_A',
+              createdon: '2026-09-09T14:16:00Z',
+              _vey_filesubmission_value: 'sub-002'
+            },
+            {
+              vey_fileingestionerrorid: 'err-002',
+              vey_rownumber: 389,
+              vey_errorcode: 'ERR_REQUIRED_FIELD_MISSING',
+              vey_errormessage: "Mandatory column 'PatientIdentifier' was null or empty.",
+              vey_errorreference: 'SCHEMA_NOT_NULL',
+              vey_rawpayload: '389,,2026-08-15,ADMITTED,DEPT_C',
+              createdon: '2026-09-09T14:16:00Z',
+              _vey_filesubmission_value: 'sub-002'
+            }
+          ]
+        };
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(mockData));
