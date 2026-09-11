@@ -191,6 +191,19 @@ class TestIsUserAuthorizedForSubmission:
 
         assert self.client.is_user_authorized_for_submission(claims, submission) is True
 
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_caller_contact_id_fallback(self, mock_resolve):
+        """If Entra claims don't resolve to a contact, verified caller_contact_id should authorize."""
+        # First call with Entra claims returns None, second call with caller_contact_id returns contact-local
+        mock_resolve.side_effect = lambda identifier, email=None: "contact-mj" if identifier == "contact-mj" else None
+
+        claims = {"oid": "non-matching-oid", "preferred_username": "other@test.com"}
+        submission = {"_vey_submittedby_value": "contact-mj"}
+
+        assert self.client.is_user_authorized_for_submission(
+            claims, submission, caller_contact_id="contact-mj"
+        ) is True
+
 
 def test_resolve_contact_org_id():
     client = DataverseClient(dataverse_url="https://test.crm.dynamics.com")

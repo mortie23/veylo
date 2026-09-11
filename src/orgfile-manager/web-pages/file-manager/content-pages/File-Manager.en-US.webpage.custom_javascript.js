@@ -206,13 +206,20 @@
         var el = document.querySelector('input[name="__RequestVerificationToken"]');
         tokenPromise = Promise.resolve(el ? el.value : '');
       }
+    } else {
+      // Prevent browser and intermediate proxy/CDN caching for GET queries
+      headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      headers['Pragma'] = 'no-cache';
     }
 
     return tokenPromise.then(function (token) {
       if (token) headers['__RequestVerificationToken'] = token;
       var opts = { method: method, headers: headers };
+      if (method === 'GET') opts.cache = 'no-store';
       if (body) opts.body = JSON.stringify(body);
-      return fetch('/_api/' + endpoint, opts);
+
+      var url = '/_api/' + endpoint;
+      return fetch(url, opts);
     }).then(function (response) {
       if (!response.ok) {
         return response.text().then(function (text) {
@@ -309,24 +316,46 @@
 
     return apiRequest('GET', 'vey_filesubmissions?$select=' + selectFields + '&$orderby=createdon desc')
       .then(function (data) {
-        state.submissions = data.value || [];
+        var serverItems = (data && data.value) || [];
+        var serverIds = {};
+        serverItems.forEach(function (s) { serverIds[s.vey_filesubmissionid] = true; });
+
+        // Preserve any recent locally submitted records that server read replica hasn't synced yet (up to 5 mins)
+        var recentPending = (state.submissions || []).filter(function (s) {
+          if (serverIds[s.vey_filesubmissionid]) return false;
+          var createdTime = s.createdon ? new Date(s.createdon).getTime() : 0;
+          var age = Date.now() - createdTime;
+          return age >= 0 && age < 300000;
+        });
+
+        state.submissions = recentPending.concat(serverItems);
         renderSubmissionsTable();
       })
       .catch(function (err) {
         console.error('Failed to load submissions:', err);
-        showStatus('Failed to load submissions list. Check permissions or network connection.', 'error');
+        showStatus('Failed to load submissions: ' + (err.message || err), 'error');
+        throw err;
       });
   }
 
   function loadIngestionErrors(submissionId) {
     var selectFields = 'vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon';
-    return apiRequest('GET', 'vey_fileingestionerrors?$filter=_vey_filesubmission_value eq ' + submissionId + '&$select=' + selectFields)
+    
+    // First try querying via parent navigation relationship to avoid top-level security filter crashes
+    return apiRequest('GET', 'vey_filesubmissions(' + submissionId + ')/vey_fileingestionerror_FileSubmission_vey_filesubmission?$select=' + selectFields)
       .then(function (data) {
-        return data.value || [];
+        return (data && data.value) || [];
       })
-      .catch(function (err) {
-        console.warn('Failed to load ingestion errors:', err);
-        return [];
+      .catch(function () {
+        // Fallback to direct filter query
+        return apiRequest('GET', 'vey_fileingestionerrors?$filter=_vey_filesubmission_value eq ' + submissionId + '&$select=' + selectFields)
+          .then(function (data) {
+            return (data && data.value) || [];
+          })
+          .catch(function (err) {
+            console.warn('Ingestion errors unavailable for submission ' + submissionId + ':', err);
+            return [];
+          });
       });
   }
 
@@ -573,21 +602,42 @@
           body: JSON.stringify({ submissionId: ticket.submissionId })
         }).then(function (compRes) {
           if (!compRes.ok) throw new Error('Completion notification failed');
-          return compRes.json();
+          return compRes.json().then(function () { return ticket; });
         });
 
       });
 
-    }).then(function () {
+    }).then(function (ticket) {
       showStatus('File "' + file.name + '" uploaded and registered successfully!', 'success');
       clearSelectedFile();
       if (progressContainer) progressContainer.style.display = 'none';
       if (cancelBtn) cancelBtn.style.display = 'none';
 
-      // Reload submissions and switch to History tab
-      loadSubmissions().then(function () {
-        switchTab('history');
-      });
+      // Optimistically add to state.submissions so user sees it immediately without cache lag
+      if (ticket && ticket.submissionId) {
+        var localRecord = {
+          vey_filesubmissionid: ticket.submissionId,
+          vey_filename: file.name,
+          vey_submissionreference: submissionReference || file.name,
+          vey_filesizebytes: file.size,
+          vey_filehash: state.selectedFileHash,
+          vey_schemaversion: schemaVersion || null,
+          vey_submissionstatus: 948740000,
+          vey_reportingperiodstart: periodStart,
+          vey_reportingperiodend: periodEnd,
+          createdon: new Date().toISOString()
+        };
+        var exists = (state.submissions || []).some(function (s) { return s.vey_filesubmissionid === ticket.submissionId; });
+        if (!exists) {
+          state.submissions = [localRecord].concat(state.submissions || []);
+          renderSubmissionsTable();
+        }
+      }
+
+      switchTab('history');
+
+      // Reload submissions from server to sync with Dataverse
+      loadSubmissions();
 
     }).catch(function (err) {
       console.error('Upload failed:', err);
@@ -612,7 +662,11 @@
     showStatus('Requesting secure download authorization\u2026', 'info');
 
     getAccessToken().then(function (token) {
-      return fetch(CONFIG.functionBaseUrl + '/api/download?submissionId=' + submissionId, {
+      var url = CONFIG.functionBaseUrl + '/api/download?submissionId=' + encodeURIComponent(submissionId);
+      if (state.currentContactId) {
+        url += '&contactId=' + encodeURIComponent(state.currentContactId);
+      }
+      return fetch(url, {
         headers: { 'Authorization': 'Bearer ' + token }
       }).then(function (res) {
         if (!res.ok) throw new Error('Download request denied: HTTP ' + res.status);
@@ -817,9 +871,13 @@
     if (refreshBtn) {
       refreshBtn.addEventListener('click', function () {
         showStatus('Refreshing submissions list\u2026', 'info');
-        loadSubmissions().then(function () {
-          showStatus('Submissions list up to date.', 'success');
-        });
+        loadSubmissions()
+          .then(function () {
+            showStatus('Submissions list up to date (' + state.submissions.length + ' lodgments found).', 'success');
+          })
+          .catch(function () {
+            // Error already displayed by loadSubmissions
+          });
       });
     }
 

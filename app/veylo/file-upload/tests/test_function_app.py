@@ -144,3 +144,29 @@ def test_download_missing_params(mock_valid_auth):
     )
     resp = download_file(req)
     assert resp.status_code == 400
+
+
+@patch("function_app.storage_service.generate_download_sas", return_value="https://sas.url/download")
+@patch("function_app.dataverse_client.is_user_authorized_for_submission", return_value=True)
+@patch("function_app.dataverse_client.get_file_submission")
+def test_download_success_with_contact_id(mock_get_sub, mock_auth, mock_sas, mock_valid_auth):
+    mock_get_sub.return_value = {
+        "vey_filesubmissionid": "sub-123",
+        "vey_filename": "payroll.csv",
+        "_vey_submittedby_value": "contact-mj"
+    }
+
+    req = func.HttpRequest(
+        method="GET",
+        url="/api/download",
+        headers={"Authorization": "Bearer mock-token"},
+        params={"submissionId": "sub-123", "contactId": "contact-mj"},
+        body=b""
+    )
+    resp = download_file(req)
+    assert resp.status_code == 200
+    data = json.loads(resp.get_body())
+    assert data["downloadUrl"] == "https://sas.url/download"
+    assert data["filename"] == "payroll.csv"
+    mock_auth.assert_called_once()
+    assert mock_auth.call_args[1]["caller_contact_id"] == "contact-mj"

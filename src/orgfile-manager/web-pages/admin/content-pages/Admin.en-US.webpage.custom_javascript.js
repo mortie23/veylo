@@ -108,6 +108,9 @@
         var el = document.querySelector('input[name="__RequestVerificationToken"]');
         tokenPromise = Promise.resolve(el ? el.value : '');
       }
+    } else {
+      headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      headers['Pragma'] = 'no-cache';
     }
 
     return tokenPromise.then(function(token) {
@@ -115,10 +118,12 @@
         headers['__RequestVerificationToken'] = token;
       }
       var opts = { method: method, headers: headers };
+      if (method === 'GET') opts.cache = 'no-store';
       if (body) {
         opts.body = JSON.stringify(body);
       }
-      return fetch(API_BASE + endpoint, opts);
+      var url = API_BASE + endpoint;
+      return fetch(url, opts);
     }).then(function (response) {
       if (!response.ok) {
         return response.text().then(function (text) {

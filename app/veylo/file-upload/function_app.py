@@ -241,6 +241,8 @@ def download_file(req: func.HttpRequest) -> func.HttpResponse:
             status_code=400
         )
 
+    caller_contact_id = req.params.get("contactId")
+
     try:
         # 2. Verify authorization against Dataverse
         submission = dataverse_client.get_file_submission(submission_id)
@@ -251,7 +253,9 @@ def download_file(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=404
             )
 
-        if not dataverse_client.is_user_authorized_for_submission(user_claims, submission):
+        if not dataverse_client.is_user_authorized_for_submission(
+            user_claims, submission, caller_contact_id=caller_contact_id
+        ):
             return func.HttpResponse(
                 body=json.dumps({"error": "Forbidden: access to this submission is restricted."}),
                 mimetype="application/json",

@@ -112,7 +112,7 @@
 - adx_description: Comma-separated list of Contact fields exposed via the Web API. Controls which columns can be read and written by portal JavaScript.
   adx_name: Webapi/contact/fields
   adx_sitesettingid: b3c4d5e6-4a0b-4e2f-f56a-d8c7b9e0f1a2
-  adx_value: contactid,fullname,emailaddress1,parentcustomerid,_parentcustomerid_value
+  adx_value: contactid,fullname,emailaddress1,parentcustomerid,parentcustomerid_account,parentcustomerid_contact,_parentcustomerid_value
 - adx_name: Authentication/Registration/LoginButtonAuthenticationType
   adx_sitesettingid: b4da25c1-4b88-451d-84f8-c1fb4263a2ea
 - adx_description: Comma-separated list of File Ingestion Error fields exposed via the Web API.

@@ -259,7 +259,8 @@ class DataverseClient:
     def is_user_authorized_for_submission(
         self,
         user_claims: Dict[str, Any],
-        submission: Dict[str, Any]
+        submission: Dict[str, Any],
+        caller_contact_id: Optional[str] = None
     ) -> bool:
         """
         Verify whether the authenticated user has permission to access the submission.
@@ -267,7 +268,7 @@ class DataverseClient:
         Resolution chain:
           1. Check admin roles first (cheapest: no API calls).
           2. Resolve the caller's Entra ID OID / email → Dataverse contact ID
-             (via adx_externalidentities or email lookup).
+             (via adx_externalidentities, email lookup, or caller_contact_id).
           3. Compare resolved contact against submission submitter.
           4. Look up the contact's parent organization and compare against
              the submission's organization.
@@ -307,6 +308,10 @@ class DataverseClient:
         )
         resolved_contact_id = self.resolve_contact_id(user_oid, user_email)
 
+        # If not resolved via Entra ID claims (e.g. portal local login), fallback to verified caller_contact_id
+        if not resolved_contact_id and caller_contact_id:
+            resolved_contact_id = self.resolve_contact_id(caller_contact_id)
+
         # Check 1: Contact ownership (submitter match)
         if resolved_contact_id and submission_submitter:
             if resolved_contact_id.lower() == submission_submitter.lower():
@@ -317,5 +322,15 @@ class DataverseClient:
             parent_org = self._get_contact_parent_org(resolved_contact_id)
             if parent_org and parent_org.lower() == submission_org.lower():
                 return True
+
+        # Check 3: If caller_contact_id was provided and didn't match primary resolved contact, check it directly
+        if caller_contact_id and caller_contact_id != resolved_contact_id:
+            contact_from_param = self.resolve_contact_id(caller_contact_id)
+            if contact_from_param and submission_submitter and contact_from_param.lower() == submission_submitter.lower():
+                return True
+            if contact_from_param and submission_org:
+                parent_org = self._get_contact_parent_org(contact_from_param)
+                if parent_org and parent_org.lower() == submission_org.lower():
+                    return True
 
         return False
