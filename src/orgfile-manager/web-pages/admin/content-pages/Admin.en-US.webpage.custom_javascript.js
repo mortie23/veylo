@@ -65,6 +65,22 @@
     return d.innerHTML;
   }
 
+  /** Extract user-friendly error message from API response errors. */
+  function extractErrorMessage(err) {
+    if (!err) return 'Unknown error';
+    var msg = err.message || String(err);
+    try {
+      var jsonStart = msg.indexOf('{');
+      if (jsonStart !== -1) {
+        var parsed = JSON.parse(msg.slice(jsonStart));
+        if (parsed && parsed.error && parsed.error.message) {
+          return parsed.error.message;
+        }
+      }
+    } catch (e) { /* ignore */ }
+    return msg;
+  }
+
   /**
    * Generic fetch wrapper for the Dataverse Web API.
    * Automatically includes OData headers and the CSRF token for mutations.
@@ -305,7 +321,7 @@
     })
     .catch(function (err) {
       console.error('Assign failed:', err);
-      showStatus('Failed to assign user. Check browser console for details.', 'error');
+      showStatus('Failed to assign user: ' + extractErrorMessage(err), 'error');
     });
   }
 
@@ -320,7 +336,7 @@
     })
     .catch(function (err) {
       console.error('Remove failed:', err);
-      showStatus('Failed to remove user. Check browser console for details.', 'error');
+      showStatus('Failed to remove user: ' + extractErrorMessage(err), 'error');
     });
   }
 
@@ -363,7 +379,7 @@
     })
     .catch(function (err) {
       console.error('Create organisation failed:', err);
-      showStatus('Failed to register organisation. Check browser console for details.', 'error');
+      showStatus('Failed to register organisation: ' + extractErrorMessage(err), 'error');
     })
     .then(function () {
       if (btn) btn.disabled = false;
@@ -397,7 +413,7 @@
     })
     .catch(function (err) {
       console.error('Delete organisation failed:', err);
-      showStatus('Failed to delete organisation. Check browser console for details.', 'error');
+      showStatus('Failed to delete organisation: ' + extractErrorMessage(err), 'error');
     });
   }
 

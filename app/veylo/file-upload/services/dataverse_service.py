@@ -119,6 +119,19 @@ class DataverseClient:
 
         return None
 
+    def resolve_contact_org_id(self, contact_id: str) -> Optional[str]:
+        """Look up the parent account ID (_parentcustomerid_value) for a given contact."""
+        if not self.dataverse_url or not contact_id:
+            return None
+        try:
+            endpoint = f"{self.dataverse_url}/api/data/v9.2/contacts({contact_id})?$select=_parentcustomerid_value"
+            res = requests.get(endpoint, headers=self._headers(), timeout=10)
+            if res.ok:
+                return res.json().get("_parentcustomerid_value")
+        except Exception as ex:
+            logger.debug(f"Contact parent org lookup failed: {ex}")
+        return None
+
     def create_file_submission(
         self,
         submission_id: str,
@@ -160,8 +173,13 @@ class DataverseClient:
         # Resolve contact ID (from direct ID, Entra OID, or email)
         resolved_contact_id = self.resolve_contact_id(submitted_by_contact_id, user_email)
 
-        if organization_id:
-            record["vey_Organization@odata.bind"] = f"/accounts({organization_id})"
+        # Auto-resolve parent organization if omitted and contact has an associated account
+        resolved_org_id = organization_id
+        if not resolved_org_id and resolved_contact_id and self.dataverse_url:
+            resolved_org_id = self.resolve_contact_org_id(resolved_contact_id)
+
+        if resolved_org_id:
+            record["vey_Organization@odata.bind"] = f"/accounts({resolved_org_id})"
         if resolved_contact_id:
             record["vey_SubmittedBy@odata.bind"] = f"/contacts({resolved_contact_id})"
 

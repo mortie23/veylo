@@ -237,17 +237,31 @@
       if (state.currentOrgName) {
         var el = document.getElementById('fm-current-org-name');
         if (el) el.textContent = state.currentOrgName;
+        return Promise.resolve();
       }
 
-      if (state.currentContactId) {
-        return Promise.resolve();
+      if (state.currentOrgId) {
+        return apiRequest('GET', 'accounts(' + state.currentOrgId + ')?$select=name')
+          .then(function (acc) {
+            state.currentOrgName = acc.name || 'Your Organisation';
+            var el = document.getElementById('fm-current-org-name');
+            if (el) el.textContent = state.currentOrgName;
+          })
+          .catch(function () {
+            var el = document.getElementById('fm-current-org-name');
+            if (el) el.textContent = 'Your Organisation';
+          });
       }
     }
 
-    return apiRequest('GET', 'contacts?$select=contactid,fullname,emailaddress1,_parentcustomerid_value&$top=1')
+    var contactQuery = state.currentContactId
+      ? 'contacts(' + state.currentContactId + ')?$select=contactid,fullname,emailaddress1,_parentcustomerid_value'
+      : 'contacts?$select=contactid,fullname,emailaddress1,_parentcustomerid_value&$top=1';
+
+    return apiRequest('GET', contactQuery)
       .then(function (data) {
-        var contact = (data.value && data.value[0]) || {};
-        state.currentContactId = contact.contactid || '';
+        var contact = (data.value && data.value[0]) || data || {};
+        if (!state.currentContactId) state.currentContactId = contact.contactid || '';
         state.currentOrgId = contact._parentcustomerid_value || '';
 
         if (state.currentOrgId) {
@@ -259,13 +273,22 @@
             });
         } else {
           var el = document.getElementById('fm-current-org-name');
-          if (el) el.textContent = 'Unassigned Organisation';
+          if (el) {
+            el.textContent = 'No Organisation Assigned';
+            el.style.color = '#718096';
+          }
+          var badge = document.getElementById('fm-org-badge');
+          if (badge) {
+            badge.innerHTML = '<span class="au-tag" style="background-color: #edf2f7; color: #4a5568;">Individual Submissions</span>';
+          }
         }
       })
       .catch(function (err) {
         console.warn('Failed to load user org info:', err);
         var el = document.getElementById('fm-current-org-name');
-        if (el && !state.currentOrgName) el.textContent = 'Default Organisation';
+        if (el && !state.currentOrgName) {
+          el.textContent = 'No Organisation Assigned';
+        }
       });
   }
 

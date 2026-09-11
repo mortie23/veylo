@@ -191,3 +191,44 @@ class TestIsUserAuthorizedForSubmission:
 
         assert self.client.is_user_authorized_for_submission(claims, submission) is True
 
+
+def test_resolve_contact_org_id():
+    client = DataverseClient(dataverse_url="https://test.crm.dynamics.com")
+    with patch("services.dataverse_service.requests.get") as mock_get, \
+         patch.object(DataverseClient, "_get_access_token", return_value="mock-token"):
+        mock_response = MagicMock()
+        mock_response.ok = True
+        mock_response.json.return_value = {"_parentcustomerid_value": "acc-999"}
+        mock_get.return_value = mock_response
+
+        org_id = client.resolve_contact_org_id("contact-123")
+        assert org_id == "acc-999"
+
+
+def test_create_file_submission_auto_resolves_org():
+    client = DataverseClient(dataverse_url="https://test.crm.dynamics.com")
+    with patch.object(DataverseClient, "resolve_contact_id", return_value="contact-123"), \
+         patch.object(DataverseClient, "resolve_contact_org_id", return_value="auto-org-456"), \
+         patch.object(DataverseClient, "_get_access_token", return_value="mock-token"), \
+         patch("services.dataverse_service.requests.post") as mock_post:
+        mock_response = MagicMock()
+        mock_response.status_code = 201
+        mock_response.content = b""
+        mock_response.json.return_value = {}
+        mock_post.return_value = mock_response
+
+        record = client.create_file_submission(
+            submission_id="sub-auto-1",
+            filename="data.csv",
+            file_size=100,
+            file_hash="hash",
+            storage_uri="https://blob/data.csv",
+            organization_id=None,  # Not provided by client
+            submitted_by_contact_id="contact-123"
+        )
+
+        sent_payload = mock_post.call_args[1]["json"]
+        assert sent_payload["vey_Organization@odata.bind"] == "/accounts(auto-org-456)"
+        assert sent_payload["vey_SubmittedBy@odata.bind"] == "/contacts(contact-123)"
+        assert record["vey_Organization@odata.bind"] == "/accounts(auto-org-456)"
+
