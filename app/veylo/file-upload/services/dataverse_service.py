@@ -220,6 +220,24 @@ class DataverseClient:
         response.raise_for_status()
         return response.json()
 
+    def _get_contact_parent_org(self, contact_id: str) -> Optional[str]:
+        """Look up the parent organization (account) for a Dataverse contact."""
+        if not self.dataverse_url or not contact_id:
+            return None
+
+        try:
+            endpoint = (
+                f"{self.dataverse_url}/api/data/v9.2/contacts({contact_id})"
+                f"?$select=_parentcustomerid_value"
+            )
+            response = requests.get(endpoint, headers=self._headers(), timeout=10)
+            if response.ok:
+                return response.json().get("_parentcustomerid_value")
+        except Exception as ex:
+            logger.debug(f"Contact parent org lookup failed: {ex}")
+
+        return None
+
     def is_user_authorized_for_submission(
         self,
         user_claims: Dict[str, Any],
@@ -227,23 +245,59 @@ class DataverseClient:
     ) -> bool:
         """
         Verify whether the authenticated user has permission to access the submission.
-        Checks contact ownership or matching organization ID.
+
+        Resolution chain:
+          1. Check admin roles first (cheapest: no API calls).
+          2. Resolve the caller's Entra ID OID / email → Dataverse contact ID
+             (via adx_externalidentities or email lookup).
+          3. Compare resolved contact against submission submitter.
+          4. Look up the contact's parent organization and compare against
+             the submission's organization.
         """
-        user_contact_id = user_claims.get("contact_id")
-        user_org_id = user_claims.get("organization_id")
+        # ----- Admin short-circuits (no Dataverse calls required) -----
 
-        submission_submitter = submission.get("vey_submittedbyid") or submission.get("submitted_by_contact_id")
-        submission_org = submission.get("vey_organizationid") or submission.get("organization_id")
-
-        if user_contact_id and submission_submitter and user_contact_id == submission_submitter:
-            return True
-
-        if user_org_id and submission_org and user_org_id == submission_org:
-            return True
-
-        # Check for administrative role claim
+        # App-level roles (from Entra ID App Registration app roles)
         roles = user_claims.get("roles", [])
         if "File.Admin" in roles or "SystemAdministrator" in roles:
             return True
+
+        # Entra ID directory roles (wids claim)
+        # 62e90394-69f5-4237-9190-012177145e10 = Global Administrator
+        # b79fbf4d-3ef9-4689-8143-76b194e85509 = Directory Readers (not admin, but useful for future)
+        wids = user_claims.get("wids", [])
+        if "62e90394-69f5-4237-9190-012177145e10" in wids:
+            return True
+
+        # ----- Extract submission lookup values (OData _field_value format) -----
+        submission_submitter = (
+            submission.get("_vey_submittedby_value")
+            or submission.get("vey_submittedbyid")
+            or submission.get("submitted_by_contact_id")
+        )
+        submission_org = (
+            submission.get("_vey_organization_value")
+            or submission.get("vey_organizationid")
+            or submission.get("organization_id")
+        )
+
+        # ----- Resolve caller identity → Dataverse contact -----
+        user_oid = user_claims.get("oid") or user_claims.get("contact_id")
+        user_email = (
+            user_claims.get("preferred_username")
+            or user_claims.get("email")
+            or user_claims.get("upn")
+        )
+        resolved_contact_id = self.resolve_contact_id(user_oid, user_email)
+
+        # Check 1: Contact ownership (submitter match)
+        if resolved_contact_id and submission_submitter:
+            if resolved_contact_id.lower() == submission_submitter.lower():
+                return True
+
+        # Check 2: Organization membership (same parent account)
+        if resolved_contact_id and submission_org:
+            parent_org = self._get_contact_parent_org(resolved_contact_id)
+            if parent_org and parent_org.lower() == submission_org.lower():
+                return True
 
         return False

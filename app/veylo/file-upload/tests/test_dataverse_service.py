@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import patch, MagicMock
 from services.dataverse_service import (
     DataverseClient,
     SubmissionStatus,
@@ -78,3 +79,115 @@ def test_update_submission_status_local_store():
     success = client.update_submission_status(sub_id, "failed")
     assert success is True
     assert _LOCAL_MOCK_STORE[sub_id]["vey_submissionstatus"] == 948740004
+
+
+# ======================================================================
+# Authorization tests
+# ======================================================================
+
+class TestIsUserAuthorizedForSubmission:
+    """Tests for is_user_authorized_for_submission with real OData field names."""
+
+    def setup_method(self):
+        self.client = DataverseClient(dataverse_url=None)
+
+    def test_admin_role_file_admin(self):
+        """File.Admin app role should grant access without any Dataverse calls."""
+        claims = {"roles": ["File.Admin"]}
+        submission = {"_vey_submittedby_value": "someone-else"}
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+
+    def test_admin_role_system_administrator(self):
+        """SystemAdministrator app role should grant access."""
+        claims = {"roles": ["SystemAdministrator"]}
+        submission = {"_vey_submittedby_value": "someone-else"}
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+
+    def test_global_admin_wids(self):
+        """Entra ID Global Administrator (via wids claim) should grant access."""
+        claims = {"wids": ["62e90394-69f5-4237-9190-012177145e10"]}
+        submission = {"_vey_submittedby_value": "someone-else"}
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+
+    def test_non_admin_wids_denied(self):
+        """A non-admin wids role should NOT grant access by itself."""
+        claims = {
+            "oid": "unknown-oid",
+            "wids": ["b79fbf4d-3ef9-4689-8143-76b194e85509"],  # Directory Readers
+        }
+        submission = {"_vey_submittedby_value": "someone-else"}
+        assert self.client.is_user_authorized_for_submission(claims, submission) is False
+
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_contact_match_via_odata_field(self, mock_resolve):
+        """Submitter match using real OData _vey_submittedby_value field."""
+        mock_resolve.return_value = "contact-abc-123"
+
+        claims = {"oid": "entra-oid-xyz", "preferred_username": "user@test.com"}
+        submission = {"_vey_submittedby_value": "contact-abc-123"}
+
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+        mock_resolve.assert_called_once_with("entra-oid-xyz", "user@test.com")
+
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_contact_match_case_insensitive(self, mock_resolve):
+        """Contact ID comparison should be case-insensitive."""
+        mock_resolve.return_value = "CONTACT-ABC-123"
+
+        claims = {"oid": "oid-1"}
+        submission = {"_vey_submittedby_value": "contact-abc-123"}
+
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+
+    @patch.object(DataverseClient, "_get_contact_parent_org")
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_org_match_via_parent_account(self, mock_resolve, mock_parent_org):
+        """Organization match: caller's parent account matches submission org."""
+        mock_resolve.return_value = "contact-different"
+        mock_parent_org.return_value = "org-shared-001"
+
+        claims = {"oid": "oid-1"}
+        submission = {
+            "_vey_submittedby_value": "contact-someone-else",
+            "_vey_organization_value": "org-shared-001",
+        }
+
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+        mock_parent_org.assert_called_once_with("contact-different")
+
+    @patch.object(DataverseClient, "_get_contact_parent_org")
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_org_mismatch_denied(self, mock_resolve, mock_parent_org):
+        """Different org should be denied."""
+        mock_resolve.return_value = "contact-other"
+        mock_parent_org.return_value = "org-other"
+
+        claims = {"oid": "oid-1"}
+        submission = {
+            "_vey_submittedby_value": "contact-someone-else",
+            "_vey_organization_value": "org-target",
+        }
+
+        assert self.client.is_user_authorized_for_submission(claims, submission) is False
+
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_unresolvable_identity_denied(self, mock_resolve):
+        """If the caller's identity cannot be resolved, deny access."""
+        mock_resolve.return_value = None
+
+        claims = {"oid": "unknown-oid"}
+        submission = {"_vey_submittedby_value": "contact-abc"}
+
+        assert self.client.is_user_authorized_for_submission(claims, submission) is False
+
+    @patch.object(DataverseClient, "resolve_contact_id")
+    def test_local_mock_store_fallback_fields(self, mock_resolve):
+        """Authorization should also work with local mock store field names."""
+        mock_resolve.return_value = "contact-local"
+
+        claims = {"oid": "local-oid"}
+        # Local mock store uses submitted_by_contact_id as fallback
+        submission = {"submitted_by_contact_id": "contact-local"}
+
+        assert self.client.is_user_authorized_for_submission(claims, submission) is True
+

@@ -596,13 +596,26 @@
         return res.json();
       });
     }).then(function (data) {
-      showStatus('Download authorized. Starting download...', 'success');
-      var a = document.createElement('a');
-      a.href = data.downloadUrl;
-      a.download = data.filename || 'download.bin';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      showStatus('Download authorized. Fetching file\u2026', 'success');
+      var filename = data.filename || 'download.bin';
+
+      // Fetch the blob via the SAS URL, then create a same-origin Blob URL.
+      // This ensures the a.download filename attribute is respected by the browser,
+      // which ignores it for cross-origin URLs (the SAS URL is on blob.core.windows.net).
+      return fetch(data.downloadUrl).then(function (blobRes) {
+        if (!blobRes.ok) throw new Error('Failed to fetch file from storage: HTTP ' + blobRes.status);
+        return blobRes.blob();
+      }).then(function (blob) {
+        var blobUrl = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        // Revoke the object URL after a short delay to free memory
+        setTimeout(function () { URL.revokeObjectURL(blobUrl); }, 5000);
+      });
     }).catch(function (err) {
       console.error('Download error:', err);
       showStatus('Failed to download file: ' + err.message, 'error');
