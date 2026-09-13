@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Veylo Data Contracts{% endblock %} — Health Design System</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/hds.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/contracts.css') }}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Australian Government / Health Header Top Bar -->
+  <header class="health-header-top">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span>Australian Government &bull; Department of Health and Aged Care &bull; Veylo Data Platform</span>
+      </div>
+      <div>
+        <span>Backend: <strong>{{ 'SQLite Local' if config.is_sqlite else 'GCP BigQuery' }}</strong></span>
+        <span class="badge {{ 'badge-warning' if config.is_sqlite else 'badge-success' }}" style="margin-left: 6px;">
+          {{ config.env | upper }}
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navigation Header -->
+  <nav class="health-header-main">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <a href="{{ url_for('contracts.index') }}" class="health-header__brand">
+        <div style="background-color: #006fb0; width: 38px; height: 38px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px;">
+          V
+        </div>
+        <div>
+          <h1 class="health-header__title">Veylo Data Contract Manager</h1>
+          <p class="health-header__subtitle">BigQuery Schema Specification &amp; Quality Enforcement Engine</p>
+        </div>
+      </a>
+
+      <div class="health-nav">
+        <a href="{{ url_for('contracts.index') }}" class="health-nav__link {% if request.endpoint == 'contracts.index' %}is-active{% endif %}">
+          Contracts Catalog
+        </a>
+        <a href="{{ url_for('contracts.new') }}" class="health-nav__link {% if request.endpoint == 'contracts.new' %}is-active{% endif %}">
+          + New Contract
+        </a>
+        <a href="https://console.cloud.google.com/bigquery" target="_blank" rel="noopener" class="health-nav__link">
+          BigQuery Console ↗
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sub-header Hero Banner -->
+  <div class="health-sub-header">
+    <div class="container">
+      <nav class="au-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="{{ url_for('contracts.index') }}">Home</a></li>
+          {% block breadcrumbs %}{% endblock %}
+        </ol>
+      </nav>
+
+      <h1>{% block page_title %}Data Contracts{% endblock %}</h1>
+      <p class="au-introduction">
+        {% block page_intro %}Define, version, and enforce schema contracts, field casting rules, and data quality specifications for BigQuery bronze layer ingestion.{% endblock %}
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="container">
+    <!-- Flash Alerts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="au-page-alerts au-page-alerts--{{ 'error' if category == 'danger' else category }}" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Health Design System Footer -->
+  <footer class="health-footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-8">
+          <h4 style="color: #ffffff; margin-top: 0;">Veylo Data Platform</h4>
+          <p style="max-width: 540px;">
+            Enforcing schema contracts across Microsoft Dataverse, Azure Blob Storage, and Google Cloud Platform BigQuery. Powered by the Australian Government Health Design System.
+          </p>
+        </div>
+        <div class="col-4">
+          <h4 style="color: #ffffff; margin-top: 0;">Cloud Architecture</h4>
+          <ul style="list-style: none; padding: 0; line-height: 1.8;">
+            <li>Project: <code>{{ config.gcp_project_id }}</code></li>
+            <li>Config Dataset: <code>{{ config.bq_config_dataset }}</code></li>
+            <li>Bronze Dataset: <code>{{ config.bq_bronze_dataset }}</code></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="health-footer__bottom">
+        <div>
+          &copy; 2026 Veylo Health Analytics. All rights reserved.
+        </div>
+        <div>
+          <span>Design System: <strong>HDS v1.4</strong></span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/contracts.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

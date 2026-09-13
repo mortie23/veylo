@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Rules: {{ attribute.tgt_field_name }} — Veylo{% endblock %}
+{% block page_title %}Rules &amp; Code Sets: <code>{{ attribute.tgt_field_name }}</code>{% endblock %}
+{% block page_intro %}
+Configure Data Quality validation constraints and categorical code translations for field '{{ attribute.src_field_name }}'.
+{% endblock %}
+
+{% block breadcrumbs %}
+  <li><a href="{{ url_for('contracts.index') }}">Contracts Catalog</a></li>
+  <li><a href="{{ url_for('contracts.detail', contract_id=contract.data_contract_id) }}">{{ contract.contract_name }}</a></li>
+  <li><span class="current">{{ attribute.tgt_field_name }} Rules</span></li>
+{% endblock %}
+
+{% block content %}
+
+<!-- Attribute Context Banner -->
+<div class="health-card">
+  <div class="health-card__body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <span style="font-size: 13px; color: var(--au-color-text-muted);">Source File Header:</span>
+      <div style="font-size: 18px; font-weight: 700;">{{ attribute.src_field_name }}</div>
+    </div>
+    <div>
+      <span style="font-size: 13px; color: var(--au-color-text-muted);">BigQuery Column:</span>
+      <div><code>{{ attribute.tgt_field_name }}</code></div>
+    </div>
+    <div>
+      <span style="font-size: 13px; color: var(--au-color-text-muted);">Target Data Type:</span>
+      <div><span class="badge badge-dark">{{ attribute.tgt_data_type }}</span></div>
+    </div>
+    <div>
+      <span style="font-size: 13px; color: var(--au-color-text-muted);">Constraints:</span>
+      <div>
+        {% if attribute.is_pk %}<span class="badge badge-warning">PK</span>{% endif %}
+        {% if not attribute.is_nullable %}<span class="badge badge-danger">Required</span>{% else %}<span class="badge badge-info">Nullable</span>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<form action="{{ url_for('rules.save_attribute_rules', contract_id=contract.data_contract_id, attribute_id=attribute.attribute_id) }}" method="POST">
+
+  <!-- Section 1: Data Quality Rules -->
+  <div class="health-card health-card--shadow">
+    <div class="health-card__header">
+      <div>
+        <h2 class="health-card__title">1. Data Quality Rules</h2>
+        <div style="font-size: 13px; color: var(--au-color-text-muted);">
+          Automated rules evaluated against each row. Failures with ERROR severity reject the file.
+        </div>
+      </div>
+      <button type="button" id="btn-add-dq" class="au-btn au-btn--secondary au-btn--sm">
+        + Add DQ Rule
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="health-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Rule Type</th>
+            <th style="width: 25%;">Rule Value (Pattern / Range)</th>
+            <th style="width: 15%;">Severity</th>
+            <th style="width: 30%;">Custom Error Message</th>
+            <th style="width: 5%;" class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody id="dq-table-body">
+          {% for rule in attribute.data_quality_rules %}
+            <tr class="dq-row">
+              <td>
+                <select class="au-select" name="dq_rules[{{ loop.index0 }}][rule_type]">
+                  <option value="REGEX" {% if rule.rule_type == 'REGEX' %}selected{% endif %}>REGEX (Pattern matching)</option>
+                  <option value="RANGE" {% if rule.rule_type == 'RANGE' %}selected{% endif %}>RANGE (Numeric min/max)</option>
+                  <option value="LENGTH" {% if rule.rule_type == 'LENGTH' %}selected{% endif %}>LENGTH (String length)</option>
+                  <option value="NOT_NULL" {% if rule.rule_type == 'NOT_NULL' %}selected{% endif %}>NOT_NULL (Non-empty check)</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" class="au-text-input" name="dq_rules[{{ loop.index0 }}][rule_value]" value="{{ rule.rule_value or '' }}" placeholder='e.g. ^[0-9]{10}$ or {"min": 0, "max": 100}' />
+              </td>
+              <td>
+                <select class="au-select" name="dq_rules[{{ loop.index0 }}][severity]">
+                  <option value="ERROR" {% if rule.severity == 'ERROR' %}selected{% endif %}>ERROR (Reject file)</option>
+                  <option value="WARNING" {% if rule.severity == 'WARNING' %}selected{% endif %}>WARNING (Log only)</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" class="au-text-input" name="dq_rules[{{ loop.index0 }}][error_message]" value="{{ rule.error_message_template or '' }}" placeholder="Custom error message template" />
+              </td>
+              <td class="text-center">
+                <button type="button" class="icon-btn btn-remove-rule" title="Delete rule">✕</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Section 2: Code Management Mappings -->
+  <div class="health-card health-card--shadow">
+    <div class="health-card__header">
+      <div>
+        <h2 class="health-card__title">2. Categorical Code Management Sets</h2>
+        <div style="font-size: 13px; color: var(--au-color-text-muted);">
+          Validates incoming values against permitted enumerated codes and optionally maps them to standardized warehouse targets.
+        </div>
+      </div>
+      <button type="button" id="btn-add-code" class="au-btn au-btn--secondary au-btn--sm">
+        + Add Allowed Code
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="health-table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Code System Name</th>
+            <th style="width: 25%;">Source Code (Incoming) *</th>
+            <th style="width: 25%;">Target Code (Standardized)</th>
+            <th style="width: 20%;">Description</th>
+            <th style="width: 5%;" class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody id="code-table-body">
+          {% for code in attribute.code_management %}
+            <tr class="code-row">
+              <td>
+                <input type="text" class="au-text-input" name="code_maps[{{ loop.index0 }}][code_system_name]" value="{{ code.code_system_name or '' }}" placeholder="e.g. ISO_3166_COUNTRY" />
+              </td>
+              <td>
+                <input type="text" class="au-text-input" name="code_maps[{{ loop.index0 }}][source_code]" value="{{ code.source_code }}" placeholder="Incoming value" required />
+              </td>
+              <td>
+                <input type="text" class="au-text-input" name="code_maps[{{ loop.index0 }}][target_code]" value="{{ code.target_code or '' }}" placeholder="Target value" />
+              </td>
+              <td>
+                <input type="text" class="au-text-input" name="code_maps[{{ loop.index0 }}][target_description]" value="{{ code.target_description or '' }}" placeholder="Description" />
+              </td>
+              <td class="text-center">
+                <button type="button" class="icon-btn btn-remove-code" title="Delete code">✕</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="health-card__footer">
+      <a href="{{ url_for('contracts.detail', contract_id=contract.data_contract_id) }}" class="au-btn au-btn--tertiary">
+        Cancel
+      </a>
+      <button type="submit" class="au-btn au-btn--primary">
+        Save Rules &amp; Codes
+      </button>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/rules-editor.js') }}"></script>
+<script>
+// Delegate deletion for pre-rendered rules
+document.querySelectorAll('.btn-remove-rule').forEach(btn => {
+  btn.addEventListener('click', (e) => e.target.closest('tr').remove());
+});
+document.querySelectorAll('.btn-remove-code').forEach(btn => {
+  btn.addEventListener('click', (e) => e.target.closest('tr').remove());
+});
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+/* ============================================================
+   Contract Management Portal Page Styles
+   ============================================================ */
+
+.contracts-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.contracts-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 480px;
+}
+
+/* Metric summary chips */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: #ffffff;
+  border: 1px solid var(--au-color-border);
+  border-radius: var(--au-radius);
+  padding: 16px 20px;
+  border-left: 4px solid var(--au-color-primary);
+}
+
+.metric-card__value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--au-color-navy);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-card__label {
+  font-size: 13px;
+  color: var(--au-color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Field designer table */
+.field-grid-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.field-grid-table td {
+  padding: 8px 10px;
+}
+
+.field-grid-table input,
+.field-grid-table select {
+  font-size: 13px;
+  padding: 6px 8px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #718096;
+  border-radius: var(--au-radius);
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  color: var(--au-color-danger);
+  background-color: var(--au-color-danger-bg);
+}
+
+/* Code & Rule Tags */
+.rule-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: monospace;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.rule-tag--error {
+  border-left: 3px solid var(--au-color-danger);
+}
+
+.rule-tag--warning {
+  border-left: 3px solid var(--au-color-warning);
+}
+
+/* Test schema editor */
+.test-schema-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .test-schema-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor-pane {
+  background: #ffffff;
+  border: 1px solid var(--au-color-border);
+  border-radius: var(--au-radius);
+  padding: 16px;
+}
+
+.editor-textarea {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  min-height: 240px;
+  white-space: pre;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  background: #ffffff;
+  border: 1px dashed var(--au-color-border);
+  border-radius: var(--au-radius);
+}
+
+.empty-state__icon {
+  font-size: 40px;
+  color: #a0aec0;
+  margin-bottom: 12px;
+}
+
+.empty-state__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--au-color-navy);
+  margin-bottom: 6px;
+}
+
+.empty-state__description {
+  color: var(--au-color-text-muted);
+  max-width: 440px;
+  margin: 0 auto 20px auto;
+  font-size: 14px;
+}

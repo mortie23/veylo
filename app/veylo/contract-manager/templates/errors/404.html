@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found — Veylo{% endblock %}
+{% block page_title %}404 — Page Not Found{% endblock %}
+{% block page_intro %}The requested data contract or resource could not be found.{% endblock %}
+
+{% block content %}
+<div class="empty-state">
+  <div class="empty-state__icon">🔍</div>
+  <h3 class="empty-state__title">Contract or Page Not Found</h3>
+  <p class="empty-state__description">
+    The contract ID or URL you requested does not exist in dataset <code>{{ config.bq_config_dataset }}</code>.
+  </p>
+  <a href="{{ url_for('contracts.index') }}" class="au-btn au-btn--primary">
+    &larr; Return to Contracts Catalog
+  </a>
+</div>
+{% endblock %}

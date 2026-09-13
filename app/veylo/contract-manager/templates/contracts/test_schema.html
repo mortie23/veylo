@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Test Schema: {{ contract.contract_name }} — Veylo{% endblock %}
+{% block page_title %}Test Schema: <code>{{ contract.contract_name }}</code> ({{ contract.contract_version }}){% endblock %}
+{% block page_intro %}
+Paste sample CSV rows to simulate contract validation, type casting, and data quality evaluation before live file uploads.
+{% endblock %}
+
+{% block breadcrumbs %}
+  <li><a href="{{ url_for('contracts.index') }}">Contracts Catalog</a></li>
+  <li><a href="{{ url_for('contracts.detail', contract_id=contract.data_contract_id) }}">{{ contract.contract_name }}</a></li>
+  <li><span class="current">Test Schema</span></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="test-schema-container">
+  <!-- Left: Input Data -->
+  <div class="editor-pane">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3 style="margin: 0; font-size: 16px; color: var(--au-color-navy);">Sample CSV Input</h3>
+      <button type="button" class="au-btn au-btn--tertiary au-btn--sm" onclick="populateSampleData()">
+        Insert Sample CSV
+      </button>
+    </div>
+
+    <form action="{{ url_for('contracts.run_test_schema', contract_id=contract.data_contract_id) }}" method="POST">
+      <div class="au-form-group">
+        <textarea id="sample_csv_input" name="sample_csv" class="au-text-input editor-textarea" placeholder="Paste CSV text here with headers matching contract..." required>{{ sample_csv or '' }}</textarea>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 12px; color: var(--au-color-text-muted);">
+          Headers must match <code>src_field_name</code> definitions.
+        </span>
+        <button type="submit" class="au-btn au-btn--primary">
+          ▶ Run Validation
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Right: Validation Results -->
+  <div class="editor-pane">
+    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--au-color-navy);">Validation Diagnostics</h3>
+
+    {% if result is defined %}
+      {% if result.is_valid %}
+        <div class="au-page-alerts au-page-alerts--success">
+          <strong>Validation Passed!</strong> All {{ result.row_count }} sample rows conform to the contract specification and would be accepted into <code>{{ entity.tgt_dataset }}.{{ entity.tgt_entity_name }}</code>.
+        </div>
+      {% else %}
+        <div class="au-page-alerts au-page-alerts--error">
+          <strong>Validation Failed:</strong> {{ result.errors | length }} errors detected across sample rows. The file would be rejected.
+        </div>
+
+        <div class="table-responsive" style="max-height: 280px; overflow-y: auto;">
+          <table class="health-table" style="font-size: 12px;">
+            <thead>
+              <tr>
+                <th>Row</th>
+                <th>Field</th>
+                <th>Code</th>
+                <th>Error Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for err in result.errors %}
+                <tr>
+                  <td>{{ err.row_number or 'N/A' }}</td>
+                  <td><code>{{ err.column_name or 'N/A' }}</code></td>
+                  <td><span class="badge badge-danger">{{ err.error_code }}</span></td>
+                  <td>{{ err.error_message }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+
+      {% if result.preview_rows %}
+        <h4 style="margin: 16px 0 8px 0; font-size: 14px; color: var(--au-color-navy);">Transformed Output Preview:</h4>
+        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+          <table class="health-table" style="font-size: 11px;">
+            <thead>
+              <tr>
+                {% for col in result.columns %}
+                  <th>{{ col }}</th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in result.preview_rows %}
+                <tr>
+                  {% for col in result.columns %}
+                    <td>{{ row.get(col, '') }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="empty-state" style="padding: 40px 10px;">
+        <div class="empty-state__icon">🧪</div>
+        <div class="empty-state__title" style="font-size: 15px;">Ready to Test</div>
+        <p class="empty-state__description" style="font-size: 13px;">
+          Paste sample CSV data on the left and click 'Run Validation' to test against schema rules.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<div style="margin-top: 24px;">
+  <a href="{{ url_for('contracts.detail', contract_id=contract.data_contract_id) }}" class="au-btn au-btn--tertiary">
+    &larr; Back to Contract Details
+  </a>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function populateSampleData() {
+  {% if contract.entities and contract.entities[0].attributes %}
+    const headers = [
+      {% for attr in contract.entities[0].attributes %}
+        "{{ attr.src_field_name }}"{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+    let csv = headers.join(",") + "\n";
+    // Dummy row values
+    const dummyVals = [
+      {% for attr in contract.entities[0].attributes %}
+        {% if attr.tgt_data_type == 'DATE' %}"2026-09-14"
+        {% elif attr.tgt_data_type in ('INT64', 'INTEGER') %}"101"
+        {% elif attr.tgt_data_type in ('FLOAT64', 'NUMERIC') %}"145.50"
+        {% elif attr.code_management %}"{{ attr.code_management[0].source_code }}"
+        {% elif attr.is_pk %}"{{ attr.tgt_field_name | upper }}-001"
+        {% else %}"Sample Value"
+        {% endif %}{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+    csv += dummyVals.join(",") + "\n";
+    document.getElementById('sample_csv_input').value = csv;
+  {% endif %}
+}
+</script>
+{% endblock %}

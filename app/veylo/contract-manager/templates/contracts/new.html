@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Create Data Contract — Veylo{% endblock %}
+{% block page_title %}Create New Data Contract{% endblock %}
+{% block page_intro %}
+Define a new contract specification, target BigQuery entity, and expected attribute mappings for automated file ingestion.
+{% endblock %}
+
+{% block breadcrumbs %}
+  <li><a href="{{ url_for('contracts.index') }}">Contracts Catalog</a></li>
+  <li><span class="current">New Contract</span></li>
+{% endblock %}
+
+{% block content %}
+
+<form action="{{ url_for('contracts.create') }}" method="POST" id="contract-builder-form">
+
+  <!-- Step 1: Contract Identity Card -->
+  <div class="health-card health-card--shadow">
+    <div class="health-card__header">
+      <h2 class="health-card__title">1. Contract Identity &amp; Governance</h2>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="au-btn au-btn--tertiary au-btn--sm" onclick="loadHealthcarePreset()">
+          📋 Load Healthcare Preset
+        </button>
+        <button type="button" class="au-btn au-btn--tertiary au-btn--sm" onclick="loadRetailPreset()">
+          📦 Load Retail Preset
+        </button>
+      </div>
+    </div>
+
+    <div class="health-card__body">
+      <div class="row">
+        <div class="col-4">
+          <div class="au-form-group">
+            <label class="au-label au-label--required" for="contract_name">Contract Name</label>
+            <input type="text" id="contract_name" name="contract_name" class="au-text-input" placeholder="e.g. patient-referrals" required />
+            <div class="au-hint">Lowercase alphanumeric and hyphens (kebab-case)</div>
+          </div>
+        </div>
+
+        <div class="col-4">
+          <div class="au-form-group">
+            <label class="au-label au-label--required" for="contract_version">Contract Version</label>
+            <input type="text" id="contract_version" name="contract_version" class="au-text-input" placeholder="e.g. v1.0.0" value="v1.0.0" required />
+            <div class="au-hint">Semantic version string (e.g. v1.0.0)</div>
+          </div>
+        </div>
+
+        <div class="col-4">
+          <div class="au-form-group">
+            <label class="au-label" for="data_steward_email">Data Steward Email</label>
+            <input type="email" id="data_steward_email" name="data_steward_email" class="au-text-input" placeholder="steward@domain.com.au" />
+            <div class="au-hint">Primary contact responsible for contract rules</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Target BigQuery Entity Card -->
+  <div class="health-card health-card--shadow">
+    <div class="health-card__header">
+      <h2 class="health-card__title">2. Target BigQuery Warehouse Entity</h2>
+    </div>
+
+    <div class="health-card__body">
+      <div class="row">
+        <div class="col-6">
+          <div class="au-form-group">
+            <label class="au-label au-label--required" for="tgt_entity_name">Target BigQuery Table Name</label>
+            <input type="text" id="tgt_entity_name" name="tgt_entity_name" class="au-text-input" placeholder="e.g. patient_referrals" required />
+            <div class="au-hint">Target table in BigQuery bronze layer (snake_case)</div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="au-form-group">
+            <label class="au-label au-label--required" for="tgt_dataset">Target BigQuery Dataset</label>
+            <input type="text" id="tgt_dataset" name="tgt_dataset" class="au-text-input" value="{{ config.bq_bronze_dataset }}" required />
+            <div class="au-hint">Default is the bronze raw ingestion dataset</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Attributes & Field Types Card -->
+  <div class="health-card health-card--shadow">
+    <div class="health-card__header">
+      <div>
+        <h2 class="health-card__title">3. Column Attributes &amp; Data Types</h2>
+        <div style="font-size: 13px; color: var(--au-color-text-muted); margin-top: 2px;">
+          Map incoming file headers to BigQuery columns and set cast data types.
+        </div>
+      </div>
+
+      <button type="button" id="btn-add-field" class="au-btn au-btn--secondary">
+        + Add Column
+      </button>
+    </div>
+
+    <div class="table-responsive">
+      <table class="health-table field-grid-table">
+        <thead>
+          <tr>
+            <th style="width: 30%;">Source Column Name (Upload) *</th>
+            <th style="width: 30%;">Target BigQuery Column *</th>
+            <th style="width: 20%;">Target Type</th>
+            <th style="width: 8%;" class="text-center">PK</th>
+            <th style="width: 8%;" class="text-center">Nullable</th>
+            <th style="width: 4%;" class="text-center"></th>
+          </tr>
+        </thead>
+        <tbody id="fields-table-body">
+          <!-- Initial Row 1 -->
+          <tr class="field-row">
+            <td>
+              <input type="text" class="au-text-input input-src-field" name="attributes[0][src_field_name]" placeholder="e.g. Record ID" value="Record ID" required />
+            </td>
+            <td>
+              <input type="text" class="au-text-input input-tgt-field" name="attributes[0][tgt_field_name]" placeholder="e.g. record_id" value="record_id" required />
+            </td>
+            <td>
+              <select class="au-select select-tgt-type" name="attributes[0][tgt_data_type]">
+                <option value="STRING">STRING</option>
+                <option value="DATE">DATE</option>
+                <option value="INT64" selected>INT64</option>
+                <option value="FLOAT64">FLOAT64</option>
+                <option value="BOOL">BOOL</option>
+                <option value="TIMESTAMP">TIMESTAMP</option>
+              </select>
+            </td>
+            <td class="text-center">
+              <input type="checkbox" name="attributes[0][is_pk]" value="true" checked />
+            </td>
+            <td class="text-center">
+              <input type="checkbox" name="attributes[0][is_nullable]" value="true" />
+            </td>
+            <td class="text-center">
+              <button type="button" class="icon-btn btn-remove-row" title="Delete attribute">✕</button>
+            </td>
+          </tr>
+          <!-- Initial Row 2 -->
+          <tr class="field-row">
+            <td>
+              <input type="text" class="au-text-input input-src-field" name="attributes[1][src_field_name]" placeholder="e.g. Submission Date" value="Submission Date" required />
+            </td>
+            <td>
+              <input type="text" class="au-text-input input-tgt-field" name="attributes[1][tgt_field_name]" placeholder="e.g. submission_date" value="submission_date" required />
+            </td>
+            <td>
+              <select class="au-select select-tgt-type" name="attributes[1][tgt_data_type]">
+                <option value="STRING">STRING</option>
+                <option value="DATE" selected>DATE</option>
+                <option value="INT64">INT64</option>
+                <option value="FLOAT64">FLOAT64</option>
+                <option value="BOOL">BOOL</option>
+                <option value="TIMESTAMP">TIMESTAMP</option>
+              </select>
+            </td>
+            <td class="text-center">
+              <input type="checkbox" name="attributes[1][is_pk]" value="true" />
+            </td>
+            <td class="text-center">
+              <input type="checkbox" name="attributes[1][is_nullable]" value="true" checked />
+            </td>
+            <td class="text-center">
+              <button type="button" class="icon-btn btn-remove-row" title="Delete attribute">✕</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="health-card__footer">
+      <a href="{{ url_for('contracts.index') }}" class="au-btn au-btn--tertiary">
+        Cancel
+      </a>
+      <button type="submit" class="au-btn au-btn--primary">
+        Save &amp; Register Data Contract
+      </button>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function loadHealthcarePreset() {
+  document.getElementById('contract_name').value = "pathology-results";
+  document.getElementById('contract_version').value = "v1.0.0";
+  document.getElementById('data_steward_email').value = "lab-steward@health.example.com.au";
+  document.getElementById('tgt_entity_name').value = "pathology_results";
+
+  const tbody = document.getElementById('fields-table-body');
+  tbody.innerHTML = `
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[0][src_field_name]" value="Specimen Number" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[0][tgt_field_name]" value="specimen_number" required /></td>
+      <td><select class="au-select" name="attributes[0][tgt_data_type]"><option value="STRING" selected>STRING</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[0][is_pk]" value="true" checked /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[0][is_nullable]" value="true" /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[1][src_field_name]" value="Collection Date" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[1][tgt_field_name]" value="collection_date" required /></td>
+      <td><select class="au-select" name="attributes[1][tgt_data_type]"><option value="DATE" selected>DATE</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[1][is_pk]" value="true" /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[1][is_nullable]" value="true" checked /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[2][src_field_name]" value="Test Code" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[2][tgt_field_name]" value="test_code" required /></td>
+      <td><select class="au-select" name="attributes[2][tgt_data_type]"><option value="STRING" selected>STRING</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[2][is_pk]" value="true" /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[2][is_nullable]" value="true" checked /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[3][src_field_name]" value="Numeric Result" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[3][tgt_field_name]" value="numeric_result" required /></td>
+      <td><select class="au-select" name="attributes[3][tgt_data_type]"><option value="FLOAT64" selected>FLOAT64</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[3][is_pk]" value="true" /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[3][is_nullable]" value="true" checked /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+  `;
+}
+
+function loadRetailPreset() {
+  document.getElementById('contract_name').value = "supplier-invoices";
+  document.getElementById('contract_version').value = "v1.0.0";
+  document.getElementById('data_steward_email').value = "finance@example.com";
+  document.getElementById('tgt_entity_name').value = "supplier_invoices";
+
+  const tbody = document.getElementById('fields-table-body');
+  tbody.innerHTML = `
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[0][src_field_name]" value="Invoice ID" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[0][tgt_field_name]" value="invoice_id" required /></td>
+      <td><select class="au-select" name="attributes[0][tgt_data_type]"><option value="STRING" selected>STRING</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[0][is_pk]" value="true" checked /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[0][is_nullable]" value="true" /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[1][src_field_name]" value="Invoice Date" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[1][tgt_field_name]" value="invoice_date" required /></td>
+      <td><select class="au-select" name="attributes[1][tgt_data_type]"><option value="DATE" selected>DATE</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[1][is_pk]" value="true" /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[1][is_nullable]" value="true" checked /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+    <tr class="field-row">
+      <td><input type="text" class="au-text-input" name="attributes[2][src_field_name]" value="Total Amount" required /></td>
+      <td><input type="text" class="au-text-input" name="attributes[2][tgt_field_name]" value="total_amount" required /></td>
+      <td><select class="au-select" name="attributes[2][tgt_data_type]"><option value="FLOAT64" selected>FLOAT64</option></select></td>
+      <td class="text-center"><input type="checkbox" name="attributes[2][is_pk]" value="true" /></td>
+      <td class="text-center"><input type="checkbox" name="attributes[2][is_nullable]" value="true" checked /></td>
+      <td class="text-center"><button type="button" class="icon-btn btn-remove-row">✕</button></td>
+    </tr>
+  `;
+}
+</script>
+{% endblock %}

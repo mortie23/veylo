@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}{{ contract.contract_name }} ({{ contract.contract_version }}) — Veylo{% endblock %}
+{% block page_title %}{{ contract.contract_name }} <span class="badge badge-dark" style="font-size: 16px; vertical-align: middle;">{{ contract.contract_version }}</span>{% endblock %}
+{% block page_intro %}
+Schema specification and validation rules enforced for uploads tagged with contract '{{ contract.contract_name }}'.
+{% endblock %}
+
+{% block breadcrumbs %}
+  <li><a href="{{ url_for('contracts.index') }}">Contracts Catalog</a></li>
+  <li><span class="current">{{ contract.contract_name }}</span></li>
+{% endblock %}
+
+{% block content %}
+
+<!-- Overview Info Card -->
+<div class="health-card">
+  <div class="health-card__header">
+    <h2 class="health-card__title">Contract Specification Details</h2>
+    <div>
+      {% if contract.is_active %}
+        <span class="badge badge-success">Active</span>
+      {% else %}
+        <span class="badge badge-danger">Inactive</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="health-card__body">
+    <div class="row">
+      <div class="col-4">
+        <label class="au-label">Contract Name</label>
+        <div style="font-weight: 600; font-size: 16px;">{{ contract.contract_name }}</div>
+      </div>
+      <div class="col-4">
+        <label class="au-label">Version</label>
+        <div><code>{{ contract.contract_version }}</code></div>
+      </div>
+      <div class="col-4">
+        <label class="au-label">Data Steward</label>
+        <div>{{ contract.data_steward_email or 'Unassigned' }}</div>
+      </div>
+    </div>
+    <div class="row" style="margin-top: 16px;">
+      <div class="col-4">
+        <label class="au-label">Contract ID (GUID)</label>
+        <div style="font-family: monospace; font-size: 12px; color: var(--au-color-text-muted);">{{ contract.data_contract_id }}</div>
+      </div>
+      <div class="col-4">
+        <label class="au-label">Created At</label>
+        <div style="font-size: 13px;">{{ contract.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if contract.created_at else 'N/A' }}</div>
+      </div>
+      <div class="col-4">
+        <label class="au-label">Last Updated</label>
+        <div style="font-size: 13px;">{{ contract.updated_at.strftime('%Y-%m-%d %H:%M:%S UTC') if contract.updated_at else 'N/A' }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="health-card__footer">
+    <a href="{{ url_for('contracts.test_schema', contract_id=contract.data_contract_id) }}" class="au-btn au-btn--secondary">
+      🧪 Test Schema Against File
+    </a>
+    <a href="{{ url_for('api.export_contract', contract_id=contract.data_contract_id) }}" target="_blank" class="au-btn au-btn--tertiary">
+      ⤓ Export Contract JSON
+    </a>
+  </div>
+</div>
+
+<!-- Entities & Attribute Schemas -->
+{% for entity in contract.entities %}
+  <div class="health-card health-card--shadow">
+    <div class="health-card__header">
+      <div>
+        <h3 class="health-card__title" style="margin-bottom: 2px;">
+          Entity: {{ entity.tgt_entity_name }}
+        </h3>
+        <span style="font-size: 12px; color: var(--au-color-text-muted);">
+          Destination: <code>{{ entity.tgt_dataset }}.{{ entity.tgt_entity_name }}</code>
+          {% if entity.src_entity_name %} | Source Entity: <code>{{ entity.src_entity_name }}</code>{% endif %}
+        </span>
+      </div>
+      <span class="badge badge-info">{{ entity.attributes | length }} Attributes</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="health-table">
+        <thead>
+          <tr>
+            <th style="width: 40px;">#</th>
+            <th>Source Header (Upload)</th>
+            <th>Target Field (BigQuery)</th>
+            <th>Target Type</th>
+            <th>Constraints</th>
+            <th>Validation Rules &amp; Codes</th>
+            <th class="text-right">Rule Config</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for attr in entity.attributes %}
+            <tr>
+              <td style="color: var(--au-color-text-muted); font-size: 12px;">{{ attr.ordinal_position + 1 }}</td>
+              <td>
+                <strong>{{ attr.src_field_name }}</strong>
+              </td>
+              <td>
+                <code>{{ attr.tgt_field_name }}</code>
+              </td>
+              <td>
+                <span class="badge badge-dark">{{ attr.tgt_data_type }}</span>
+              </td>
+              <td>
+                {% if attr.is_pk %}
+                  <span class="badge badge-warning" title="Primary Key">PK</span>
+                {% endif %}
+                {% if not attr.is_nullable %}
+                  <span class="badge badge-danger" title="Required / Non-Null">Required</span>
+                {% else %}
+                  <span style="font-size: 12px; color: var(--au-color-text-muted);">Nullable</span>
+                {% endif %}
+              </td>
+              <td>
+                <!-- Data Quality Rules -->
+                {% for rule in attr.data_quality_rules %}
+                  <span class="rule-tag {{ 'rule-tag--error' if rule.severity == 'ERROR' else 'rule-tag--warning' }}" title="{{ rule.error_message_template or rule.rule_type }}">
+                    {{ rule.rule_type }}{% if rule.rule_value %}: {{ rule.rule_value }}{% endif %}
+                  </span>
+                {% endfor %}
+
+                <!-- Code Management Sets -->
+                {% if attr.code_management %}
+                  <span class="rule-tag" style="border-left: 3px solid #006fb0;" title="{{ attr.code_management | length }} allowed codes">
+                    CODESET ({{ attr.code_management | length }} codes)
+                  </span>
+                {% endif %}
+
+                {% if not attr.data_quality_rules and not attr.code_management %}
+                  <span style="font-size: 12px; color: #a0aec0;">Standard type validation</span>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                <a href="{{ url_for('rules.edit_attribute_rules', contract_id=contract.data_contract_id, attribute_id=attr.attribute_id) }}" class="au-btn au-btn--secondary au-btn--sm">
+                  Manage Rules
+                </a>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center" style="padding: 24px;">
+                No attributes configured for this entity.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endfor %}
+
+<div style="margin-top: 24px; display: flex; justify-content: space-between;">
+  <a href="{{ url_for('contracts.index') }}" class="au-btn au-btn--tertiary">
+    &larr; Back to Catalog
+  </a>
+  <form action="{{ url_for('contracts.delete_contract', contract_id=contract.data_contract_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this contract? Target warehouse data is preserved.');">
+    <button type="submit" class="au-btn au-btn--danger">
+      Delete Contract
+    </button>
+  </form>
+</div>
+
+{% endblock %}

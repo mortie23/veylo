@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Contracts Catalog — Veylo{% endblock %}
+{% block page_title %}Data Contracts Catalog{% endblock %}
+{% block page_intro %}
+Browse, inspect, and manage schema contracts enforced by the validation engine during Azure Blob to BigQuery bronze ingestion.
+{% endblock %}
+
+{% block breadcrumbs %}
+  <li><span class="current">Contracts Catalog</span></li>
+{% endblock %}
+
+{% block content %}
+
+<!-- Metrics Summary Bar -->
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="metric-card__value">{{ stats.total_contracts }}</div>
+    <div class="metric-card__label">Total Contracts</div>
+  </div>
+  <div class="metric-card" style="border-left-color: var(--au-color-accent);">
+    <div class="metric-card__value">{{ stats.active_contracts }}</div>
+    <div class="metric-card__label">Active Contracts</div>
+  </div>
+  <div class="metric-card" style="border-left-color: #f59e0b;">
+    <div class="metric-card__value">{{ stats.total_entities }}</div>
+    <div class="metric-card__label">Target Tables / Entities</div>
+  </div>
+  <div class="metric-card" style="border-left-color: #8b5cf6;">
+    <div class="metric-card__value">{{ stats.total_rules }}</div>
+    <div class="metric-card__label">Data Quality &amp; Code Rules</div>
+  </div>
+</div>
+
+<!-- Toolbar & Search -->
+<div class="contracts-toolbar">
+  <div class="contracts-search">
+    <input type="text" id="contract-search-input" class="au-text-input" placeholder="Search contracts by name, version, or steward&hellip;" />
+  </div>
+
+  <div style="display: flex; gap: 10px;">
+    {% if config.is_sqlite %}
+      <form action="{{ url_for('contracts.seed_data_route') }}" method="POST" style="display: inline;">
+        <button type="submit" class="au-btn au-btn--secondary au-btn--sm" title="Re-seed standard demo contracts">
+          ↻ Re-seed Samples
+        </button>
+      </form>
+    {% endif %}
+    <a href="{{ url_for('contracts.new') }}" class="au-btn au-btn--primary">
+      + Create New Contract
+    </a>
+  </div>
+</div>
+
+<!-- Contracts Table / List -->
+<div class="health-card health-card--shadow">
+  <div class="health-card__header">
+    <h2 class="health-card__title">Registered Data Contracts</h2>
+    <span class="badge badge-info">{{ contracts | length }} Total</span>
+  </div>
+
+  {% if contracts %}
+    <div class="table-responsive">
+      <table class="health-table">
+        <thead>
+          <tr>
+            <th>Contract Name</th>
+            <th>Version</th>
+            <th>Data Steward</th>
+            <th>Target BigQuery Entity</th>
+            <th>Attributes</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="contracts-table-body">
+          {% for contract in contracts %}
+            <tr>
+              <td>
+                <a href="{{ url_for('contracts.detail', contract_id=contract.data_contract_id) }}" style="font-weight: 700; color: var(--au-color-primary); text-decoration: none;">
+                  {{ contract.contract_name }}
+                </a>
+              </td>
+              <td>
+                <span class="badge badge-dark">{{ contract.contract_version }}</span>
+              </td>
+              <td>
+                <span style="font-size: 13px; color: var(--au-color-text-muted);">
+                  {{ contract.data_steward_email or 'Unassigned' }}
+                </span>
+              </td>
+              <td>
+                {% for entity in contract.entities %}
+                  <code style="font-size: 12px; background: #eef2f6; padding: 2px 6px; border-radius: 3px;">
+                    {{ entity.tgt_dataset }}.{{ entity.tgt_entity_name }}
+                  </code>
+                {% else %}
+                  <span class="text-muted">No entities</span>
+                {% endfor %}
+              </td>
+              <td>
+                {% set attr_count = namespace(total=0) %}
+                {% for entity in contract.entities %}
+                  {% set attr_count.total = attr_count.total + (entity.attributes | length) %}
+                {% endfor %}
+                <span class="badge badge-info">{{ attr_count.total }} fields</span>
+              </td>
+              <td>
+                {% if contract.is_active %}
+                  <span class="badge badge-success">Active</span>
+                {% else %}
+                  <span class="badge badge-danger">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                <a href="{{ url_for('contracts.detail', contract_id=contract.data_contract_id) }}" class="au-btn au-btn--secondary au-btn--sm">
+                  Inspect Schema
+                </a>
+                <a href="{{ url_for('contracts.test_schema', contract_id=contract.data_contract_id) }}" class="au-btn au-btn--tertiary au-btn--sm" title="Test with sample payload">
+                  Test
+                </a>
+                <form action="{{ url_for('contracts.toggle_status', contract_id=contract.data_contract_id) }}" method="POST" style="display: inline;">
+                  <button type="submit" class="au-btn au-btn--tertiary au-btn--sm" title="Toggle active status">
+                    {{ 'Deactivate' if contract.is_active else 'Activate' }}
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state__icon">📄</div>
+      <h3 class="empty-state__title">No Data Contracts Configured</h3>
+      <p class="empty-state__description">
+        No contract specifications were found in dataset <code>{{ config.bq_config_dataset }}</code>. Create your first contract to start validating file uploads.
+      </p>
+      <a href="{{ url_for('contracts.new') }}" class="au-btn au-btn--primary">
+        + Create First Contract
+      </a>
+      {% if config.is_sqlite %}
+        <form action="{{ url_for('contracts.seed_data_route') }}" method="POST" style="display: inline; margin-left: 10px;">
+          <button type="submit" class="au-btn au-btn--secondary">
+            Load Sample Contracts
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

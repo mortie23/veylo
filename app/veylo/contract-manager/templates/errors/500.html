@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Internal Server Error — Veylo{% endblock %}
+{% block page_title %}500 — Internal Server Error{% endblock %}
+{% block page_intro %}An unexpected error occurred while communicating with the data store.{% endblock %}
+
+{% block content %}
+<div class="empty-state">
+  <div class="empty-state__icon">⚠️</div>
+  <h3 class="empty-state__title">Data Store Error</h3>
+  <p class="empty-state__description">
+    Could not complete operation against backend ({{ config.effective_database_url }}). Check database connectivity or Cloud Run service account permissions.
+  </p>
+  <a href="{{ url_for('contracts.index') }}" class="au-btn au-btn--primary">
+    &larr; Return to Contracts Catalog
+  </a>
+</div>
+{% endblock %}
