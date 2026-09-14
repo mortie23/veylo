@@ -4,56 +4,100 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Veylo Data Contracts{% endblock %} — Health Design System</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/hds.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/hds-all.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/contracts.css') }}">
   {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="au-body au-grid">
 
-  <!-- Australian Government / Health Header Top Bar -->
-  <header class="health-header-top">
-    <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-      <div>
-        <span>Australian Government &bull; Department of Health and Aged Care &bull; Veylo Data Platform</span>
-      </div>
-      <div>
-        <span>Backend: <strong>{{ 'SQLite Local' if config.is_sqlite else 'GCP BigQuery' }}</strong></span>
-        <span class="badge {{ 'badge-warning' if config.is_sqlite else 'badge-success' }}" style="margin-left: 6px;">
-          {{ config.env | upper }}
-        </span>
+  <!-- HDS Header with Australian Government Pillars Ribbon -->
+  <header class="au-header pillars-container" role="banner">
+    <div class="container">
+      <div id="pillars"></div>
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="au-header__brand-wrapper" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding: 8px 0;">
+            <a href="{{ url_for('contracts.index') }}" class="au-header__brand" title="Veylo Data Contracts" style="display: flex; align-items: center; text-decoration: none;">
+              <img src="{{ url_for('static', filename='images/logo-veylo.png') }}" alt="Veylo" class="au-header__logo" style="width: auto; height: 38px; margin-right: 14px; vertical-align: middle;">
+              <div>
+                <span class="siteTitle" style="font-size: 20px; font-weight: 700; color: #313131; display: block; line-height: 1.2;">Veylo Data Contract Manager</span>
+                <span style="font-size: 12px; color: #555555; display: block;">BigQuery Schema Specification &amp; Quality Enforcement Engine</span>
+              </div>
+            </a>
+            <div style="font-size: 13px; color: #555555; display: flex; align-items: center; gap: 10px;">
+              <span>Backend: <strong>{{ 'SQLite Local' if config.is_sqlite else 'GCP BigQuery' }}</strong></span>
+              <span class="badge {{ 'badge-warning' if config.is_sqlite else 'badge-success' }}">
+                {{ config.env | upper }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Navigation Header -->
-  <nav class="health-header-main">
-    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-      <a href="{{ url_for('contracts.index') }}" class="health-header__brand">
-        <div style="background-color: #006fb0; width: 38px; height: 38px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px;">
-          V
+  <!-- HDS Navigation Bar with Dropdown & Responsive Drawer -->
+  <nav class="au-main-nav au-main-nav--dropdown" aria-label="Main Navigation">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div id="main-nav-default" class="au-main-nav__content">
+            <button aria-controls="main-nav-default" class="au-main-nav__toggle au-main-nav__toggle--open"
+              onclick="return AU.mainNav.Toggle(this)" aria-expanded="false">
+              <span class="svg-inline--fa fa-fw" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" focusable="false" style="width: 16px; height: 16px; vertical-align: middle;">
+                  <path fill="currentColor"
+                    d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z">
+                  </path>
+                </svg>
+              </span>
+              Menu
+            </button>
+            <div class="au-main-nav__menu">
+              <div class="au-main-nav__menu-inner">
+                <div class="au-main-nav__focus-trap-top"></div>
+                <button aria-controls="main-nav-default" class="au-main-nav__toggle au-main-nav__toggle--close"
+                  onclick="return AU.mainNav.Toggle(this)" aria-expanded="false">
+                  <span class="svg-inline--fa fa-fw" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512" focusable="false" style="width: 16px; height: 16px; vertical-align: middle;">
+                      <path fill="currentColor"
+                        d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z">
+                      </path>
+                    </svg>
+                  </span>
+                  Close
+                </button>
+                <ul class="au-link-list">
+                  <li class="{% if request.endpoint == 'contracts.index' %}active{% endif %}">
+                    <a href="{{ url_for('contracts.index') }}" {% if request.endpoint == 'contracts.index' %}aria-current="page"{% endif %}>
+                      Contracts Catalog
+                    </a>
+                  </li>
+                  <li class="{% if request.endpoint == 'contracts.new' %}active{% endif %}">
+                    <a href="{{ url_for('contracts.new') }}" {% if request.endpoint == 'contracts.new' %}aria-current="page"{% endif %}>
+                      + New Contract
+                    </a>
+                  </li>
+                  <li class="au-main-nav__utility-item">
+                    <a href="https://console.cloud.google.com/bigquery" target="_blank" rel="noopener">
+                      BigQuery Console ↗
+                    </a>
+                  </li>
+                </ul>
+                <div class="au-main-nav__focus-trap-bottom"></div>
+              </div>
+            </div>
+            <div class="au-main-nav__overlay" aria-controls="main-nav-default"
+              onclick="return AU.mainNav.Toggle(this)">
+            </div>
+          </div>
         </div>
-        <div>
-          <h1 class="health-header__title">Veylo Data Contract Manager</h1>
-          <p class="health-header__subtitle">BigQuery Schema Specification &amp; Quality Enforcement Engine</p>
-        </div>
-      </a>
-
-      <div class="health-nav">
-        <a href="{{ url_for('contracts.index') }}" class="health-nav__link {% if request.endpoint == 'contracts.index' %}is-active{% endif %}">
-          Contracts Catalog
-        </a>
-        <a href="{{ url_for('contracts.new') }}" class="health-nav__link {% if request.endpoint == 'contracts.new' %}is-active{% endif %}">
-          + New Contract
-        </a>
-        <a href="https://console.cloud.google.com/bigquery" target="_blank" rel="noopener" class="health-nav__link">
-          BigQuery Console ↗
-        </a>
       </div>
     </div>
   </nav>
 
-  <!-- Sub-header Hero Banner -->
-  <div class="health-sub-header">
+  <!-- HDS Sub-header Dark Gradient Banner -->
+  <div class="health-sub-header health-sub-header--dark">
     <div class="container">
       <nav class="au-breadcrumbs" aria-label="Breadcrumb">
         <ol>
@@ -70,7 +114,7 @@
   </div>
 
   <!-- Main Content Area -->
-  <main class="container">
+  <main class="container" id="content">
     <!-- Flash Alerts -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -85,37 +129,55 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Health Design System Footer -->
-  <footer class="health-footer">
+  <!-- HDS Dark Footer -->
+  <footer class="au-footer au-footer--dark au-body au-body--dark au-grid" role="contentinfo" style="clear: both; margin-top: 60px;">
     <div class="container">
-      <div class="row">
-        <div class="col-8">
-          <h4 style="color: #ffffff; margin-top: 0;">Veylo Data Platform</h4>
-          <p style="max-width: 540px;">
-            Enforcing schema contracts across Microsoft Dataverse, Azure Blob Storage, and Google Cloud Platform BigQuery. Powered by the Australian Government Health Design System.
+      <nav class="au-footer__navigation row" aria-label="footer">
+        <div class="col-sm-6 col-md-4 au-footer__navigation-section">
+          <h3>Veylo Data Platform</h3>
+          <p style="font-size: 14px; line-height: 1.6; color: #d1e2f2;">
+            Enforcing schema contracts across Microsoft Dataverse, Azure Blob Storage, and Google Cloud Platform BigQuery. Built using the authentic Australian Government Health Design System.
           </p>
         </div>
-        <div class="col-4">
-          <h4 style="color: #ffffff; margin-top: 0;">Cloud Architecture</h4>
-          <ul style="list-style: none; padding: 0; line-height: 1.8;">
-            <li>Project: <code>{{ config.gcp_project_id }}</code></li>
+        <div class="col-sm-6 col-md-4 au-footer__navigation-section">
+          <h3>Quick Links</h3>
+          <ul class="au-link-list">
+            <li><a href="{{ url_for('contracts.index') }}">Contracts Catalog</a></li>
+            <li><a href="{{ url_for('contracts.new') }}">Create New Contract</a></li>
+            <li><a href="https://console.cloud.google.com/bigquery" target="_blank" rel="noopener">BigQuery Console ↗</a></li>
+          </ul>
+        </div>
+        <div class="col-sm-6 col-md-4 au-footer__navigation-section">
+          <h3>Cloud Architecture</h3>
+          <ul class="au-link-list">
+            <li>GCP Project: <code>{{ config.gcp_project_id }}</code></li>
             <li>Config Dataset: <code>{{ config.bq_config_dataset }}</code></li>
             <li>Bronze Dataset: <code>{{ config.bq_bronze_dataset }}</code></li>
           </ul>
         </div>
-      </div>
-
-      <div class="health-footer__bottom">
-        <div>
-          &copy; 2026 Veylo Health Analytics. All rights reserved.
-        </div>
-        <div>
-          <span>Design System: <strong>HDS v1.4</strong></span>
+      </nav>
+      <div class="au-footer__end">
+        <div class="row">
+          <div class="col-xs-12" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <p><small>&copy; 2026 Commonwealth of Australia &bull; Department of Health and Aged Care &bull; Veylo Data Platform</small></p>
+            <p><small>Design System: <strong>HDS v2.0</strong></small></p>
+          </div>
         </div>
       </div>
     </div>
   </footer>
 
+  <!-- Scripts: jQuery, Drupal once polyfill, HDS JS, and App JS -->
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script>
+    // Polyfill for Drupal once library used by HDS
+    if (typeof once === 'undefined') {
+      var once = window.once = function (id, selector, context) {
+        return jQuery(selector, context).get();
+      };
+    }
+  </script>
+  <script src="{{ url_for('static', filename='js/hds.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/contracts.js') }}"></script>
   {% block extra_scripts %}{% endblock %}
 </body>

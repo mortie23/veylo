@@ -22,6 +22,7 @@ def create_app() -> Flask:
 
     app.config["SECRET_KEY"] = settings.secret_key
     app.config["APP_SETTINGS"] = settings
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
 
     # Ensure tables exist and seed demo data if in SQLite mode
     init_db()

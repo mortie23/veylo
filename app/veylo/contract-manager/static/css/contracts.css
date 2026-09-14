@@ -1,7 +1,425 @@
 /* ============================================================
-   Contract Management Portal Page Styles
+   Contract Management Portal Styles & HDS Overrides
+   Veylo Data Contract Manager
    ============================================================ */
 
+:root {
+  --au-font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --au-color-primary: #006fb0;
+  --au-color-primary-dark: #005080;
+  --au-color-primary-light: #eef6fc;
+  --au-color-navy: #0e2a47;
+  --au-color-navy-dark: #091a2d;
+  --au-color-accent: #0b996c;
+  --au-color-warning: #b35c00;
+  --au-color-warning-bg: #fff8e6;
+  --au-color-danger: #c5192d;
+  --au-color-danger-bg: #fde8e8;
+  --au-color-success: #0b996c;
+  --au-color-success-bg: #e6f7f0;
+  --au-color-text: #212529;
+  --au-color-text-muted: #555555;
+  --au-color-border: #dcdcdc;
+  --au-color-bg-light: #f8fafc;
+  --au-radius: 4px;
+}
+
+/* -------------------------------------------------------------
+   HDS Overrides: Health Cards & Content
+   ------------------------------------------------------------- */
+/* HDS hides .health-card__header by default (meant for CMS teaser cards).
+   Our app uses card headers for section titles & action/preset buttons. */
+.au-body .health-card__header {
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--au-color-border);
+  background-color: #fafbfc;
+}
+
+/* Reset HDS top margin, display, and hover jumps on form/portal cards */
+.au-body .health-card {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 24px;
+  background: #ffffff;
+  border: 1px solid var(--au-color-border);
+  border-radius: var(--au-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.health-card--shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.au-body .health-card__body {
+  display: block;
+  flex-direction: row;
+  padding: 20px;
+}
+
+.au-body .health-card__body[style*="display: flex"],
+.health-card__body--flex {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.au-body .health-card__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--au-color-navy);
+}
+
+.au-body .health-card__footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--au-color-border);
+  background-color: #fafbfc;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* -------------------------------------------------------------
+   HDS Overrides: Main Navigation Active Tab
+   ------------------------------------------------------------- */
+/* HDS sets border-bottom-color on all .au-link-list>li a, creating a line under every tab.
+   Ensure only the active nav link displays the bottom border. */
+.au-main-nav .au-link-list > li > a {
+  border-bottom-color: transparent !important;
+}
+
+.au-main-nav .au-link-list > li.active > a,
+.au-main-nav .au-link-list > li.active-trail > a {
+  border-bottom-color: var(--main-nav-active-link-border) !important;
+}
+
+/* -------------------------------------------------------------
+   HDS Overrides: Sub-Header & Breadcrumbs
+   ------------------------------------------------------------- */
+.health-sub-header.health-sub-header--dark {
+  margin-bottom: 28px;
+}
+
+.health-sub-header.health-sub-header--dark h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #ffffff !important;
+}
+
+.health-sub-header.health-sub-header--dark .au-introduction {
+  font-size: 16px;
+  color: #d1e2f2 !important;
+  margin: 0;
+  max-width: 800px;
+}
+
+.health-sub-header .au-breadcrumbs {
+  margin-bottom: 12px;
+}
+
+.health-sub-header .au-breadcrumbs ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.health-sub-header .au-breadcrumbs li::after {
+  content: "›";
+  margin-left: 6px;
+  color: #8da4bc;
+}
+
+.health-sub-header .au-breadcrumbs li:last-child::after {
+  content: "";
+}
+
+.health-sub-header .au-breadcrumbs a {
+  color: #a4c2e0;
+  text-decoration: none;
+}
+
+.health-sub-header .au-breadcrumbs a:hover {
+  text-decoration: underline;
+  color: #ffffff;
+}
+
+.health-sub-header .au-breadcrumbs span.current {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------
+   Grid Layout Columns
+   ------------------------------------------------------------- */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+.col-12 { flex: 0 0 100%; max-width: 100%; padding: 0 12px; }
+.col-8  { flex: 0 0 66.666667%; max-width: 66.666667%; padding: 0 12px; }
+.col-6  { flex: 0 0 50%; max-width: 50%; padding: 0 12px; }
+.col-4  { flex: 0 0 33.333333%; max-width: 33.333333%; padding: 0 12px; }
+
+@media (max-width: 768px) {
+  .col-8, .col-6, .col-4 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* -------------------------------------------------------------
+   Buttons
+   ------------------------------------------------------------- */
+.au-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--au-font-family);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: var(--au-radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.au-btn--primary {
+  background-color: var(--au-color-primary);
+  border-color: var(--au-color-primary);
+  color: #ffffff !important;
+}
+
+.au-btn--primary:hover {
+  background-color: var(--au-color-primary-dark);
+  border-color: var(--au-color-primary-dark);
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+.au-btn--secondary {
+  background-color: #ffffff;
+  border-color: var(--au-color-primary);
+  color: var(--au-color-primary) !important;
+}
+
+.au-btn--secondary:hover {
+  background-color: var(--au-color-primary-light);
+  color: var(--au-color-primary-dark) !important;
+  text-decoration: none;
+}
+
+.au-btn--tertiary {
+  background-color: transparent;
+  border-color: #dcdcdc;
+  color: var(--au-color-text) !important;
+}
+
+.au-btn--tertiary:hover {
+  background-color: #eef1f5;
+  text-decoration: none;
+}
+
+.au-btn--danger {
+  background-color: var(--au-color-danger);
+  border-color: var(--au-color-danger);
+  color: #ffffff !important;
+}
+
+.au-btn--danger:hover {
+  background-color: #9e1424;
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+.au-btn--sm {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* -------------------------------------------------------------
+   Forms & Inputs
+   ------------------------------------------------------------- */
+.au-form-group {
+  margin-bottom: 18px;
+}
+
+.au-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: var(--au-color-text);
+}
+
+.au-label--required::after {
+  content: " *";
+  color: var(--au-color-danger);
+}
+
+.au-hint {
+  font-size: 12px;
+  color: var(--au-color-text-muted);
+  margin-top: 4px;
+}
+
+.au-text-input,
+.au-select,
+textarea.au-text-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--au-font-family);
+  font-size: 14px;
+  color: var(--au-color-text);
+  background-color: #ffffff;
+  border: 1px solid var(--au-color-border);
+  border-radius: var(--au-radius);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.au-text-input:focus,
+.au-select:focus,
+textarea.au-text-input:focus {
+  border-color: var(--au-color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 111, 176, 0.2);
+}
+
+/* -------------------------------------------------------------
+   Tables
+   ------------------------------------------------------------- */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.health-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.health-table th {
+  background-color: #f1f4f8;
+  color: var(--au-color-navy);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--au-color-border);
+}
+
+.health-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--au-color-border);
+  vertical-align: middle;
+}
+
+.health-table tr:hover td {
+  background-color: #fbfcfd;
+}
+
+/* -------------------------------------------------------------
+   Badges & Tags
+   ------------------------------------------------------------- */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-success {
+  background-color: var(--au-color-success-bg);
+  color: #066345;
+  border: 1px solid #a3e0c8;
+}
+
+.badge-warning {
+  background-color: var(--au-color-warning-bg);
+  color: #7a3e00;
+  border: 1px solid #fbdc99;
+}
+
+.badge-danger {
+  background-color: var(--au-color-danger-bg);
+  color: var(--au-color-danger);
+  border: 1px solid #f8b4b4;
+}
+
+.badge-info {
+  background-color: var(--au-color-primary-light);
+  color: var(--au-color-primary-dark);
+  border: 1px solid #bcdbf3;
+}
+
+.badge-dark {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+/* -------------------------------------------------------------
+   Alerts & Notifications
+   ------------------------------------------------------------- */
+.au-page-alerts {
+  border-left: 4px solid;
+  padding: 14px 18px;
+  border-radius: var(--au-radius);
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.au-page-alerts--info {
+  background-color: var(--au-color-primary-light);
+  border-color: var(--au-color-primary);
+  color: #00456d;
+}
+
+.au-page-alerts--success {
+  background-color: var(--au-color-success-bg);
+  border-color: var(--au-color-success);
+  color: #066345;
+}
+
+.au-page-alerts--warning {
+  background-color: var(--au-color-warning-bg);
+  border-color: var(--au-color-warning);
+  color: #7a3e00;
+}
+
+.au-page-alerts--error {
+  background-color: var(--au-color-danger-bg);
+  border-color: var(--au-color-danger);
+  color: #7b0b18;
+}
+
+/* -------------------------------------------------------------
+   Contract Management Specific Components
+   ------------------------------------------------------------- */
 .contracts-toolbar {
   display: flex;
   justify-content: space-between;
