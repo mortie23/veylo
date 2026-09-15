@@ -1,0 +1,33 @@
+"venue_id","venue_name","capacity","surface","venue_type","created_date","create_user"
+17,"Lucas Oil Stadium",67000,"artificial","retractable_dome","2018-10-15 07:04:20",mortimer
+15,"Lincoln Financial Field",68532,"turf","outdoor","2018-10-15 07:04:20",mortimer
+13,"Lambeau Field",80750,"turf","outdoor","2018-10-15 07:04:20",mortimer
+32,"Wembley Stadium",90000,"artificial","retractable_dome","2018-10-15 07:04:20",mortimer
+11,"Gillette Stadium",68756,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+30,"TCF Bank Stadium",52000,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+9,"Ford Field",65000,"artificial","dome","2018-10-15 07:04:20",mortimer
+28,"Sports Authority Field at Mile High",76125,"turf","outdoor","2018-10-15 07:04:20",mortimer
+16,"LP Field",69143,"turf","outdoor","2018-10-15 07:04:20",mortimer
+14,"Levi's Stadium",68500,"turf","outdoor","2018-10-15 07:04:20",mortimer
+12,"Heinz Field",65050,"turf","outdoor","2018-10-15 07:04:20",mortimer
+31,"University of Phoenix Stadium",63400,"turf","retractable_dome","2018-10-15 07:04:20",mortimer
+10,"Georgia Dome",74228,"artificial","dome","2018-10-15 07:04:20",mortimer
+29,"Sun Life Stadium",76100,"turf","outdoor","2018-10-15 07:04:20",mortimer
+27,"Soldier Field",61500,"turf","outdoor","2018-10-15 07:04:20",mortimer
+19,"Mercedes-Benz Superdome",76468,"artificial","dome","2018-10-15 07:04:20",mortimer
+7,"FedEx Field",83000,"turf","outdoor","2018-10-15 07:04:20",mortimer
+26,"Raymond James Stadium",65890,"turf","outdoor","2018-10-15 07:04:20",mortimer
+5,"Edward Jones Dome",66000,"artificial","dome","2018-10-15 07:04:20",mortimer
+24,"Qualcomm Stadium",70561,"turf","outdoor","2018-10-15 07:04:20",mortimer
+3,"Bank of America Stadium",73778,"turf","outdoor","2018-10-15 07:04:20",mortimer
+22,"O.co Coliseum",53200,"turf","outdoor","2018-10-15 07:04:20",mortimer
+1,"Arrowhead Stadium",79451,"turf","outdoor","2018-10-15 07:04:20",mortimer
+20,"MetLife Stadium",82500,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+18,"M&T Bank Stadium",71008,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+8,"FirstEnergy Stadium",71516,"turf","outdoor","2018-10-15 07:04:20",mortimer
+6,"EverBank Field",67246,"turf","outdoor","2018-10-15 07:04:20",mortimer
+25,"Ralph Wilson Stadium",73079,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+4,"CenturyLink Field",67000,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+23,"Paul Brown Stadium",65535,"artificial","outdoor","2018-10-15 07:04:20",mortimer
+2,"AT&T Stadium",80000,"artificial","retractable_dome","2018-10-15 07:04:20",mortimer
+21,"NRG Stadium",71054,"turf","retractable_dome","2018-10-15 07:04:20",mortimer

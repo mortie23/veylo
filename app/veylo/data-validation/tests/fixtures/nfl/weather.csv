@@ -1,0 +1,117 @@
+weather_game_id,game_id,TEMPERATURE,WEATHER_CONDITION,WIND_SPEED,HUMIDITY,WIND_DIRECTION,created_date,create_user
+1,61,82,Partly Cloudy,6,45,NE,2018-10-15 07:05:52,mortimer
+2,40,73,Partly Cloudy,27,69,SW,2018-10-15 07:05:52,mortimer
+3,19,68,Overcast,8,60,NE,2018-10-15 07:05:52,mortimer
+4,80,55,Sunny,15,51,SSE,2018-10-15 07:05:52,mortimer
+5,59,68,Partly Cloudy,0,60,S,2018-10-15 07:05:52,mortimer
+6,38,79,Partly Cloudy,11,65,SSE,2018-10-15 07:05:52,mortimer
+7,78,55,Sunny,0,47,ESE,2018-10-15 07:05:52,mortimer
+8,57,72,Partly Cloudy,12,61,S,2018-10-15 07:05:52,mortimer
+9,97,48,Sunny,12,71,SSW,2018-10-15 07:05:52,mortimer
+10,76,68,Clear,4,46,SE,2018-10-15 07:05:52,mortimer
+11,259,30,Overcast,16,100,W,2018-10-15 07:05:52,mortimer
+12,55,75,Partly Cloudy,0,54,N,2018-10-15 07:05:52,mortimer
+13,116,77,Sunny,4,34,N,2018-10-15 07:05:52,mortimer
+14,95,48,Partly Cloudy,6,66,W,2018-10-15 07:05:52,mortimer
+15,257,50,Mist,4,94,N,2018-10-15 07:05:52,mortimer
+16,114,56,Partly Cloudy,11,51,W,2018-10-15 07:05:52,mortimer
+17,93,55,Sunny,13,41,WNW,2018-10-15 07:05:52,mortimer
+18,72,68,Partly Cloudy,6,26,NNW,2018-10-15 07:05:52,mortimer
+19,112,76,Sunny,0,45,N,2018-10-15 07:05:52,mortimer
+20,91,65,Overcast,8,87,SE,2018-10-15 07:05:52,mortimer
+21,110,61,Overcast,15,39,NNW,2018-10-15 07:05:52,mortimer
+22,7,72,Sunny,9,53,ESE,2018-10-15 07:05:52,mortimer
+23,108,59,Partly Cloudy,15,63,SW,2018-10-15 07:05:52,mortimer
+24,26,82,Partly Cloudy,13,55,NW,2018-10-15 07:05:52,mortimer
+25,5,77,Sunny,8,47,NE,2018-10-15 07:05:52,mortimer
+26,24,64,Sunny,4,52,N,2018-10-15 07:05:52,mortimer
+27,3,90,Partly Cloudy,16,59,SE,2018-10-15 07:05:52,mortimer
+28,43,70,Partly Cloudy,24,73,W,2018-10-15 07:05:52,mortimer
+29,22,59,Overcast,0,59,N,2018-10-15 07:05:52,mortimer
+30,1,73,Sunny,11,50,WNW,2018-10-15 07:05:52,mortimer
+31,62,63,Mist,8,94,ESE,2018-10-15 07:05:52,mortimer
+32,20,59,Partly Cloudy,0,55,NE,2018-10-15 07:05:52,mortimer
+33,60,86,Partly Cloudy,0,37,N,2018-10-15 07:05:52,mortimer
+34,39,72,Mist,4,83,N,2018-10-15 07:05:52,mortimer
+35,18,70,Partly Cloudy,4,60,NNW,2018-10-15 07:05:52,mortimer
+36,79,61,Sunny,6,45,NNE,2018-10-15 07:05:52,mortimer
+37,58,83,Sunny,9,38,S,2018-10-15 07:05:52,mortimer
+38,37,72,Overcast,4,78,E,2018-10-15 07:05:52,mortimer
+39,98,76,Partly Cloudy,8,54,NNE,2018-10-15 07:05:52,mortimer
+40,77,84,Clear,16,62,SE,2018-10-15 07:05:52,mortimer
+41,260,48,Sunny,12,29,WNW,2018-10-15 07:05:52,mortimer
+42,56,70,Partly Cloudy,9,64,E,2018-10-15 07:05:52,mortimer
+43,96,46,Partly Cloudy,7,76,SSW,2018-10-15 07:05:52,mortimer
+44,75,48,Clear,0,71,N,2018-10-15 07:05:52,mortimer
+45,258,45,Light rain,11,81,SSE,2018-10-15 07:05:52,mortimer
+46,54,79,Partly Cloudy,0,48,N,2018-10-15 07:05:52,mortimer
+47,115,72,Sunny,4,69,SE,2018-10-15 07:05:52,mortimer
+48,94,56,Sunny,8,64,SSW,2018-10-15 07:05:52,mortimer
+49,73,81,Partly Cloudy,4,28,WNW,2018-10-15 07:05:52,mortimer
+50,113,69,Sunny,0,75,N,2018-10-15 07:05:52,mortimer
+51,92,65,Light rain,8,93,S,2018-10-15 07:05:52,mortimer
+52,111,77,Sunny,9,39,W,2018-10-15 07:05:52,mortimer
+53,90,59,Partly Cloudy,4,59,SSE,2018-10-15 07:05:52,mortimer
+54,8,68,Sunny,9,53,E,2018-10-15 07:05:52,mortimer
+55,109,61,Sunny,0,42,N,2018-10-15 07:05:52,mortimer
+56,6,75,Partly Cloudy,4,41,ENE,2018-10-15 07:05:52,mortimer
+57,25,64,Sunny,0,49,N,2018-10-15 07:05:52,mortimer
+58,4,75,Partly Cloudy,8,50,N,2018-10-15 07:05:52,mortimer
+59,44,95,Partly Cloudy,0,22,N,2018-10-15 07:05:52,mortimer
+60,23,64,Partly Cloudy,0,52,ESE,2018-10-15 07:05:52,mortimer
+61,2,84,Overcast,4,62,N,2018-10-15 07:05:52,mortimer
+62,42,85,Partly Cloudy,11,63,ENE,2018-10-15 07:05:52,mortimer
+63,101,46,Sunny,6,53,W,2018-10-15 07:05:52,mortimer
+64,263,25,Overcast,0,58,N,2018-10-15 07:05:52,mortimer
+65,120,78,Clear,7,58,SE,2018-10-15 07:05:52,mortimer
+66,99,54,Partly Cloudy,19,41,NW,2018-10-15 07:05:52,mortimer
+67,17,81,Overcast,0,79,N,2018-10-15 07:05:52,mortimer
+68,261,20,Sunny,9,54,WSW,2018-10-15 07:05:52,mortimer
+69,118,55,Sunny,19,51,W,2018-10-15 07:05:52,mortimer
+70,15,73,Sunny,8,50,SE,2018-10-15 07:05:52,mortimer
+71,34,66,Partly Cloudy,14,64,W,2018-10-15 07:05:52,mortimer
+72,13,84,Partly Cloudy,7,57,N,2018-10-15 07:05:52,mortimer
+73,53,79,Partly Cloudy,4,42,NE,2018-10-15 07:05:52,mortimer
+74,32,57,Light rain,4,88,W,2018-10-15 07:05:52,mortimer
+75,11,71,Sunny,8,57,E,2018-10-15 07:05:52,mortimer
+76,51,72,Sunny,7,50,WSW,2018-10-15 07:05:52,mortimer
+77,30,80,Partly Cloudy,0,17,W,2018-10-15 07:05:52,mortimer
+78,70,61,Sunny,0,36,SW,2018-10-15 07:05:52,mortimer
+79,49,64,Overcast,4,88,N,2018-10-15 07:05:52,mortimer
+80,28,70,Partly Cloudy,11,64,W,2018-10-15 07:05:52,mortimer
+81,89,84,Sunny,0,40,SW,2018-10-15 07:05:52,mortimer
+82,68,73,Partly Cloudy,9,38,E,2018-10-15 07:05:52,mortimer
+83,47,81,Partly Cloudy,4,54,SW,2018-10-15 07:05:52,mortimer
+84,87,63,Partly Cloudy,6,68,SW,2018-10-15 07:05:52,mortimer
+85,66,57,Partly Cloudy,13,44,WSW,2018-10-15 07:05:52,mortimer
+86,106,55,Partly Cloudy,7,51,S,2018-10-15 07:05:52,mortimer
+87,85,55,Overcast,6,72,NNE,2018-10-15 07:05:52,mortimer
+88,64,54,Partly Cloudy,14,50,S,2018-10-15 07:05:52,mortimer
+89,83,84,Partly Cloudy,0,62,ESE,2018-10-15 07:05:52,mortimer
+90,102,73,Partly Cloudy,9,61,WSW,2018-10-15 07:05:52,mortimer
+91,81,88,Partly Cloudy,15,63,E,2018-10-15 07:05:52,mortimer
+92,264,41,Partly Cloudy,8,62,N,2018-10-15 07:05:52,mortimer
+93,121,83,Clear,15,38,SSE,2018-10-15 07:05:52,mortimer
+94,100,41,Partly Cloudy,9,56,WNW,2018-10-15 07:05:52,mortimer
+95,262,48,Mist,0,87,N,2018-10-15 07:05:52,mortimer
+96,119,61,Sunny,14,23,NW,2018-10-15 07:05:52,mortimer
+97,16,100,Partly Cloudy,7,29,SW,2018-10-15 07:05:52,mortimer
+98,117,84,Partly Cloudy,6,40,SSW,2018-10-15 07:05:52,mortimer
+99,35,77,Partly Cloudy,15,61,W,2018-10-15 07:05:52,mortimer
+100,14,77,Partly Cloudy,11,24,SSW,2018-10-15 07:05:52,mortimer
+101,33,81,Clear,0,51,N,2018-10-15 07:05:52,mortimer
+102,12,88,Partly Cloudy,4,49,W,2018-10-15 07:05:52,mortimer
+103,31,79,Partly Cloudy,11,48,W,2018-10-15 07:05:52,mortimer
+104,10,75,Partly Cloudy,8,48,N,2018-10-15 07:05:52,mortimer
+105,71,71,Sunny,11,27,N,2018-10-15 07:05:52,mortimer
+106,50,82,Partly Cloudy,6,70,NE,2018-10-15 07:05:52,mortimer
+107,29,63,Sunny,17,52,S,2018-10-15 07:05:52,mortimer
+108,69,54,Overcast,17,50,SW,2018-10-15 07:05:52,mortimer
+109,48,63,Clear,14,42,NW,2018-10-15 07:05:52,mortimer
+110,88,81,Partly Cloudy,4,58,ESE,2018-10-15 07:05:52,mortimer
+111,67,63,Partly Cloudy,12,36,SSW,2018-10-15 07:05:52,mortimer
+112,46,77,Sunny,7,47,SE,2018-10-15 07:05:52,mortimer
+113,107,69,Partly Cloudy,0,24,N,2018-10-15 07:05:52,mortimer
+114,86,70,Sunny,6,73,W,2018-10-15 07:05:52,mortimer
+115,105,70,Partly Cloudy,0,23,ENE,2018-10-15 07:05:52,mortimer
+116,82,63,Overcast,4,100,S,2018-10-15 07:05:52,mortimer
