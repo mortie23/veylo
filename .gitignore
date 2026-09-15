@@ -70,3 +70,8 @@ venv/
 htmlcov/
 local.settings.json
 local.settings.json.bak
+
+# Local SQLite & dev databases
+*.db
+*.sqlite
+*.sqlite3
