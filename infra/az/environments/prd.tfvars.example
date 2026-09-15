@@ -22,3 +22,8 @@ tags = {
   CostCenter  = "Production"
   Project     = "Veylo"
 }
+
+# Allowed redirect URIs for the Contract Manager Web Portal
+contract_manager_redirect_uris = [
+  "https://contracts.example.com/auth/callback"
+]

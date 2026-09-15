@@ -8,8 +8,9 @@ locals {
   log_analytics_workspace_name = "log-vey-${var.app_name}-${var.environment}-${var.instance_seq}"
   application_insights_name    = "appi-vey-${var.app_name}-${var.environment}-${var.instance_seq}"
 
-  backend_api_name  = "app-vey-${var.app_name}-api-${var.environment}"
-  frontend_spa_name = "app-vey-${var.app_name}-spa-${var.environment}"
+  backend_api_name   = "app-vey-${var.app_name}-api-${var.environment}"
+  frontend_spa_name  = "app-vey-${var.app_name}-spa-${var.environment}"
+  contracts_app_name = "app-vey-contracts-${var.environment}"
 
   # Identifier URI for Entra ID backend API
   api_identifier_uri = "api://func-vey-${var.app_name}-${var.environment}"

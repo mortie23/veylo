@@ -73,3 +73,15 @@ output "application_insights_connection_string" {
   value       = azurerm_application_insights.appinsights.connection_string
   sensitive   = true
 }
+
+output "contracts_client_id" {
+  description = "Entra ID Client ID for Contract Manager"
+  value       = azuread_application.contracts_web.client_id
+}
+
+output "contracts_client_secret" {
+  description = "Entra ID Client Secret for Contract Manager"
+  value       = azuread_application_password.contracts_web.value
+  sensitive   = true
+}
+

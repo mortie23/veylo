@@ -32,3 +32,9 @@ tags = {
   CostCenter  = "Engineering"
   Project     = "Veylo"
 }
+
+# Allowed redirect URIs for the Contract Manager Web Portal
+contract_manager_redirect_uris = [
+  "https://contracts-dev.example.com/auth/callback",
+  "http://localhost:8080/auth/callback"
+]

@@ -68,3 +68,32 @@ resource "azuread_application_pre_authorized" "spa_to_api" {
   authorized_client_id = azuread_application.portal_spa.client_id
   permission_ids       = [random_uuid.file_upload_scope_id.result]
 }
+
+# -----------------------------------------------------------------------------
+# 5. Contract Manager Web App Registration (Confidential Client on Cloud Run)
+# -----------------------------------------------------------------------------
+resource "azuread_application" "contracts_web" {
+  display_name = local.contracts_app_name
+
+  web {
+    redirect_uris = var.contract_manager_redirect_uris
+
+    implicit_grant {
+      access_token_issuance_enabled = false
+      id_token_issuance_enabled     = true
+    }
+  }
+
+  tags = ["Veylo", var.environment, "ContractManagerWeb"]
+}
+
+resource "azuread_service_principal" "contracts_web" {
+  client_id                    = azuread_application.contracts_web.client_id
+  app_role_assignment_required = false
+}
+
+resource "azuread_application_password" "contracts_web" {
+  application_id = azuread_application.contracts_web.id
+  display_name   = "cloudrun-contracts-secret"
+}
+

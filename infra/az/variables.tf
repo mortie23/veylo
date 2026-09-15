@@ -81,3 +81,11 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "contract_manager_redirect_uris" {
+  description = "Allowed redirect URIs for the Contract Manager Web Portal"
+  type        = list(string)
+  default     = ["http://localhost:8080/auth/callback"]
+}
+
+
