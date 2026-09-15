@@ -65,23 +65,41 @@
                   {% assign primary_nav = weblinks.Default %}
                   {% if primary_nav %}
                   {% for link in primary_nav.weblinks %}
-                  {% assign is_active = false %}
-                  {% if link.is_sitemap_current %}
-                  {% assign is_active = true %}
-                  {% elsif request.path == link.url or page.url == link.url %}
-                  {% assign is_active = true %}
+                  {% assign target_url = link.url | default: link.adx_url | default: link.adx_externalurl %}
+                  {% if target_url == null or target_url == '' %}
+                    {% if link.name == 'Data Contracts' %}
+                      {% assign target_url = 'https://run-xyz-dev-veylo-contracts-0-251731083825.australia-southeast1.run.app' %}
+                    {% endif %}
                   {% endif %}
+                  {% assign is_external = false %}
+                  {% if target_url contains '://' or link.open_in_new_window %}
+                    {% assign is_external = true %}
+                  {% endif %}
+                  {% assign is_active = false %}
+                  {% unless is_external %}
+                    {% if link.is_sitemap_current %}
+                      {% assign is_active = true %}
+                    {% elsif target_url and (request.path == target_url or page.url == target_url) %}
+                      {% assign is_active = true %}
+                    {% endif %}
+                  {% endunless %}
                   {% if link.weblinks.size > 0 %}
                   <li class='au-main-nav__dropdown-control {% if is_active %}active{% endif %}'>
-                    <a href='{{ link.url | escape }}' {% if is_active %}aria-current='page' {% endif %}
+                    <a href='{{ target_url | escape }}' {% if is_active %}aria-current='page' {% endif %}
+                      {% if is_external %}target='_blank' rel='noopener noreferrer' {% endif %}
                       title='{{ link.tooltip | default: link.name | escape }}'>
                       {{ link.name | escape }}
                     </a>
                     <div class='au-main-nav__dropdown'>
                       <ul class='au-link-list'>
                         {% for sublink in link.weblinks %}
+                        {% assign sub_target = sublink.url | default: sublink.adx_url | default: sublink.adx_externalurl %}
+                        {% assign sub_external = false %}
+                        {% if sub_target contains '://' or sublink.open_in_new_window %}
+                          {% assign sub_external = true %}
+                        {% endif %}
                         <li>
-                          <a href='{{ sublink.url | escape }}' title='{{ sublink.tooltip | default: sublink.name | escape }}'>{{ sublink.name | escape }}</a>
+                          <a href='{{ sub_target | escape }}' {% if sub_external %}target='_blank' rel='noopener noreferrer' {% endif %}title='{{ sublink.tooltip | default: sublink.name | escape }}'>{{ sublink.name | escape }}</a>
                         </li>
                         {% endfor %}
                       </ul>
@@ -89,13 +107,15 @@
                   </li>
                   {% else %}
                   <li class='{% if is_active %}active{% endif %}'>
-                    <a href='{{ link.url | escape }}' {% if is_active %}aria-current='page' {% endif %}
+                    <a href='{{ target_url | escape }}' {% if is_active %}aria-current='page' {% endif %}
+                      {% if is_external %}target='_blank' rel='noopener noreferrer' {% endif %}
                       title='{{ link.tooltip | default: link.name | escape }}'>
                       {{ link.name | escape }}
                     </a>
                   </li>
                   {% endif %}
                   {% endfor %}
+
                   {% endif %}
 
                   {% assign search_enabled = settings['Search/Enabled'] | boolean | default: true %}
@@ -212,7 +232,8 @@
           links.forEach(function (a) {
             a.removeAttribute('aria-current');
             var href = a.getAttribute('href');
-            if (!href || href === '#' || href.indexOf('javascript:') === 0) return;
+            if (!href || href === '#' || href.indexOf('javascript:') === 0 || a.target === '_blank' || href.indexOf('://') !== -1) return;
+
 
             var linkPath = normalizePath(a.pathname || href);
 

@@ -31,3 +31,17 @@
   adx_robotsfollowlink: true
   adx_weblinkid: d9a5e3b4-0c6f-4a8d-b12c-f4e3d5c6a7b8
   adx_weblinksetid: 32b7220d-8cd4-498c-9f09-4331c3b1cfa8
+- adx_disablepagevalidation: true
+  adx_displayimageonly: false
+  adx_displayorder: 4
+  adx_displaypagechildlinks: false
+  adx_name: Data Contracts
+  adx_openinnewwindow: true
+  adx_publishingstateid: 8be00a48-c2ad-46bd-81c6-44fb1d885bef
+  adx_robotsfollowlink: true
+  adx_externalurl: https://run-xyz-dev-veylo-contracts-0-251731083825.australia-southeast1.run.app
+  adx_url: https://run-xyz-dev-veylo-contracts-0-251731083825.australia-southeast1.run.app
+  adx_weblinkid: e5f6a7b8-9012-3456-789a-bcdef0123456
+  adx_weblinksetid: 32b7220d-8cd4-498c-9f09-4331c3b1cfa8
+
+
