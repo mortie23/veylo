@@ -144,6 +144,8 @@ class DataverseClient:
         user_email: Optional[str] = None,
         submission_reference: Optional[str] = None,
         schema_version: Optional[str] = None,
+        contract_name: Optional[str] = None,
+        contract_version: Optional[str] = None,
         reporting_period_start: Optional[str] = None,
         reporting_period_end: Optional[str] = None,
         idempotency_key: Optional[str] = None
@@ -161,6 +163,10 @@ class DataverseClient:
             "statuscode": 1
         }
 
+        if contract_name:
+            record["vey_contractname"] = contract_name
+        if contract_version:
+            record["vey_contractversion"] = contract_version
         if schema_version:
             record["vey_schemaversion"] = schema_version
         if reporting_period_start:

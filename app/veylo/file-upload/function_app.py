@@ -113,6 +113,8 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
 
         submission_reference = (data.get("submissionReference") or "").strip() or safe_filename
         schema_version = (data.get("schemaVersion") or "").strip() or None
+        contract_name = (data.get("contractName") or data.get("contract_name") or "").strip() or None
+        contract_version = (data.get("contractVersion") or data.get("contract_version") or "").strip() or None
         reporting_period_start = data.get("reportingPeriodStart") or None
         reporting_period_end = data.get("reportingPeriodEnd") or None
         idempotency_key = (data.get("idempotencyKey") or "").strip() or None
@@ -132,6 +134,8 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
             user_email=user_email,
             submission_reference=submission_reference,
             schema_version=schema_version,
+            contract_name=contract_name,
+            contract_version=contract_version,
             reporting_period_start=reporting_period_start,
             reporting_period_end=reporting_period_end,
             idempotency_key=idempotency_key
