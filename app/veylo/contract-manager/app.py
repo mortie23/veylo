@@ -1,8 +1,8 @@
 import logging
-import os
-from flask import Flask, render_template
+from flask import Flask, g, redirect, render_template, request, session, url_for
 
 from blueprints.api import api_bp
+from blueprints.auth import auth_bp, get_current_user
 from blueprints.contracts import contracts_bp
 from blueprints.rules import rules_bp
 from config import get_settings
@@ -30,15 +30,40 @@ def create_app() -> Flask:
         seed_sample_contracts(force=False)
 
     # Register Blueprints
+    app.register_blueprint(auth_bp)
     app.register_blueprint(contracts_bp)
     app.register_blueprint(rules_bp)
     app.register_blueprint(api_bp)
+
+    # Authentication guard
+    @app.before_request
+    def global_auth_guard():
+        # Allow health checks, static assets, and auth endpoints without authentication
+        if request.endpoint and (
+            request.endpoint.startswith("auth.")
+            or request.endpoint == "api.health_check"
+            or request.endpoint == "static"
+        ):
+            return None
+
+        if not settings.is_auth_enabled:
+            g.user = get_current_user()
+            return None
+
+        user = session.get("user")
+        if not user:
+            session["next_url"] = request.url
+            return redirect(url_for("auth.login"))
+
+        g.user = user
+        return None
 
     # Global template context
     @app.context_processor
     def inject_globals():
         return {
             "config": settings,
+            "current_user": session.get("user") or get_current_user(),
         }
 
     # Error handlers

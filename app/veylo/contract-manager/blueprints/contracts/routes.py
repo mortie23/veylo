@@ -337,6 +337,18 @@ def run_test_schema(contract_id: str):
                         elif attr.tgt_data_type == "DATE":
                             datetime.strptime(clean_val, "%Y-%m-%d")
                             transformed_val = clean_val
+                        elif attr.tgt_data_type in ("TIMESTAMP", "DATETIME"):
+                            parsed = False
+                            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S"):
+                                try:
+                                    datetime.strptime(clean_val, fmt)
+                                    parsed = True
+                                    break
+                                except ValueError:
+                                    continue
+                            if not parsed:
+                                raise ValueError(f"Cannot parse timestamp '{clean_val}'")
+                            transformed_val = clean_val
                         elif attr.tgt_data_type == "BOOL":
                             transformed_val = clean_val.lower() in ("true", "1", "yes")
                         else:
@@ -374,6 +386,18 @@ def run_test_schema(contract_id: str):
                                     "error_code": "DQ_REGEX_FAILED",
                                     "error_message": dq.error_message_template or f"Value '{clean_val}' failed pattern '{dq.rule_value}'",
                                 })
+                        elif dq.rule_type == "ENUM" and dq.rule_value:
+                            try:
+                                allowed = json.loads(dq.rule_value) if dq.rule_value.startswith("[") else [s.strip() for s in dq.rule_value.split(",")]
+                                if clean_val not in allowed:
+                                    errors.append({
+                                        "row_number": row_idx,
+                                        "column_name": attr.src_field_name,
+                                        "error_code": "DQ_ENUM_INVALID",
+                                        "error_message": dq.error_message_template or f"Value '{clean_val}' is not in allowed list: {allowed}",
+                                    })
+                            except Exception:
+                                pass
                         elif dq.rule_type == "RANGE" and dq.rule_value:
                             try:
                                 bounds = json.loads(dq.rule_value)

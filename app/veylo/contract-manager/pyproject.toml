@@ -12,6 +12,7 @@ dependencies = [
     "pydantic>=2.6.0",
     "python-dotenv>=1.0.0",
     "gunicorn>=21.2.0",
+    "msal>=1.38.0",
 ]
 
 [dependency-groups]
