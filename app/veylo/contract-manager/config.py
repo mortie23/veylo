@@ -23,6 +23,25 @@ class Settings:
         # Explicit database URL override
         self.database_url_override = os.environ.get("DATABASE_URL")
 
+        # Entra ID Authentication Config
+        self.entra_tenant_id = os.environ.get("ENTRA_TENANT_ID", "")
+        self.entra_client_id = os.environ.get("ENTRA_CLIENT_ID", "")
+        self.entra_client_secret = os.environ.get("ENTRA_CLIENT_SECRET", "")
+        self.entra_redirect_uri = os.environ.get("ENTRA_REDIRECT_URI", "")
+
+    @property
+    def is_auth_enabled(self) -> bool:
+        """Determines if Entra ID authentication is enforced."""
+        env_override = os.environ.get("AUTH_ENABLED")
+        if env_override is not None:
+            return env_override.lower() in ("1", "true", "yes")
+        return bool(self.entra_client_secret and self.entra_client_id)
+
+    @property
+    def entra_authority(self) -> str:
+        return f"https://login.microsoftonline.com/{self.entra_tenant_id}"
+
+
     @property
     def effective_database_url(self) -> str:
         """
