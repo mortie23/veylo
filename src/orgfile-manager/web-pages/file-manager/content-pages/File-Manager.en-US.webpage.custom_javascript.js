@@ -38,7 +38,9 @@
     currentContactId: '',
     submissions: [],
     currentUploadXhr: null,
-    msalInstance: null
+    msalInstance: null,
+    currentModalErrors: [],
+    currentModalFilename: ''
   };
 
   // Status mapping
@@ -299,6 +301,107 @@
       });
   }
 
+  function formatContractName(name) {
+    return (name || '').split('-').map(function (w) {
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    }).join(' ');
+  }
+
+  function loadContracts() {
+    var select = document.getElementById('fm-schema-select');
+    if (!select) return;
+
+    select.disabled = true;
+    select.innerHTML = '<option value="">Loading active data standards\u2026</option>';
+
+    fetch(CONFIG.functionBaseUrl + '/api/contracts')
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (contracts) {
+        select.disabled = false;
+        if (!contracts || !contracts.length) {
+          select.innerHTML = '<option value="">-- No Active Contracts Found --</option><option value="__custom__">Custom Schema Version...</option>';
+          return;
+        }
+
+        select.innerHTML = '<option value="">-- Select Active Data Contract --</option>';
+        contracts.forEach(function (c) {
+          var opt = document.createElement('option');
+          opt.value = c.contract_name + '::' + c.contract_version;
+          opt.dataset.contractName = c.contract_name;
+          opt.dataset.contractVersion = c.contract_version;
+
+          var displayName = formatContractName(c.contract_name) + ' (' + c.contract_version + ')';
+          opt.textContent = displayName;
+          select.appendChild(opt);
+        });
+
+        var customOpt = document.createElement('option');
+        customOpt.value = '__custom__';
+        customOpt.textContent = 'Custom Schema Version...';
+        select.appendChild(customOpt);
+      })
+      .catch(function (err) {
+        console.warn('Failed to load dynamic contracts:', err);
+        select.disabled = false;
+        select.innerHTML = '<option value="">-- Failed to load contracts (Refresh page) --</option><option value="__custom__">Custom Schema Version...</option>';
+      });
+  }
+
+  // Polling Engine for In-Flight Validations (SEC-11)
+  var _pollTimer = null;
+  var _pollIntervalMs = 4000;
+  var _pollAttempts = 0;
+  var _maxPollAttempts = 60; // 4 minutes max to prevent runaway polling
+
+  function stopPolling() {
+    if (_pollTimer) {
+      clearInterval(_pollTimer);
+      _pollTimer = null;
+    }
+    _pollAttempts = 0;
+  }
+
+  function checkAndStartPolling() {
+    var hasPending = (state.submissions || []).some(function (s) {
+      var status = Number(s.vey_submissionstatus);
+      return status === 948740000 || status === 948740001; // Uploaded or Validating
+    });
+
+    if (!hasPending) {
+      stopPolling();
+      return;
+    }
+
+    if (_pollTimer) return;
+
+    _pollAttempts = 0;
+    _pollTimer = setInterval(function () {
+      _pollAttempts++;
+      if (_pollAttempts > _maxPollAttempts) {
+        stopPolling();
+        console.warn('Polling attempt limit reached for active validations.');
+        return;
+      }
+
+      loadSubmissions().then(function () {
+        var stillPending = (state.submissions || []).some(function (s) {
+          var status = Number(s.vey_submissionstatus);
+          return status === 948740000 || status === 948740001;
+        });
+
+        if (!stillPending) {
+          stopPolling();
+          showStatus('File validation processing completed.', 'success');
+        }
+      }).catch(function (err) {
+        console.warn('Polling error:', err);
+      });
+    }, _pollIntervalMs);
+  }
+
   function loadSubmissions() {
     var selectFields = [
       'vey_filesubmissionid',
@@ -306,6 +409,8 @@
       'vey_submissionreference',
       'vey_filesizebytes',
       'vey_filehash',
+      'vey_contractname',
+      'vey_contractversion',
       'vey_schemaversion',
       'vey_submissionstatus',
       'vey_reportingperiodstart',
@@ -330,6 +435,7 @@
 
         state.submissions = recentPending.concat(serverItems);
         renderSubmissionsTable();
+        checkAndStartPolling();
       })
       .catch(function (err) {
         console.error('Failed to load submissions:', err);
@@ -495,6 +601,8 @@
 
     // Check schema toggle
     var schemaVersion = '';
+    var contractName = null;
+    var contractVersion = null;
     var schemaToggle = document.getElementById('fm-schema-toggle');
     if (schemaToggle && schemaToggle.checked) {
       var select = document.getElementById('fm-schema-select');
@@ -502,8 +610,18 @@
       if (selVal === '__custom__') {
         var customInput = document.getElementById('fm-schema-custom');
         schemaVersion = (customInput && customInput.value.trim()) || '';
-      } else {
-        schemaVersion = selVal;
+      } else if (selVal) {
+        var selectedOpt = (select.selectedOptions && select.selectedOptions[0]) || (select.options && select.options[select.selectedIndex]);
+        if (selectedOpt && selectedOpt.dataset) {
+          contractName = selectedOpt.dataset.contractName || null;
+          contractVersion = selectedOpt.dataset.contractVersion || null;
+        }
+        if ((!contractName || !contractVersion) && selVal.indexOf('::') !== -1) {
+          var parts = selVal.split('::');
+          contractName = parts[0];
+          contractVersion = parts[1];
+        }
+        schemaVersion = (contractName && contractVersion) ? (formatContractName(contractName) + ' (' + contractVersion + ')') : selVal;
       }
     }
 
@@ -541,6 +659,8 @@
           contactId: state.currentContactId,
           submissionReference: submissionReference,
           schemaVersion: schemaVersion || null,
+          contractName: contractName,
+          contractVersion: contractVersion,
           reportingPeriodStart: periodStart,
           reportingPeriodEnd: periodEnd
         })
@@ -602,13 +722,21 @@
           body: JSON.stringify({ submissionId: ticket.submissionId })
         }).then(function (compRes) {
           if (!compRes.ok) throw new Error('Completion notification failed');
-          return compRes.json().then(function () { return ticket; });
+          return compRes.json().then(function (compData) {
+            return { ticket: ticket, complete: compData };
+          });
         });
 
       });
 
-    }).then(function (ticket) {
-      showStatus('File "' + file.name + '" uploaded and registered successfully!', 'success');
+    }).then(function (result) {
+      var ticket = result.ticket;
+      var compData = result.complete;
+      var isPendingValidation = compData && compData.status === 'Validating';
+      var statusNum = isPendingValidation ? 948740001 : 948740000;
+      var statusText = isPendingValidation ? 'Validating' : 'Uploaded';
+
+      showStatus('File "' + file.name + '" uploaded successfully (Status: ' + statusText + ')!', 'success');
       clearSelectedFile();
       if (progressContainer) progressContainer.style.display = 'none';
       if (cancelBtn) cancelBtn.style.display = 'none';
@@ -621,8 +749,10 @@
           vey_submissionreference: submissionReference || file.name,
           vey_filesizebytes: file.size,
           vey_filehash: state.selectedFileHash,
+          vey_contractname: contractName,
+          vey_contractversion: contractVersion,
           vey_schemaversion: schemaVersion || null,
-          vey_submissionstatus: 948740000,
+          vey_submissionstatus: statusNum,
           vey_reportingperiodstart: periodStart,
           vey_reportingperiodend: periodEnd,
           createdon: new Date().toISOString()
@@ -636,7 +766,7 @@
 
       switchTab('history');
 
-      // Reload submissions from server to sync with Dataverse
+      // Reload submissions from server to sync with Dataverse and start polling
       loadSubmissions();
 
     }).catch(function (err) {
@@ -713,11 +843,26 @@
 
     var statusObj = STATUS_LABELS[sub.vey_submissionstatus] || { text: 'Uploaded', cls: 'fm-status-pill--uploaded' };
 
+    var summaryContainer = document.getElementById('fm-modal-summary-container');
+    var summaryEl = document.getElementById('fm-modal-summary');
+    if (summaryContainer && summaryEl) {
+      if (sub.vey_contractname) {
+        summaryEl.textContent = 'Data Contract: ' + formatContractName(sub.vey_contractname) + (sub.vey_contractversion ? ' (' + sub.vey_contractversion + ')' : '');
+        summaryContainer.style.display = 'block';
+      } else {
+        summaryContainer.style.display = 'none';
+      }
+    }
+
     document.getElementById('fm-modal-ref').textContent = sub.vey_submissionreference || sub.vey_filename || '\u2014';
     document.getElementById('fm-modal-status').innerHTML = '<span class="fm-status-pill ' + statusObj.cls + '">' + esc(statusObj.text) + '</span>';
     document.getElementById('fm-modal-filename').textContent = sub.vey_filename || '\u2014';
     document.getElementById('fm-modal-filesize').textContent = formatBytes(sub.vey_filesizebytes);
-    document.getElementById('fm-modal-schema').textContent = sub.vey_schemaversion || 'None / Unvalidated';
+    
+    var modalSchema = sub.vey_contractname
+      ? (formatContractName(sub.vey_contractname) + (sub.vey_contractversion ? ' (' + sub.vey_contractversion + ')' : ''))
+      : (sub.vey_schemaversion || 'None / Unvalidated');
+    document.getElementById('fm-modal-schema').textContent = modalSchema;
     
     var period = '\u2014';
     if (sub.vey_reportingperiodstart || sub.vey_reportingperiodend) {
@@ -741,12 +886,23 @@
     var errorsSection = document.getElementById('fm-modal-errors-section');
     var errorsTbody = document.getElementById('fm-modal-errors-tbody');
     var errorCount = document.getElementById('fm-modal-error-count');
+    var csvBtn = document.getElementById('fm-download-errors-csv');
+
+    state.currentModalErrors = [];
+    state.currentModalFilename = sub.vey_filename || 'submission';
+
+    if (csvBtn) {
+      csvBtn.onclick = function () {
+        exportErrorsToCsv(state.currentModalErrors, state.currentModalFilename);
+      };
+    }
 
     if (errorsSection && errorsTbody && errorCount) {
       errorsSection.style.display = 'none';
       errorsTbody.innerHTML = '';
 
       loadIngestionErrors(sub.vey_filesubmissionid).then(function (errors) {
+        state.currentModalErrors = errors || [];
         if (errors.length > 0) {
           errorCount.textContent = errors.length;
           var errRows = '';
@@ -765,6 +921,52 @@
     }
 
     modal.classList.add('is-active');
+  }
+
+  function sanitizeCsvCell(val) {
+    if (val === null || val === undefined) return '""';
+    var str = String(val);
+    // SEC-09: Prevent CSV Formula Injection
+    if (/^[=+\-@\t\r]/.test(str)) {
+      str = "'" + str;
+    }
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+
+  function exportErrorsToCsv(errors, filename) {
+    if (!errors || !errors.length) {
+      showStatus('No validation errors available to export.', 'info');
+      return;
+    }
+
+    var headers = ['Row Number', 'Error Code', 'Column / Reference', 'Error Message', 'Raw Value'];
+    var rows = errors.map(function (e) {
+      return [
+        sanitizeCsvCell(e.vey_rownumber || ''),
+        sanitizeCsvCell(e.vey_errorcode || ''),
+        sanitizeCsvCell(e.vey_errorreference || ''),
+        sanitizeCsvCell(e.vey_errormessage || ''),
+        sanitizeCsvCell(e.vey_rawpayload || '')
+      ].join(',');
+    });
+
+    var csvContent = [headers.map(sanitizeCsvCell).join(',')].concat(rows).join('\r\n');
+    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    var cleanBase = (filename || 'submission').replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+    var downloadFileName = 'validation-errors-' + cleanBase + '.csv';
+
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(blob, downloadFileName);
+    } else {
+      var url = URL.createObjectURL(blob);
+      var link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', downloadFileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+    }
   }
 
   function closeModal() {
@@ -903,9 +1105,19 @@
       });
     }
 
-    // Initialize MSAL and load data
+    // Initialize MSAL, dynamic contracts, and load submissions
     initMsal();
+    loadContracts();
     loadCurrentUserAndOrg().then(loadSubmissions);
+
+    // Pause/resume polling based on browser tab visibility
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        checkAndStartPolling();
+      }
+    });
   }
 
   if (document.readyState === 'loading') {

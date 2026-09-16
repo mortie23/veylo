@@ -185,7 +185,7 @@
 - adx_description: Comma-separated list of File Submission fields exposed via the Web API.
   adx_name: Webapi/vey_filesubmission/fields
   adx_sitesettingid: f7a8b9c0-8e4f-6c6d-d9ae-02b3c4d5e6f7
-  adx_value: vey_filesubmissionid,vey_filename,vey_submissionreference,vey_filesizebytes,vey_filehash,vey_schemaversion,vey_submissionstatus,vey_reportingperiodstart,vey_reportingperiodend,createdon,vey_submittedby,_vey_submittedby_value,vey_organization,_vey_organization_value,vey_storageuri
+  adx_value: vey_filesubmissionid,vey_filename,vey_submissionreference,vey_filesizebytes,vey_filehash,vey_contractname,vey_contractversion,vey_schemaversion,vey_submissionstatus,vey_reportingperiodstart,vey_reportingperiodend,createdon,vey_submittedby,_vey_submittedby_value,vey_organization,_vey_organization_value,vey_storageuri
 - adx_name: Profile/ShowMarketingOptionsPanel
   adx_sitesettingid: fa78801d-99b7-4d5f-a216-6c5f3def6602
   adx_value: True

@@ -207,10 +207,7 @@
                   <div id="fm-schema-options" style="display: none; margin-top: 14px;">
                     <label for="fm-schema-select">Target Schema Version</label>
                     <select id="fm-schema-select" class="au-select au-select--block">
-                      <option value="">-- Select Schema Contract --</option>
-                      <option value="v1.0">Healthcare Admissions Standard v1.0</option>
-                      <option value="v2.1">Clinical Encounters &amp; Discharges v2.1</option>
-                      <option value="v1.2">Financial &amp; Billing Registry v1.2</option>
+                      <option value="">-- Select Active Data Contract --</option>
                       <option value="__custom__">Custom Schema Version...</option>
                     </select>
 
@@ -282,6 +279,12 @@
 
     <div class="custom-modal-body">
       
+      <!-- Validation Summary Banner -->
+      <div id="fm-modal-summary-container" style="margin-bottom: 18px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: 4px;">
+        <span style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Validation Summary</span>
+        <div id="fm-modal-summary" style="font-size: 0.95rem; color: #1e293b; font-weight: 500;">No summary notes available.</div>
+      </div>
+
       <!-- Key Metadata Grid -->
       <div class="fm-meta-grid">
         <div class="fm-meta-item">
@@ -320,10 +323,15 @@
 
       <!-- Ingestion Errors Section (from vey_FileIngestionError) -->
       <div id="fm-modal-errors-section" style="display: none; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 18px;">
-        <h5 style="color: #991b1b; margin-top: 0; font-size: 1.1rem;">
-          <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-          Ingestion &amp; Schema Validation Errors (<span id="fm-modal-error-count">0</span>)
-        </h5>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <h5 style="color: #991b1b; margin: 0; font-size: 1.1rem;">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            Ingestion &amp; Schema Validation Errors (<span id="fm-modal-error-count">0</span>)
+          </h5>
+          <button id="fm-download-errors-csv" class="au-btn au-btn--secondary au-btn--sm" type="button">
+            <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Error Log (.csv)
+          </button>
+        </div>
         <p style="font-size: 0.9rem; color: #555555; margin-bottom: 12px;">
           The downstream BigQuery validation engine flagged the following row issues during contract verification:
         </p>
