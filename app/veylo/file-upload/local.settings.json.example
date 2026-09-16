@@ -9,6 +9,8 @@
     "DATAVERSE_URL": "https://org123.crm.dynamics.com",
     "ENTRA_TENANT_ID": "00000000-0000-0000-0000-000000000000",
     "API_AUDIENCE": "api://func-vey-portal-dev",
+    "VEYLO_VALIDATION_SERVICE_URL": "https://<service-name>-<project-number>.<region>.run.app",
+    "VEYLO_CLOUD_RUN_API_KEY": "",
     "APPLICATIONINSIGHTS_CONNECTION_STRING": ""
   },
   "Host": {
