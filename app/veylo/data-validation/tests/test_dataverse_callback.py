@@ -19,7 +19,7 @@ def test_dataverse_mock_status_update():
     # Processed
     callback.update_submission_status(submission_id, STATUS_PROCESSED, summary="All rows passed")
     assert _LOCAL_MOCK_STORE[submission_id]["vey_submissionstatus"] == STATUS_PROCESSED
-    assert _LOCAL_MOCK_STORE[submission_id]["vey_name"] == "All rows passed"
+    assert "vey_name" not in _LOCAL_MOCK_STORE[submission_id]
 
 
 def test_dataverse_mock_report_errors():

@@ -35,7 +35,10 @@ class DataverseCallback:
         tenant_id: Optional[str] = None,
     ):
         settings = get_settings()
-        self.dataverse_url = (dataverse_url or settings.dataverse_url or "").rstrip("/")
+        if dataverse_url is not None:
+            self.dataverse_url = dataverse_url.rstrip("/")
+        else:
+            self.dataverse_url = (settings.dataverse_url or "").rstrip("/")
         self.client_id = client_id or settings.dataverse_client_id or ""
         self.client_secret = client_secret or settings.dataverse_client_secret or ""
         self.tenant_id = tenant_id or settings.dataverse_tenant_id or ""
@@ -43,6 +46,11 @@ class DataverseCallback:
         self._msal_app: Optional[msal.ConfidentialClientApplication] = None
         self._token: Optional[str] = None
         self._token_expires_at: float = 0
+
+    @property
+    def is_configured(self) -> bool:
+        """Returns True if Dataverse URL and all required Entra ID credentials are provided."""
+        return bool(self.dataverse_url and self.client_id and self.client_secret and self.tenant_id)
 
     def _get_access_token(self) -> str:
         """Acquires OAuth2 token using MSAL client credentials with in-memory caching."""
@@ -95,11 +103,8 @@ class DataverseCallback:
         payload: Dict[str, Any] = {
             "vey_submissionstatus": status,
         }
-        if summary:
-            # vey_name is the primary name attribute of vey_FileSubmission
-            payload["vey_name"] = summary[:500]
 
-        if not self.dataverse_url:
+        if not self.is_configured:
             logger.info(f"[Local Mock] Updating vey_FileSubmission {submission_id}: {payload}")
             if submission_id not in _LOCAL_MOCK_STORE:
                 _LOCAL_MOCK_STORE[submission_id] = {"id": submission_id, "errors": []}
@@ -128,7 +133,7 @@ class DataverseCallback:
         if not errors:
             return 0
 
-        if not self.dataverse_url:
+        if not self.is_configured:
             logger.info(f"[Local Mock] Reporting {len(errors)} errors for submission {submission_id}")
             if submission_id not in _LOCAL_MOCK_STORE:
                 _LOCAL_MOCK_STORE[submission_id] = {"id": submission_id, "errors": []}

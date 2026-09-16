@@ -44,3 +44,19 @@ def test_parse_empty_content():
 def test_parse_unsupported_format():
     with pytest.raises(FileParserError, match="Unsupported file format"):
         FileParser.parse(b"hello world", "test.pdf")
+
+
+def test_stream_sas_invalid_scheme():
+    with pytest.raises(FileParserError, match="Insecure SAS URL scheme"):
+        FileParser.stream_file_from_sas("http://mystorageaccount.blob.core.windows.net/test.csv")
+
+
+def test_stream_sas_untrusted_host_metadata():
+    with pytest.raises(FileParserError, match="Untrusted SAS URL host"):
+        FileParser.stream_file_from_sas("https://169.254.169.254/computeMetadata/v1/")
+
+
+def test_stream_sas_untrusted_host_arbitrary():
+    with pytest.raises(FileParserError, match="Untrusted SAS URL host"):
+        FileParser.stream_file_from_sas("https://evil-host.attacker.com/blob.csv")
+

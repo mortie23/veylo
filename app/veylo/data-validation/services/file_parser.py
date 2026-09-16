@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import urllib.parse
 from typing import Optional
 import pandas as pd
 import requests
@@ -23,6 +24,14 @@ class FileParser:
         No Azure SDK is required on the GCP side as the SAS URL is a pre-signed HTTPS URL.
         """
         try:
+            parsed = urllib.parse.urlparse(sas_url)
+            if parsed.scheme != "https":
+                raise FileParserError(f"Insecure SAS URL scheme '{parsed.scheme}'; HTTPS is required.")
+
+            hostname = (parsed.hostname or "").lower()
+            if not (hostname.endswith(".blob.core.windows.net") or hostname in ("localhost", "127.0.0.1", "testserver")):
+                raise FileParserError(f"Untrusted SAS URL host '{hostname}'; must be an Azure Blob Storage domain.")
+
             logger.info("Initiating streaming download from SAS URL")
             with requests.get(sas_url, stream=True, timeout=timeout) as response:
                 if response.status_code != 200:

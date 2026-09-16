@@ -34,10 +34,12 @@ app = FastAPI(
     version="1.0.0",
 )
 
+import secrets
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -45,12 +47,17 @@ app.add_middleware(
 
 def verify_api_key(x_api_key: Optional[str] = Header(default=None, alias="X-API-Key")) -> None:
     """Validates inbound server-to-server webhook requests using an API key."""
-    if settings.api_key:
-        if not x_api_key or x_api_key != settings.api_key:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or missing X-API-Key header",
-            )
+    if not settings.api_key:
+        logger.error("Server API key configuration (VEYLO_CLOUD_RUN_API_KEY) is missing.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Server API key configuration is missing",
+        )
+    if not x_api_key or not secrets.compare_digest(x_api_key, settings.api_key):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing X-API-Key header",
+        )
 
 
 def process_validation_task(payload: WebhookPayload) -> None:
