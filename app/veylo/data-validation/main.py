@@ -77,8 +77,11 @@ def process_validation_task(payload: WebhookPayload) -> None:
     logger.info(f"Starting background validation for submission: {correlation_id}")
 
     try:
-        # Step 1: Transition status to Validating
-        dataverse.update_submission_status(correlation_id, STATUS_VALIDATING, summary="Validation in progress...")
+        # Step 1: Transition status to Validating (non-fatal if already set by Azure Function)
+        try:
+            dataverse.update_submission_status(correlation_id, STATUS_VALIDATING, summary="Validation in progress...")
+        except Exception as ex:
+            logger.warning(f"Submission {correlation_id}: Non-fatal Dataverse callback failure on status update: {ex}")
 
         # Step 2: Fetch Contract
         with SessionLocal() as db:
@@ -202,13 +205,16 @@ def process_validation_task(payload: WebhookPayload) -> None:
     except Exception as ex:
         logger.exception(f"Unhandled exception during validation of {correlation_id}: {ex}")
         try:
-            dataverse.update_submission_status(
-                correlation_id,
-                STATUS_FAILED,
-                summary=f"Internal validation engine failure: {ex}",
-            )
-        except Exception:
-            pass
+            if dataverse.is_configured:
+                dataverse.update_submission_status(
+                    correlation_id,
+                    STATUS_FAILED,
+                    summary=f"Internal validation engine failure: {ex}",
+                )
+            else:
+                logger.error(f"Cannot report failure for {correlation_id} to Dataverse: credentials are not configured.")
+        except Exception as dv_ex:
+            logger.error(f"Failed to update Dataverse with failure status for {correlation_id}: {dv_ex}")
 
 
 # ---------------------------------------------------------------------------

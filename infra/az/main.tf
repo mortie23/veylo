@@ -115,6 +115,13 @@ resource "azurerm_linux_function_app" "function" {
   }
 
   tags = local.common_tags
+
+  lifecycle {
+    ignore_changes = [
+      app_settings,
+      tags,
+    ]
+  }
 }
 
 # -----------------------------------------------------------------------------

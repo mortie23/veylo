@@ -97,3 +97,33 @@ resource "azuread_application_password" "contracts_web" {
   display_name   = "cloudrun-contracts-secret"
 }
 
+# -----------------------------------------------------------------------------
+# 6. Dataverse Callback App Registration (GCP Cloud Run Validation -> Dataverse)
+# -----------------------------------------------------------------------------
+resource "azuread_application" "validation_callback" {
+  display_name = "app-vey-validation-api-${var.environment}"
+
+  required_resource_access {
+    # Dynamics CRM / Dataverse API well-known resource ID
+    resource_app_id = "00000007-0000-0000-c000-000000000000"
+
+    resource_access {
+      # user_impersonation scope ID
+      id   = "78ce6682-4c54-45e6-ac32-2e2ec6679b23"
+      type = "Scope"
+    }
+  }
+
+  tags = ["Veylo", var.environment, "ValidationCallback"]
+}
+
+resource "azuread_service_principal" "validation_callback" {
+  client_id                    = azuread_application.validation_callback.client_id
+  app_role_assignment_required = false
+}
+
+resource "azuread_application_password" "validation_callback" {
+  application_id = azuread_application.validation_callback.id
+  display_name   = "cloudrun-dataverse-callback-secret"
+}
+

@@ -123,6 +123,12 @@
         }
       };
       state.msalInstance = new msal.PublicClientApplication(msalConfig);
+
+      // Set active account if existing session accounts are found in cache
+      var accounts = state.msalInstance.getAllAccounts();
+      if (accounts && accounts.length > 0) {
+        state.msalInstance.setActiveAccount(accounts[0]);
+      }
     } catch (ex) {
       console.error('Failed to initialize MSAL:', ex);
     }
@@ -142,24 +148,47 @@
       return Promise.reject(new Error('MSAL library is not initialized. Please ensure msal-browser.min.js is loaded.'));
     }
 
-    var accounts = state.msalInstance.getAllAccounts();
+    var activeAccount = state.msalInstance.getActiveAccount();
+    if (!activeAccount) {
+      var accounts = state.msalInstance.getAllAccounts();
+      if (accounts && accounts.length > 0) {
+        activeAccount = accounts[0];
+        state.msalInstance.setActiveAccount(activeAccount);
+      }
+    }
+
     var tokenRequest = {
       scopes: [CONFIG.apiScope],
-      account: accounts[0]
+      account: activeAccount
     };
+
+    // If no account exists yet, skip silent failure and prompt directly
+    if (!activeAccount) {
+      return state.msalInstance.acquireTokenPopup({ scopes: [CONFIG.apiScope] }).then(function (res) {
+        if (res && res.account) {
+          state.msalInstance.setActiveAccount(res.account);
+        }
+        return res.accessToken;
+      }).catch(function (popupErr) {
+        var msg = popupErr.errorMessage || popupErr.message || String(popupErr);
+        throw new Error('Entra ID authentication required. ' + msg);
+      });
+    }
 
     return state.msalInstance.acquireTokenSilent(tokenRequest).then(function (res) {
       return res.accessToken;
     }).catch(function (silentErr) {
       console.info('Silent token acquisition failed, prompting with popup:', silentErr);
       return state.msalInstance.acquireTokenPopup(tokenRequest).then(function (res) {
+        if (res && res.account) {
+          state.msalInstance.setActiveAccount(res.account);
+        }
         return res.accessToken;
       }).catch(function (popupErr) {
         var msg = popupErr.errorMessage || popupErr.message || String(popupErr);
         throw new Error(
           'Entra ID authentication required. ' +
-          'Direct Azure upload requires an active Microsoft Entra ID session. ' +
-          'Users registered via standard portal accounts must sign in or link their account with Microsoft Entra ID. (' + msg + ')'
+          'Direct Azure upload requires an active Microsoft Entra ID session. (' + msg + ')'
         );
       });
     });

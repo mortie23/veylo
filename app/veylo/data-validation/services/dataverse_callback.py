@@ -49,8 +49,16 @@ class DataverseCallback:
 
     @property
     def is_configured(self) -> bool:
-        """Returns True if Dataverse URL and all required Entra ID credentials are provided."""
-        return bool(self.dataverse_url and self.client_id and self.client_secret and self.tenant_id)
+        """Returns True if Dataverse URL and all required Entra ID credentials are valid and non-placeholder."""
+        def is_valid(val: Optional[str]) -> bool:
+            return bool(val and "placeholder" not in val.lower())
+
+        return bool(
+            self.dataverse_url
+            and is_valid(self.client_id)
+            and is_valid(self.client_secret)
+            and is_valid(self.tenant_id)
+        )
 
     def _get_access_token(self) -> str:
         """Acquires OAuth2 token using MSAL client credentials with in-memory caching."""

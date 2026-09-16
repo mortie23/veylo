@@ -222,7 +222,7 @@ def request_upload(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as ex:
         logging.exception(f"Failed to generate upload ticket: {ex}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Internal server error."}),
+            body=json.dumps({"error": f"Internal server error: {type(ex).__name__}: {str(ex)}"}),
             mimetype="application/json",
             status_code=500
         )
@@ -338,7 +338,7 @@ def complete_upload(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as ex:
         logging.exception(f"Failed to complete upload: {ex}")
         return func.HttpResponse(
-            body=json.dumps({"error": "Internal server error."}),
+            body=json.dumps({"error": f"Internal server error: {type(ex).__name__}: {str(ex)}"}),
             mimetype="application/json",
             status_code=500
         )

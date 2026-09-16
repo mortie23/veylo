@@ -85,3 +85,14 @@ output "contracts_client_secret" {
   sensitive   = true
 }
 
+output "validation_callback_client_id" {
+  description = "Entra ID Client ID for GCP Cloud Run Dataverse Callback"
+  value       = azuread_application.validation_callback.client_id
+}
+
+output "validation_callback_client_secret" {
+  description = "Entra ID Client Secret for GCP Cloud Run Dataverse Callback"
+  value       = azuread_application_password.validation_callback.value
+  sensitive   = true
+}
+
