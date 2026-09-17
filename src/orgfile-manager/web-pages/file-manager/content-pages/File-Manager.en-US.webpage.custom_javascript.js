@@ -53,8 +53,107 @@
   };
 
   // ============================================================
-  // UI Helpers
+  // UI Helpers & Toast Notification System
   // ============================================================
+  function showToast(title, message, type, options) {
+    var container = document.getElementById('fm-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'fm-toast-container';
+      container.className = 'fm-toast-container';
+      container.setAttribute('aria-live', 'polite');
+      container.setAttribute('aria-atomic', 'true');
+      document.body.appendChild(container);
+    }
+
+    var toastType = type || 'info';
+    var toast = document.createElement('div');
+    toast.className = 'fm-toast fm-toast--' + toastType;
+
+    var iconMap = {
+      error: 'glyphicon-remove-sign',
+      warning: 'glyphicon-warning-sign',
+      success: 'glyphicon-ok-sign',
+      info: 'glyphicon-info-sign'
+    };
+    var iconClass = iconMap[toastType] || iconMap.info;
+
+    var actionHtml = '';
+    if (options && options.actionLabel) {
+      actionHtml = '<button type="button" class="au-btn au-btn--sm fm-toast__action-btn">' + esc(options.actionLabel) + '</button>';
+    }
+
+    toast.innerHTML = [
+      '<div class="fm-toast__icon"><span class="glyphicon ' + iconClass + '" aria-hidden="true"></span></div>',
+      '<div class="fm-toast__content">',
+        '<div class="fm-toast__title">' + esc(title) + '</div>',
+        '<div class="fm-toast__message">' + esc(message) + '</div>',
+        actionHtml ? '<div class="fm-toast__actions">' + actionHtml + '</div>' : '',
+      '</div>',
+      '<button type="button" class="fm-toast__close" aria-label="Dismiss notification">&times;</button>'
+    ].join('');
+
+    if (options && options.actionLabel && typeof options.onAction === 'function') {
+      var actBtn = toast.querySelector('.fm-toast__action-btn');
+      if (actBtn) {
+        actBtn.addEventListener('click', function () {
+          options.onAction();
+          dismissToast(toast);
+        });
+      }
+    }
+
+    var closeBtn = toast.querySelector('.fm-toast__close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        dismissToast(toast);
+      });
+    }
+
+    container.appendChild(toast);
+
+    var autoDismissMs = (options && options.duration) || (toastType === 'error' ? 15000 : 8000);
+    var timer = setTimeout(function () {
+      dismissToast(toast);
+    }, autoDismissMs);
+
+    toast.addEventListener('mouseenter', function () { clearTimeout(timer); });
+    toast.addEventListener('mouseleave', function () {
+      timer = setTimeout(function () { dismissToast(toast); }, 4000);
+    });
+
+    return toast;
+  }
+
+  function dismissToast(toast) {
+    if (!toast || toast._dismissing) return;
+    toast._dismissing = true;
+    toast.classList.add('is-dismissing');
+    setTimeout(function () {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }
+
+  function copyToClipboard(text, btnEl) {
+    if (!navigator.clipboard) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    } else {
+      navigator.clipboard.writeText(text);
+    }
+    if (btnEl) {
+      var origHtml = btnEl.innerHTML;
+      btnEl.innerHTML = '<span class="glyphicon glyphicon-ok" style="color:#0b996c;" aria-hidden="true"></span>';
+      setTimeout(function () {
+        btnEl.innerHTML = origHtml;
+      }, 1500);
+    }
+  }
+
   function showStatus(message, type) {
     var el = document.getElementById('fm-status');
     if (!el) return;
@@ -72,7 +171,7 @@
 
     el.style.display = 'block';
     if (type === 'success') {
-      setTimeout(function () { el.style.display = 'none'; }, 5000);
+      setTimeout(function () { el.style.display = 'none'; }, 6000);
     }
   }
 
@@ -423,7 +522,12 @@
 
         if (!stillPending) {
           stopPolling();
-          showStatus('File validation processing completed.', 'success');
+          var anyFailed = (state.submissions || []).some(function (s) {
+            return Number(s.vey_submissionstatus) === 948740004;
+          });
+          if (!anyFailed) {
+            showStatus('File validation processing completed successfully.', 'success');
+          }
         }
       }).catch(function (err) {
         console.warn('Polling error:', err);
@@ -454,6 +558,54 @@
         var serverIds = {};
         serverItems.forEach(function (s) { serverIds[s.vey_filesubmissionid] = true; });
 
+        // Detect validation state transitions for notification
+        state.knownStatuses = state.knownStatuses || {};
+        serverItems.forEach(function (s) {
+          var id = s.vey_filesubmissionid;
+          var cur = Number(s.vey_submissionstatus);
+          var prev = state.knownStatuses[id];
+
+          if (prev !== undefined && prev !== cur) {
+            var label = s.vey_submissionreference || s.vey_filename || 'File submission';
+            if ((prev === 948740000 || prev === 948740001) && cur === 948740004) {
+              // FAILED!
+              showToast(
+                'Validation Failed',
+                'Submission "' + label + '" failed data contract verification.',
+                'error',
+                {
+                  actionLabel: 'Inspect Errors',
+                  onAction: function () {
+                    inspectSubmission(id);
+                  }
+                }
+              );
+              showStatus('Submission "' + label + '" failed data contract validation. Click "Inspect Errors" to view issues.', 'error');
+            } else if ((prev === 948740000 || prev === 948740001) && cur === 948740002) {
+              // PROCESSED
+              showToast(
+                'Validation Passed',
+                'Submission "' + label + '" was processed successfully.',
+                'success'
+              );
+            } else if ((prev === 948740000 || prev === 948740001) && cur === 948740003) {
+              // PARTIAL SUCCESS
+              showToast(
+                'Validation Completed with Warnings',
+                'Submission "' + label + '" has partial validation warnings.',
+                'warning',
+                {
+                  actionLabel: 'Inspect Errors',
+                  onAction: function () {
+                    inspectSubmission(id);
+                  }
+                }
+              );
+            }
+          }
+          state.knownStatuses[id] = cur;
+        });
+
         // Preserve any recent locally submitted records that server read replica hasn't synced yet (up to 5 mins)
         var recentPending = (state.submissions || []).filter(function (s) {
           if (serverIds[s.vey_filesubmissionid]) return false;
@@ -475,21 +627,54 @@
 
   function loadIngestionErrors(submissionId) {
     var selectFields = 'vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon';
-    
-    // First try querying via parent navigation relationship to avoid top-level security filter crashes
-    return apiRequest('GET', 'vey_filesubmissions(' + submissionId + ')/vey_fileingestionerror_FileSubmission_vey_filesubmission?$select=' + selectFields)
+
+    // Primary: Query via FetchXML (Microsoft-recommended for parent-scoped table permissions in Power Pages)
+    // Avoids URL-routing 403 on child relationships and bypasses OData $filter limitations
+    var fetchXml = '<fetch>' +
+      '<entity name="vey_fileingestionerror">' +
+      '<attribute name="vey_fileingestionerrorid"/>' +
+      '<attribute name="vey_rownumber"/>' +
+      '<attribute name="vey_errorcode"/>' +
+      '<attribute name="vey_errormessage"/>' +
+      '<attribute name="vey_errorreference"/>' +
+      '<attribute name="vey_rawpayload"/>' +
+      '<attribute name="createdon"/>' +
+      '<order attribute="vey_rownumber" descending="false"/>' +
+      '<filter type="and">' +
+      '<condition attribute="vey_filesubmission" operator="eq" value="' + submissionId + '"/>' +
+      '</filter>' +
+      '</entity>' +
+      '</fetch>';
+
+    return apiRequest('GET', 'vey_fileingestionerrors?fetchXml=' + encodeURIComponent(fetchXml))
       .then(function (data) {
         return (data && data.value) || [];
       })
-      .catch(function () {
-        // Fallback to direct filter query
-        return apiRequest('GET', 'vey_fileingestionerrors?$filter=_vey_filesubmission_value eq ' + submissionId + '&$select=' + selectFields)
+      .catch(function (fetchErr) {
+        console.warn('FetchXML query for ingestion errors failed, falling back to OData filter:', fetchErr);
+
+        // Fallback 1: OData $filter with quoted GUID
+        return apiRequest('GET', 'vey_fileingestionerrors?$filter=_vey_filesubmission_value eq \'' + submissionId + '\'&$select=' + selectFields + '&$orderby=vey_rownumber asc')
           .then(function (data) {
             return (data && data.value) || [];
           })
-          .catch(function (err) {
-            console.warn('Ingestion errors unavailable for submission ' + submissionId + ':', err);
-            return [];
+          .catch(function () {
+            // Fallback 2: OData $filter with unquoted GUID
+            return apiRequest('GET', 'vey_fileingestionerrors?$filter=_vey_filesubmission_value eq ' + submissionId + '&$select=' + selectFields)
+              .then(function (data) {
+                return (data && data.value) || [];
+              })
+              .catch(function () {
+                // Fallback 3: OData $filter with guid prefix
+                return apiRequest('GET', 'vey_fileingestionerrors?$filter=_vey_filesubmission_value eq guid\'' + submissionId + '\'&$select=' + selectFields)
+                  .then(function (data) {
+                    return (data && data.value) || [];
+                  })
+                  .catch(function (err) {
+                    console.error('All retrieval methods failed for ingestion errors (submission ' + submissionId + '):', err);
+                    throw err;
+                  });
+              });
           });
       });
   }
@@ -519,13 +704,29 @@
 
     var rows = '';
     filtered.forEach(function (s) {
-      var statusObj = STATUS_LABELS[s.vey_submissionstatus] || { text: 'Uploaded', cls: 'fm-status-pill--uploaded' };
+      var statusNum = Number(s.vey_submissionstatus);
+      var statusObj = STATUS_LABELS[statusNum] || { text: 'Uploaded', cls: 'fm-status-pill--uploaded' };
       var period = '\u2014';
       if (s.vey_reportingperiodstart || s.vey_reportingperiodend) {
         var startStr = s.vey_reportingperiodstart ? s.vey_reportingperiodstart.split('T')[0] : '...';
         var endStr = s.vey_reportingperiodend ? s.vey_reportingperiodend.split('T')[0] : '...';
         period = startStr + ' to ' + endStr;
       }
+
+      var isFailed = statusNum === 948740004;
+      var isValidating = statusNum === 948740001;
+
+      var pillHtml = '<span class="fm-status-pill ' + statusObj.cls + '">';
+      if (isFailed) {
+        pillHtml += '<span class="glyphicon glyphicon-remove-sign" aria-hidden="true" style="margin-right: 4px;"></span>';
+      } else if (isValidating) {
+        pillHtml += '<span class="glyphicon glyphicon-refresh fm-spin" aria-hidden="true" style="margin-right: 4px;"></span>';
+      }
+      pillHtml += esc(statusObj.text) + '</span>';
+
+      var actionBtnHtml = isFailed
+        ? '<button type="button" class="au-btn au-btn--sm js-inspect-btn fm-btn--inspect-failed" data-id="' + s.vey_filesubmissionid + '"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Inspect Errors</button>'
+        : '<button type="button" class="au-btn au-btn--secondary au-btn--sm js-inspect-btn" data-id="' + s.vey_filesubmissionid + '">Inspect</button>';
 
       rows += '<tr style="cursor: pointer;" data-id="' + s.vey_filesubmissionid + '">';
       rows += '<td><strong>' + esc(s.vey_submissionreference || s.vey_filename || '—') + '</strong></td>';
@@ -534,10 +735,8 @@
       rows += '<td>' + formatBytes(s.vey_filesizebytes) + '</td>';
       rows += '<td>' + esc(period) + '</td>';
       rows += '<td>' + formatDate(s.createdon) + '</td>';
-      rows += '<td><span class="fm-status-pill ' + statusObj.cls + '">' + esc(statusObj.text) + '</span></td>';
-      rows += '<td>';
-      rows += '<button type="button" class="au-btn au-btn--secondary au-btn--sm js-inspect-btn" data-id="' + s.vey_filesubmissionid + '">Inspect</button>';
-      rows += '</td>';
+      rows += '<td>' + pillHtml + '</td>';
+      rows += '<td>' + actionBtnHtml + '</td>';
       rows += '</tr>';
     });
 
@@ -791,6 +990,8 @@
           state.submissions = [localRecord].concat(state.submissions || []);
           renderSubmissionsTable();
         }
+        state.knownStatuses = state.knownStatuses || {};
+        state.knownStatuses[ticket.submissionId] = statusNum;
       }
 
       switchTab('history');
@@ -859,8 +1060,76 @@
   }
 
   // ============================================================
-  // Inspection Modal
+  // Inspection Modal & Errors Viewer
   // ============================================================
+  function renderModalErrors(errors, searchTerm) {
+    var tbody = document.getElementById('fm-modal-errors-tbody');
+    var filterCountEl = document.getElementById('fm-errors-filter-count');
+    if (!tbody) return;
+
+    var term = (searchTerm || '').toLowerCase().trim();
+    var filtered = (errors || []).filter(function (e) {
+      if (!term) return true;
+      var rowStr = e.vey_rownumber !== null && e.vey_rownumber !== undefined ? String(e.vey_rownumber) : '';
+      var codeStr = (e.vey_errorcode || '').toLowerCase();
+      var refStr = (e.vey_errorreference || '').toLowerCase();
+      var msgStr = (e.vey_errormessage || '').toLowerCase();
+      var rawStr = (e.vey_rawpayload || '').toLowerCase();
+      return rowStr.indexOf(term) !== -1 ||
+             codeStr.indexOf(term) !== -1 ||
+             refStr.indexOf(term) !== -1 ||
+             msgStr.indexOf(term) !== -1 ||
+             rawStr.indexOf(term) !== -1;
+    });
+
+    if (filterCountEl) {
+      if (term) {
+        filterCountEl.textContent = 'Showing ' + filtered.length + ' of ' + errors.length + ' errors';
+      } else {
+        filterCountEl.textContent = errors.length + ' error' + (errors.length === 1 ? '' : 's') + ' recorded';
+      }
+    }
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 20px; color: #64748b;">No validation errors match your search.</td></tr>';
+      return;
+    }
+
+    var html = '';
+    filtered.forEach(function (e) {
+      var rowDisplay = (e.vey_rownumber !== null && e.vey_rownumber !== undefined && e.vey_rownumber !== '')
+        ? '<span class="fm-row-badge">Row ' + esc(String(e.vey_rownumber)) + '</span>'
+        : '<span class="fm-row-badge fm-row-badge--file">File-level</span>';
+
+      var codeDisplay = '<span class="fm-code-badge">' + esc(e.vey_errorcode || 'SCHEMA_ERR') + '</span>';
+      var refDisplay = e.vey_errorreference ? '<span class="fm-ref-badge">' + esc(e.vey_errorreference) + '</span>' : '\u2014';
+      var msgDisplay = '<div class="fm-error-msg">' + esc(e.vey_errormessage || 'Validation constraint violated') + '</div>';
+
+      var rawDisplay = '\u2014';
+      if (e.vey_rawpayload) {
+        rawDisplay = '<div class="fm-payload-cell">' +
+          '<code class="fm-payload-code" title="' + esc(e.vey_rawpayload) + '">' + esc(e.vey_rawpayload) + '</code>' +
+          '<button type="button" class="fm-copy-payload-btn js-copy-payload" title="Copy raw payload" data-raw="' + esc(e.vey_rawpayload) + '">' +
+          '<span class="glyphicon glyphicon-copy" aria-hidden="true"></span>' +
+          '</button>' +
+          '</div>';
+      }
+
+      var timeDisplay = '<span class="fm-time-badge">' + formatDate(e.createdon) + '</span>';
+
+      html += '<tr>' +
+        '<td>' + rowDisplay + '</td>' +
+        '<td>' + codeDisplay + '</td>' +
+        '<td>' + refDisplay + '</td>' +
+        '<td>' + msgDisplay + '</td>' +
+        '<td>' + rawDisplay + '</td>' +
+        '<td>' + timeDisplay + '</td>' +
+        '</tr>';
+    });
+
+    tbody.innerHTML = html;
+  }
+
   function inspectSubmission(submissionId) {
     var sub = state.submissions.find(function (s) {
       return s.vey_filesubmissionid === submissionId;
@@ -871,28 +1140,78 @@
     if (!modal) return;
 
     var statusObj = STATUS_LABELS[sub.vey_submissionstatus] || { text: 'Uploaded', cls: 'fm-status-pill--uploaded' };
+    var isFailed = Number(sub.vey_submissionstatus) === 948740004;
+    var isPartial = Number(sub.vey_submissionstatus) === 948740003;
+    var isSuccess = Number(sub.vey_submissionstatus) === 948740002;
 
+    // Update modal title
+    var modalTitle = document.getElementById('fm-modal-title');
+    if (modalTitle) {
+      if (isFailed) {
+        modalTitle.innerHTML = '<span class="glyphicon glyphicon-exclamation-sign" style="color:#d60000; margin-right:8px;" aria-hidden="true"></span> Submission Details &mdash; Validation Failed';
+      } else {
+        modalTitle.textContent = 'Submission Details';
+      }
+    }
+
+    // High-impact Failure Alert Card
+    var failureAlert = document.getElementById('fm-modal-failure-alert');
+    var failureTitle = document.getElementById('fm-modal-failure-title');
+    var failureDesc = document.getElementById('fm-modal-failure-desc');
+    if (failureAlert) {
+      if (isFailed) {
+        if (failureTitle) failureTitle.textContent = 'Data Contract Validation Failed';
+        if (failureDesc) {
+          var contractTxt = sub.vey_contractname ? formatContractName(sub.vey_contractname) + (sub.vey_contractversion ? ' (' + sub.vey_contractversion + ')' : '') : 'the configured data contract';
+          failureDesc.textContent = 'File "' + (sub.vey_filename || 'submission') + '" failed verification against ' + contractTxt + '. Review row-level errors and validation messages below.';
+        }
+        failureAlert.style.display = 'flex';
+      } else {
+        failureAlert.style.display = 'none';
+      }
+    }
+
+    // Validation & Schema Summary
     var summaryContainer = document.getElementById('fm-modal-summary-container');
     var summaryEl = document.getElementById('fm-modal-summary');
     if (summaryContainer && summaryEl) {
-      if (sub.vey_contractname) {
-        summaryEl.textContent = 'Data Contract: ' + formatContractName(sub.vey_contractname) + (sub.vey_contractversion ? ' (' + sub.vey_contractversion + ')' : '');
-        summaryContainer.style.display = 'block';
+      var contractInfo = sub.vey_contractname
+        ? 'Data Contract: ' + formatContractName(sub.vey_contractname) + (sub.vey_contractversion ? ' (' + sub.vey_contractversion + ')' : '')
+        : (sub.vey_schemaversion ? 'Schema: ' + sub.vey_schemaversion : 'No Data Contract / Schema specified');
+
+      var statusNote = '';
+      if (isFailed) {
+        summaryContainer.style.borderLeftColor = '#dc2626';
+        summaryContainer.style.backgroundColor = '#fffafb';
+        statusNote = ' &bull; <strong style="color:#dc2626;">Status: Failed</strong>';
+      } else if (isPartial) {
+        summaryContainer.style.borderLeftColor = '#d97706';
+        summaryContainer.style.backgroundColor = '#fffdf5';
+        statusNote = ' &bull; <strong style="color:#d97706;">Status: Partial Success (Warnings)</strong>';
+      } else if (isSuccess) {
+        summaryContainer.style.borderLeftColor = '#0b996c';
+        summaryContainer.style.backgroundColor = '#f6fdf9';
+        statusNote = ' &bull; <strong style="color:#0b996c;">Status: Processed (Passed)</strong>';
       } else {
-        summaryContainer.style.display = 'none';
+        summaryContainer.style.borderLeftColor = '#0284c7';
+        summaryContainer.style.backgroundColor = '#f8fafc';
+        statusNote = ' &bull; <strong>Status: ' + statusObj.text + '</strong>';
       }
+
+      summaryEl.innerHTML = esc(contractInfo) + statusNote;
+      summaryContainer.style.display = 'block';
     }
 
     document.getElementById('fm-modal-ref').textContent = sub.vey_submissionreference || sub.vey_filename || '\u2014';
     document.getElementById('fm-modal-status').innerHTML = '<span class="fm-status-pill ' + statusObj.cls + '">' + esc(statusObj.text) + '</span>';
     document.getElementById('fm-modal-filename').textContent = sub.vey_filename || '\u2014';
     document.getElementById('fm-modal-filesize').textContent = formatBytes(sub.vey_filesizebytes);
-    
+
     var modalSchema = sub.vey_contractname
       ? (formatContractName(sub.vey_contractname) + (sub.vey_contractversion ? ' (' + sub.vey_contractversion + ')' : ''))
       : (sub.vey_schemaversion || 'None / Unvalidated');
     document.getElementById('fm-modal-schema').textContent = modalSchema;
-    
+
     var period = '\u2014';
     if (sub.vey_reportingperiodstart || sub.vey_reportingperiodend) {
       period = (sub.vey_reportingperiodstart ? sub.vey_reportingperiodstart.split('T')[0] : '...') +
@@ -911,11 +1230,18 @@
       };
     }
 
-    // Load child errors if applicable
+    // Load child errors
     var errorsSection = document.getElementById('fm-modal-errors-section');
-    var errorsTbody = document.getElementById('fm-modal-errors-tbody');
-    var errorCount = document.getElementById('fm-modal-error-count');
+    var errorsLoading = document.getElementById('fm-modal-errors-loading');
+    var errorsFetchError = document.getElementById('fm-modal-errors-fetch-error');
+    var errorsFetchErrorText = document.getElementById('fm-modal-fetch-error-text');
+    var errorsEmpty = document.getElementById('fm-modal-errors-empty');
+    var errorsTableWrap = document.getElementById('fm-modal-errors-table-wrap');
+    var errorsToolbar = document.getElementById('fm-errors-toolbar');
+    var errorBadge = document.getElementById('fm-modal-error-badge');
     var csvBtn = document.getElementById('fm-download-errors-csv');
+    var searchInput = document.getElementById('fm-errors-search-input');
+    var retryBtn = document.getElementById('fm-errors-retry-btn');
 
     state.currentModalErrors = [];
     state.currentModalFilename = sub.vey_filename || 'submission';
@@ -926,27 +1252,67 @@
       };
     }
 
-    if (errorsSection && errorsTbody && errorCount) {
-      errorsSection.style.display = 'none';
-      errorsTbody.innerHTML = '';
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.oninput = function () {
+        renderModalErrors(state.currentModalErrors, searchInput.value);
+      };
+    }
 
-      loadIngestionErrors(sub.vey_filesubmissionid).then(function (errors) {
-        state.currentModalErrors = errors || [];
-        if (errors.length > 0) {
-          errorCount.textContent = errors.length;
-          var errRows = '';
-          errors.forEach(function (e) {
-            errRows += '<tr>';
-            errRows += '<td>' + (e.vey_rownumber || '\u2014') + '</td>';
-            errRows += '<td><code>' + esc(e.vey_errorcode || 'SCHEMA_ERR') + '</code></td>';
-            errRows += '<td>' + esc(e.vey_errormessage || '\u2014') + '</td>';
-            errRows += '<td><code>' + esc(e.vey_rawpayload || '\u2014') + '</code></td>';
-            errRows += '</tr>';
-          });
-          errorsTbody.innerHTML = errRows;
-          errorsSection.style.display = 'block';
-        }
-      });
+    function loadErrorsForModal(submission) {
+      if (!errorsSection) return;
+
+      errorsSection.style.display = 'block';
+      if (errorsLoading) errorsLoading.style.display = 'block';
+      if (errorsFetchError) errorsFetchError.style.display = 'none';
+      if (errorsEmpty) errorsEmpty.style.display = 'none';
+      if (errorsTableWrap) errorsTableWrap.style.display = 'none';
+      if (errorsToolbar) errorsToolbar.style.display = 'none';
+
+      loadIngestionErrors(submission.vey_filesubmissionid)
+        .then(function (errors) {
+          if (errorsLoading) errorsLoading.style.display = 'none';
+          state.currentModalErrors = errors || [];
+
+          if (errorBadge) errorBadge.textContent = state.currentModalErrors.length;
+
+          if (state.currentModalErrors.length > 0) {
+            renderModalErrors(state.currentModalErrors, '');
+            if (errorsToolbar) errorsToolbar.style.display = 'flex';
+            if (errorsTableWrap) errorsTableWrap.style.display = 'block';
+            if (errorsEmpty) errorsEmpty.style.display = 'none';
+          } else {
+            // 0 errors returned
+            if (isFailed || isPartial) {
+              if (errorsEmpty) errorsEmpty.style.display = 'block';
+            } else {
+              // Processed or unvalidated with 0 errors
+              errorsSection.style.display = 'none';
+            }
+          }
+        })
+        .catch(function (err) {
+          if (errorsLoading) errorsLoading.style.display = 'none';
+          if (errorsFetchError) {
+            if (errorsFetchErrorText) {
+              errorsFetchErrorText.textContent = err.message || 'An unexpected Dataverse Web API error occurred.';
+            }
+            errorsFetchError.style.display = 'flex';
+          }
+        });
+    }
+
+    if (retryBtn) {
+      retryBtn.onclick = function () {
+        loadErrorsForModal(sub);
+      };
+    }
+
+    // Only attempt loading ingestion errors if submission is Failed, Partial, or has contract/schema
+    if (isFailed || isPartial || sub.vey_contractname || sub.vey_schemaversion) {
+      loadErrorsForModal(sub);
+    } else if (errorsSection) {
+      errorsSection.style.display = 'none';
     }
 
     modal.classList.add('is-active');
@@ -968,14 +1334,15 @@
       return;
     }
 
-    var headers = ['Row Number', 'Error Code', 'Column / Reference', 'Error Message', 'Raw Value'];
+    var headers = ['Row Number', 'Error Code', 'Column / Reference', 'Error Message', 'Raw Value', 'Logged At'];
     var rows = errors.map(function (e) {
       return [
-        sanitizeCsvCell(e.vey_rownumber || ''),
+        sanitizeCsvCell(e.vey_rownumber !== null && e.vey_rownumber !== undefined ? e.vey_rownumber : 'File-level'),
         sanitizeCsvCell(e.vey_errorcode || ''),
         sanitizeCsvCell(e.vey_errorreference || ''),
         sanitizeCsvCell(e.vey_errormessage || ''),
-        sanitizeCsvCell(e.vey_rawpayload || '')
+        sanitizeCsvCell(e.vey_rawpayload || ''),
+        sanitizeCsvCell(formatDate(e.createdon) || '')
       ].join(',');
     });
 
@@ -1116,6 +1483,25 @@
     if (statusFilter) statusFilter.addEventListener('change', renderSubmissionsTable);
 
     if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
+    var modalCloseX = document.querySelector('.js-modal-close-x');
+    if (modalCloseX) modalCloseX.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        closeModal();
+      }
+    });
+
+    var errorsTbody = document.getElementById('fm-modal-errors-tbody');
+    if (errorsTbody) {
+      errorsTbody.addEventListener('click', function (e) {
+        var copyBtn = e.target.closest && e.target.closest('.js-copy-payload');
+        if (copyBtn) {
+          var raw = copyBtn.getAttribute('data-raw');
+          if (raw) copyToClipboard(raw, copyBtn);
+        }
+      });
+    }
 
     var modal = document.getElementById('fm-details-modal');
     if (modal) {

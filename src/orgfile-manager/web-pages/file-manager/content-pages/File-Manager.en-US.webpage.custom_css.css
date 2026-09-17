@@ -228,3 +228,427 @@
   color: #212529;
   word-break: break-all;
 }
+
+/* ============================================================
+   Toast Notification System (Fixed Top-Right)
+   ============================================================ */
+.fm-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 440px;
+  width: calc(100% - 48px);
+  pointer-events: none;
+}
+
+.fm-toast {
+  pointer-events: auto;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  border-left: 5px solid #006fb0;
+  padding: 16px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  animation: fmToastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.fm-toast.is-dismissing {
+  animation: fmToastOut 0.25s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+}
+
+@keyframes fmToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fmToastOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+}
+
+.fm-toast--error {
+  border-left-color: #d60000;
+  background-color: #fffafb;
+}
+
+.fm-toast--warning {
+  border-left-color: #d97706;
+  background-color: #fffdf5;
+}
+
+.fm-toast--success {
+  border-left-color: #0b996c;
+  background-color: #f6fdf9;
+}
+
+.fm-toast--info {
+  border-left-color: #006fb0;
+}
+
+.fm-toast__icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.fm-toast--error .fm-toast__icon { color: #d60000; }
+.fm-toast--warning .fm-toast__icon { color: #d97706; }
+.fm-toast--success .fm-toast__icon { color: #0b996c; }
+.fm-toast--info .fm-toast__icon { color: #006fb0; }
+
+.fm-toast__content {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.fm-toast__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 3px;
+}
+
+.fm-toast--error .fm-toast__title { color: #991b1b; }
+.fm-toast--warning .fm-toast__title { color: #92400e; }
+.fm-toast--success .fm-toast__title { color: #166534; }
+
+.fm-toast__message {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.fm-toast__actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.fm-toast__action-btn {
+  background: #d60000;
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.fm-toast__action-btn:hover, .fm-toast__action-btn:focus {
+  background: #a80000;
+  color: #ffffff;
+}
+
+.fm-toast--warning .fm-toast__action-btn {
+  background: #d97706;
+}
+
+.fm-toast--warning .fm-toast__action-btn:hover {
+  background: #b45309;
+}
+
+.fm-toast__close {
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.fm-toast__close:hover {
+  color: #334155;
+}
+
+/* Spinner and Animation Helpers */
+.fm-spin {
+  animation: fmSpin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes fmSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Failed Inspect Button Highlight */
+.fm-btn--inspect-failed {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border: 1px solid #f87171 !important;
+  font-weight: 600;
+}
+
+.fm-btn--inspect-failed:hover, .fm-btn--inspect-failed:focus {
+  background-color: #fecaca !important;
+  color: #7f1d1d !important;
+  border-color: #ef4444 !important;
+}
+
+/* ============================================================
+   Validation & Ingestion Errors UI Component (Modal)
+   ============================================================ */
+
+/* High-Impact Failure Alert Banner in Modal */
+.fm-modal-failure-alert {
+  padding: 14px 18px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 5px solid #dc2626;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.fm-modal-failure-alert__icon {
+  font-size: 1.5rem;
+  color: #dc2626;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.fm-modal-failure-alert__body {
+  flex-grow: 1;
+}
+
+.fm-modal-failure-alert__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #991b1b;
+  margin-bottom: 3px;
+}
+
+.fm-modal-failure-alert__desc {
+  font-size: 0.92rem;
+  color: #7f1d1d;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Errors Section Toolbar */
+.fm-errors-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.fm-errors-search-wrap {
+  position: relative;
+  min-width: 240px;
+  flex-grow: 1;
+  max-width: 380px;
+}
+
+.fm-errors-search-wrap .glyphicon-search {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.fm-errors-search-input {
+  width: 100%;
+  padding: 6px 12px 6px 32px;
+  font-size: 0.88rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  outline: none;
+}
+
+.fm-errors-search-input:focus {
+  border-color: #006fb0;
+  box-shadow: 0 0 0 2px rgba(0, 111, 176, 0.15);
+}
+
+/* Ingestion Errors Table */
+.fm-errors-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.fm-errors-table th {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid #cbd5e1;
+  white-space: nowrap;
+}
+
+.fm-errors-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+.fm-errors-table tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Specific Field Badges */
+.fm-row-badge {
+  display: inline-block;
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fm-row-badge--file {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.fm-code-badge {
+  display: inline-block;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fm-ref-badge {
+  display: inline-block;
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 3px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.fm-error-msg {
+  color: #1e293b;
+  line-height: 1.45;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.fm-payload-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+}
+
+.fm-payload-code {
+  display: inline-block;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+  color: #334155;
+}
+
+.fm-copy-payload-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 0.85rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.fm-copy-payload-btn:hover {
+  color: #006fb0;
+  background-color: #e2e8f0;
+}
+
+.fm-time-badge {
+  color: #64748b;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Loading & Empty States */
+.fm-loading-container {
+  padding: 28px;
+  text-align: center;
+  color: #475569;
+}
+
+.fm-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #006fb0;
+  border-radius: 50%;
+  animation: fmSpin 0.8s linear infinite;
+  margin: 0 auto 10px auto;
+}
+
+.fm-errors-fetch-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  padding: 16px;
+  color: #991b1b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.fm-errors-empty-state {
+  padding: 24px;
+  text-align: center;
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 4px;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+

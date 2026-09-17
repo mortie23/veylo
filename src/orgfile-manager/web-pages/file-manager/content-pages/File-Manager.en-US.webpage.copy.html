@@ -36,6 +36,9 @@
 <div class="health-band">
   <div class="container">
 
+    <!-- Real-time Toast Notifications Container -->
+    <div id="fm-toast-container" class="fm-toast-container" aria-live="polite" aria-atomic="true"></div>
+
     <!-- Liquid Portal Context -->
     <div id="fm-portal-context"
          data-contact-id="{{ user.id }}"
@@ -273,15 +276,29 @@
 <div class="custom-modal-overlay" id="fm-details-modal" role="dialog" aria-modal="true" aria-labelledby="fm-modal-title">
   <div class="custom-modal-dialog custom-modal-dialog--lg">
     
-    <div class="custom-modal-header">
+    <div class="custom-modal-header" style="display: flex; justify-content: space-between; align-items: center;">
       <h4 id="fm-modal-title">Submission Details</h4>
+      <button type="button" class="fm-toast__close js-modal-close-x" aria-label="Close dialog">&times;</button>
     </div>
 
     <div class="custom-modal-body">
       
-      <!-- Validation Summary Banner -->
+      <!-- Prominent Failure Alert Banner (Visible when status is Failed) -->
+      <div id="fm-modal-failure-alert" class="fm-modal-failure-alert" style="display: none;">
+        <div class="fm-modal-failure-alert__icon">
+          <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+        </div>
+        <div class="fm-modal-failure-alert__body">
+          <div class="fm-modal-failure-alert__title" id="fm-modal-failure-title">Data Contract Validation Failed</div>
+          <p class="fm-modal-failure-alert__desc" id="fm-modal-failure-desc">
+            This submission did not satisfy the data contract specification. See row-level errors and validation logs below.
+          </p>
+        </div>
+      </div>
+
+      <!-- Contract Validation Summary Banner -->
       <div id="fm-modal-summary-container" style="margin-bottom: 18px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: 4px;">
-        <span style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Validation Summary</span>
+        <span style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Validation &amp; Schema Status</span>
         <div id="fm-modal-summary" style="font-size: 0.95rem; color: #1e293b; font-weight: 500;">No summary notes available.</div>
       </div>
 
@@ -304,7 +321,7 @@
           <div id="fm-modal-filesize">-</div>
         </div>
         <div class="fm-meta-item">
-          <label>Schema Version</label>
+          <label>Schema / Contract</label>
           <div id="fm-modal-schema">-</div>
         </div>
         <div class="fm-meta-item">
@@ -323,26 +340,67 @@
 
       <!-- Ingestion Errors Section (from vey_FileIngestionError) -->
       <div id="fm-modal-errors-section" style="display: none; margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
-          <h5 style="color: #991b1b; margin: 0; font-size: 1.1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+          <h5 style="color: #991b1b; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            Ingestion &amp; Schema Validation Errors (<span id="fm-modal-error-count">0</span>)
+            <span>Ingestion &amp; Schema Validation Errors</span>
+            <span id="fm-modal-error-badge" class="fm-row-badge" style="background-color: #fee2e2; color: #991b1b; border-color: #fca5a5;">0</span>
           </h5>
-          <button id="fm-download-errors-csv" class="au-btn au-btn--secondary au-btn--sm" type="button">
-            <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Error Log (.csv)
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="fm-download-errors-csv" class="au-btn au-btn--secondary au-btn--sm" type="button">
+              <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Error Log (.csv)
+            </button>
+          </div>
+        </div>
+
+        <p id="fm-modal-errors-lead" style="font-size: 0.9rem; color: #555555; margin-bottom: 14px;">
+          The downstream validation engine flagged the following row and schema issues during contract verification:
+        </p>
+
+        <!-- Errors Filter Toolbar -->
+        <div class="fm-errors-toolbar" id="fm-errors-toolbar">
+          <div class="fm-errors-search-wrap">
+            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            <input type="text" id="fm-errors-search-input" class="fm-errors-search-input" placeholder="Search errors by row, code, column, or text..." aria-label="Search validation errors" />
+          </div>
+          <div id="fm-errors-filter-count" style="font-size: 0.85rem; color: #64748b; font-weight: 500;"></div>
+        </div>
+
+        <!-- Loading State Indicator -->
+        <div id="fm-modal-errors-loading" class="fm-loading-container" style="display: none;">
+          <div class="fm-spinner"></div>
+          <div>Retrieving validation error logs from Dataverse&hellip;</div>
+        </div>
+
+        <!-- Fetch Error Alert with Retry -->
+        <div id="fm-modal-errors-fetch-error" class="fm-errors-fetch-error" style="display: none;">
+          <div>
+            <strong><span class="glyphicon glyphicon-warning-sign"></span> Unable to load error records:</strong>
+            <span id="fm-modal-fetch-error-text" style="margin-left: 6px;">An unexpected error occurred.</span>
+          </div>
+          <button type="button" id="fm-errors-retry-btn" class="au-btn au-btn--sm au-btn--secondary" style="background: #ffffff; color: #991b1b; border-color: #f87171;">
+            <span class="glyphicon glyphicon-refresh"></span> Retry
           </button>
         </div>
-        <p style="font-size: 0.9rem; color: #555555; margin-bottom: 12px;">
-          The downstream BigQuery validation engine flagged the following row issues during contract verification:
-        </p>
-        <div class="health-table__responsive" style="max-height: 220px; overflow-y: auto;">
+
+        <!-- Empty State (when Failed but 0 records in Dataverse) -->
+        <div id="fm-modal-errors-empty" class="fm-errors-empty-state" style="display: none;">
+          <span class="glyphicon glyphicon-info-sign" style="font-size: 1.3rem; display: block; margin-bottom: 8px; color: #64748b;"></span>
+          <strong>No individual row error records found.</strong>
+          <div style="margin-top: 4px; color: #64748b;">This submission is marked as Failed, but no row-level validation errors were recorded. The file may have failed during initial contract matching, archive unpacking, or ingestion preprocessing.</div>
+        </div>
+
+        <!-- Errors Table -->
+        <div class="health-table__responsive" id="fm-modal-errors-table-wrap" style="max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 4px;">
           <table class="fm-errors-table">
             <thead>
               <tr>
-                <th scope="col" style="width: 80px;">Row #</th>
-                <th scope="col" style="width: 180px;">Error Code</th>
-                <th scope="col">Message</th>
-                <th scope="col">Raw Payload</th>
+                <th scope="col" style="width: 90px;">Row #</th>
+                <th scope="col" style="width: 170px;">Error Code</th>
+                <th scope="col" style="width: 150px;">Column / Ref</th>
+                <th scope="col">Error Message</th>
+                <th scope="col" style="width: 220px;">Raw Value / Payload</th>
+                <th scope="col" style="width: 130px;">Logged</th>
               </tr>
             </thead>
             <tbody id="fm-modal-errors-tbody"></tbody>

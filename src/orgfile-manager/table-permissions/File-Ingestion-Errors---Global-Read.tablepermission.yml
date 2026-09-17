@@ -1,0 +1,14 @@
+adx_append: false
+adx_appendto: false
+adx_create: false
+adx_delete: false
+adx_entitylogicalname: vey_fileingestionerror
+adx_entityname: File Ingestion Errors - Global Read
+adx_entitypermission_webrole:
+- 097d8814-ae15-4cec-b236-6f2b0d60cc5e
+- a3468391-97d1-40d6-8f13-9ffa6bc9f379
+adx_entitypermissionid: d2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a
+adx_parententitypermission: 
+adx_read: true
+adx_scope: 756150000
+adx_write: false

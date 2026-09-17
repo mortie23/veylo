@@ -193,7 +193,7 @@ export function createDevServer(config: ResolvedConfig): DevServer {
               createdon: '2026-09-08T10:30:00Z',
               _vey_submittedby_value: 'mock-1',
               _vey_organization_value: 'mock-1',
-              vey_storageuri: 'https://stveyportaldev01.blob.core.windows.net/submissions/raw/sub-001/admissions_q3_2026.csv'
+              vey_storageuri: 'https://mockstorageaccount.blob.core.windows.net/submissions/raw/sub-001/admissions_q3_2026.csv'
             },
             {
               vey_filesubmissionid: 'sub-002',
@@ -209,35 +209,90 @@ export function createDevServer(config: ResolvedConfig): DevServer {
               createdon: '2026-09-09T14:15:00Z',
               _vey_submittedby_value: 'mock-1',
               _vey_organization_value: 'mock-1',
-              vey_storageuri: 'https://stveyportaldev01.blob.core.windows.net/submissions/raw/sub-002/discharges_august.csv'
+              vey_storageuri: 'https://mockstorageaccount.blob.core.windows.net/submissions/raw/sub-002/discharges_august.csv'
+            },
+            {
+              vey_filesubmissionid: 'sub-003',
+              vey_name: 'Emergency-Presentations-Sep2026',
+              vey_submissionreference: 'Emergency-Presentations-Sep2026',
+              vey_filename: 'emergency_dept_data.csv',
+              vey_filesizebytes: 2048590,
+              vey_filehash: 'c3d4e5f6a1b20718293a4b5c6d7e8f90123456789abcdef0123456789abcdef2',
+              vey_contractname: 'emergency_department',
+              vey_contractversion: 'v1.0',
+              vey_schemaversion: 'Emergency Department (v1.0)',
+              vey_submissionstatus: 948740004, // Failed
+              vey_reportingperiodstart: '2026-09-01T00:00:00Z',
+              vey_reportingperiodend: '2026-09-15T00:00:00Z',
+              createdon: '2026-09-16T09:00:00Z',
+              _vey_submittedby_value: 'mock-1',
+              _vey_organization_value: 'mock-1',
+              vey_storageuri: 'https://mockstorageaccount.blob.core.windows.net/submissions/raw/sub-003/emergency_dept_data.csv'
             }
           ]
         };
       } else if (entity === 'vey_fileingestionerrors') {
-        mockData = {
-          value: [
-            {
-              vey_fileingestionerrorid: 'err-001',
-              vey_rownumber: 142,
-              vey_errorcode: 'ERR_INVALID_DATE_FORMAT',
-              vey_errormessage: "Value '31/02/2026' in column 'AdmissionDate' is not a valid ISO-8601 date.",
-              vey_errorreference: 'SCHEMA_FIELD_VALIDATION',
-              vey_rawpayload: '142,P104928,31/02/2026,DISCHARGED,DEPT_A',
-              createdon: '2026-09-09T14:16:00Z',
-              _vey_filesubmission_value: 'sub-002'
-            },
-            {
-              vey_fileingestionerrorid: 'err-002',
-              vey_rownumber: 389,
-              vey_errorcode: 'ERR_REQUIRED_FIELD_MISSING',
-              vey_errormessage: "Mandatory column 'PatientIdentifier' was null or empty.",
-              vey_errorreference: 'SCHEMA_NOT_NULL',
-              vey_rawpayload: '389,,2026-08-15,ADMITTED,DEPT_C',
-              createdon: '2026-09-09T14:16:00Z',
-              _vey_filesubmission_value: 'sub-002'
-            }
-          ]
-        };
+        const allErrors = [
+          {
+            vey_fileingestionerrorid: 'err-001',
+            vey_rownumber: 142,
+            vey_errorcode: 'ERR_INVALID_DATE_FORMAT',
+            vey_errormessage: "Value '31/02/2026' in column 'AdmissionDate' is not a valid ISO-8601 date.",
+            vey_errorreference: 'AdmissionDate',
+            vey_rawpayload: '142,P104928,31/02/2026,DISCHARGED,DEPT_A',
+            createdon: '2026-09-09T14:16:00Z',
+            _vey_filesubmission_value: 'sub-002'
+          },
+          {
+            vey_fileingestionerrorid: 'err-002',
+            vey_rownumber: 389,
+            vey_errorcode: 'ERR_REQUIRED_FIELD_MISSING',
+            vey_errormessage: "Mandatory column 'PatientIdentifier' was null or empty.",
+            vey_errorreference: 'PatientIdentifier',
+            vey_rawpayload: '389,,2026-08-15,ADMITTED,DEPT_C',
+            createdon: '2026-09-09T14:16:00Z',
+            _vey_filesubmission_value: 'sub-002'
+          },
+          {
+            vey_fileingestionerrorid: 'err-003',
+            vey_rownumber: 12,
+            vey_errorcode: 'ERR_DATA_TYPE_MISMATCH',
+            vey_errormessage: "Value 'UNKNOWN_STATUS' in column 'TriageCategory' does not conform to expected integer range (1-5).",
+            vey_errorreference: 'TriageCategory',
+            vey_rawpayload: '12,EM-09921,2026-09-02,UNKNOWN_STATUS,ROOM_4',
+            createdon: '2026-09-16T09:01:00Z',
+            _vey_filesubmission_value: 'sub-003'
+          },
+          {
+            vey_fileingestionerrorid: 'err-004',
+            vey_rownumber: 45,
+            vey_errorcode: 'ERR_FOREIGN_KEY_VIOLATION',
+            vey_errormessage: "Facility identifier 'FAC_999' not found in master facility registry.",
+            vey_errorreference: 'FacilityId',
+            vey_rawpayload: '45,EM-09954,2026-09-03,2,FAC_999',
+            createdon: '2026-09-16T09:01:00Z',
+            _vey_filesubmission_value: 'sub-003'
+          },
+          {
+            vey_fileingestionerrorid: 'err-005',
+            vey_rownumber: null,
+            vey_errorcode: 'CONTRACT_SCHEMA_MISMATCH',
+            vey_errormessage: "Contract schema validation failed: 2 non-compliant rows identified.",
+            vey_errorreference: 'SchemaValidator',
+            vey_rawpayload: 'Emergency Department Contract v1.0 enforcement check',
+            createdon: '2026-09-16T09:01:05Z',
+            _vey_filesubmission_value: 'sub-003'
+          }
+        ];
+
+        const reqUrl = decodeURIComponent(req.url || '');
+        const match = reqUrl.match(/(?:value eq |value="|value='|eq ')(sub-[0-9a-zA-Z-]+|[0-9a-fA-F-]{36})/);
+        if (match && match[1]) {
+          const targetId = match[1];
+          mockData = { value: allErrors.filter(e => e._vey_filesubmission_value === targetId) };
+        } else {
+          mockData = { value: allErrors };
+        }
       }
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(mockData));
