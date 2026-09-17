@@ -118,7 +118,7 @@
 - adx_description: Comma-separated list of File Ingestion Error fields exposed via the Web API.
   adx_name: Webapi/vey_fileingestionerror/fields
   adx_sitesettingid: b9c0d1e2-0a6b-8e8f-fb1a-24d5e6f7a8b9
-  adx_value: vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon
+  adx_value: vey_fileingestionerrorid,vey_rownumber,vey_errorcode,vey_errormessage,vey_errorreference,vey_rawpayload,createdon,vey_filesubmission
 - adx_description: Denies use of the portal to minors. By default, it is set to false.
   adx_name: Authentication/Registration/DenyMinors
   adx_sitesettingid: bc106268-f3d4-41c9-9cc6-afea2bdbdfd9
