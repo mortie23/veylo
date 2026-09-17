@@ -36,6 +36,10 @@
     currentOrgId: '',
     currentOrgName: '',
     currentContactId: '',
+    currentContactName: '',
+    contactMap: {},
+    pendingDeleteSubmissionId: null,
+    currentInspectedSubmissionId: null,
     submissions: [],
     currentUploadXhr: null,
     msalInstance: null,
@@ -319,7 +323,8 @@
     var headers = {
       'Accept': 'application/json',
       'OData-MaxVersion': '4.0',
-      'OData-Version': '4.0'
+      'OData-Version': '4.0',
+      'Prefer': 'odata.include-annotations="*"'
     };
 
     var tokenPromise = Promise.resolve('');
@@ -353,7 +358,16 @@
     }).then(function (response) {
       if (!response.ok) {
         return response.text().then(function (text) {
-          throw new Error('API ' + response.status + ': ' + text);
+          var errorMsg = 'API ' + response.status;
+          try {
+            var errObj = JSON.parse(text);
+            if (errObj && errObj.error && errObj.error.message) {
+              errorMsg = errObj.error.message;
+            }
+          } catch (e) {
+            if (text) errorMsg += ': ' + text;
+          }
+          throw new Error(errorMsg);
         });
       }
       if (response.status === 204) return null;
@@ -368,8 +382,13 @@
     var ctx = document.getElementById('fm-portal-context');
     if (ctx) {
       state.currentContactId = ctx.getAttribute('data-contact-id') || '';
+      state.currentContactName = ctx.getAttribute('data-contact-name') || '';
       state.currentOrgId = ctx.getAttribute('data-org-id') || '';
       state.currentOrgName = ctx.getAttribute('data-org-name') || '';
+
+      if (state.currentContactId && state.currentContactName) {
+        state.contactMap[state.currentContactId] = state.currentContactName;
+      }
 
       if (state.currentOrgName) {
         var el = document.getElementById('fm-current-org-name');
@@ -399,6 +418,10 @@
       .then(function (data) {
         var contact = (data.value && data.value[0]) || data || {};
         if (!state.currentContactId) state.currentContactId = contact.contactid || '';
+        if (contact.fullname) state.currentContactName = contact.fullname;
+        if (state.currentContactId && state.currentContactName) {
+          state.contactMap[state.currentContactId] = state.currentContactName;
+        }
         state.currentOrgId = contact._parentcustomerid_value || '';
 
         if (state.currentOrgId) {
@@ -427,6 +450,52 @@
           el.textContent = 'No Organisation Assigned';
         }
       });
+  }
+
+  function loadContacts() {
+    return apiRequest('GET', 'contacts?$select=contactid,fullname,emailaddress1')
+      .then(function (data) {
+        var items = (data && data.value) || [];
+        items.forEach(function (c) {
+          if (c.contactid) {
+            state.contactMap[c.contactid] = c.fullname || c.emailaddress1 || c.contactid;
+          }
+        });
+        if (state.currentContactId && state.currentContactName) {
+          state.contactMap[state.currentContactId] = state.currentContactName;
+        }
+      })
+      .catch(function (err) {
+        console.warn('Contacts lookup query failed:', err);
+      });
+  }
+
+  function getSubmitterName(s) {
+    if (!s) return 'Unknown';
+
+    // 1. Check formatted value annotations from Dataverse OData
+    var formatted = s['_vey_submittedby_value@OData.Community.Display.V1.FormattedValue'] ||
+                    s['vey_SubmittedBy@OData.Community.Display.V1.FormattedValue'];
+    if (formatted) return formatted;
+
+    // 2. Check contactId in contactMap
+    var cid = s._vey_submittedby_value || s.submitted_by_contact_id || s.vey_submittedbyid;
+    if (cid) {
+      if (state.contactMap && state.contactMap[cid]) {
+        return state.contactMap[cid];
+      }
+      if (state.currentContactId && cid.toLowerCase() === state.currentContactId.toLowerCase()) {
+        return state.currentContactName || 'You';
+      }
+    }
+
+    // 3. Fallback to local submission metadata or current user if match
+    if (s.submitted_by_name) return s.submitted_by_name;
+    if (state.currentContactName && (!cid || cid === state.currentContactId)) {
+      return state.currentContactName;
+    }
+
+    return '\u2014';
   }
 
   function formatContractName(name) {
@@ -549,7 +618,8 @@
       'vey_reportingperiodstart',
       'vey_reportingperiodend',
       'createdon',
-      'vey_storageuri'
+      'vey_storageuri',
+      '_vey_submittedby_value'
     ].join(',');
 
     return apiRequest('GET', 'vey_filesubmissions?$select=' + selectFields + '&$orderby=createdon desc')
@@ -698,7 +768,7 @@
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding: 24px; color: #666;">No submissions found.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center" style="padding: 24px; color: #666;">No submissions found.</td></tr>';
       return;
     }
 
@@ -724,9 +794,24 @@
       }
       pillHtml += esc(statusObj.text) + '</span>';
 
-      var actionBtnHtml = isFailed
-        ? '<button type="button" class="au-btn au-btn--sm js-inspect-btn fm-btn--inspect-failed" data-id="' + s.vey_filesubmissionid + '"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Inspect Errors</button>'
+      var submitterName = getSubmitterName(s);
+      var isCurrentUser = state.currentContactId &&
+        ((s._vey_submittedby_value && s._vey_submittedby_value.toLowerCase() === state.currentContactId.toLowerCase()) ||
+         (state.currentContactName && submitterName === state.currentContactName));
+
+      var submitterHtml = esc(submitterName);
+      if (isCurrentUser) {
+        submitterHtml += ' <span class="au-tag" style="font-size: 0.75rem; padding: 1px 6px; margin-left: 4px; background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd;">You</span>';
+      }
+
+      var inspectBtnHtml = isFailed
+        ? '<button type="button" class="au-btn au-btn--sm js-inspect-btn fm-btn--inspect-failed" data-id="' + s.vey_filesubmissionid + '">Inspect</button>'
         : '<button type="button" class="au-btn au-btn--secondary au-btn--sm js-inspect-btn" data-id="' + s.vey_filesubmissionid + '">Inspect</button>';
+
+      var deleteBtnHtml = '<button type="button" class="au-btn au-btn--sm fm-btn--delete js-delete-btn" data-id="' + s.vey_filesubmissionid + '" title="Delete submission">' +
+        '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete</button>';
+
+      var actionBtnsHtml = '<div class="fm-table-actions">' + deleteBtnHtml + inspectBtnHtml + '</div>';
 
       rows += '<tr style="cursor: pointer;" data-id="' + s.vey_filesubmissionid + '">';
       rows += '<td><strong>' + esc(s.vey_submissionreference || s.vey_filename || '—') + '</strong></td>';
@@ -734,9 +819,10 @@
       rows += '<td>' + (s.vey_schemaversion ? '<span class="au-tag">' + esc(s.vey_schemaversion) + '</span>' : '\u2014') + '</td>';
       rows += '<td>' + formatBytes(s.vey_filesizebytes) + '</td>';
       rows += '<td>' + esc(period) + '</td>';
+      rows += '<td>' + submitterHtml + '</td>';
       rows += '<td>' + formatDate(s.createdon) + '</td>';
       rows += '<td>' + pillHtml + '</td>';
-      rows += '<td>' + actionBtnHtml + '</td>';
+      rows += '<td>' + actionBtnsHtml + '</td>';
       rows += '</tr>';
     });
 
@@ -983,7 +1069,9 @@
           vey_submissionstatus: statusNum,
           vey_reportingperiodstart: periodStart,
           vey_reportingperiodend: periodEnd,
-          createdon: new Date().toISOString()
+          createdon: new Date().toISOString(),
+          _vey_submittedby_value: state.currentContactId,
+          submitted_by_name: state.currentContactName || 'You'
         };
         var exists = (state.submissions || []).some(function (s) { return s.vey_filesubmissionid === ticket.submissionId; });
         if (!exists) {
@@ -1139,6 +1227,8 @@
     var modal = document.getElementById('fm-details-modal');
     if (!modal) return;
 
+    state.currentInspectedSubmissionId = submissionId;
+
     var statusObj = STATUS_LABELS[sub.vey_submissionstatus] || { text: 'Uploaded', cls: 'fm-status-pill--uploaded' };
     var isFailed = Number(sub.vey_submissionstatus) === 948740004;
     var isPartial = Number(sub.vey_submissionstatus) === 948740003;
@@ -1219,8 +1309,22 @@
                (sub.vey_reportingperiodend ? sub.vey_reportingperiodend.split('T')[0] : '...');
     }
     document.getElementById('fm-modal-period').textContent = period;
+
+    var modalSubmittedByEl = document.getElementById('fm-modal-submittedby');
+    if (modalSubmittedByEl) {
+      modalSubmittedByEl.textContent = getSubmitterName(sub);
+    }
+
     document.getElementById('fm-modal-createdon').textContent = formatDate(sub.createdon);
     document.getElementById('fm-modal-hash').textContent = sub.vey_filehash || '\u2014';
+
+    // Hook modal delete button
+    var modalDelBtn = document.getElementById('fm-modal-delete-btn');
+    if (modalDelBtn) {
+      modalDelBtn.onclick = function () {
+        promptDeleteSubmission(submissionId);
+      };
+    }
 
     // Hook download button
     var dlBtn = document.getElementById('fm-modal-download-btn');
@@ -1366,8 +1470,94 @@
   }
 
   function closeModal() {
+    state.currentInspectedSubmissionId = null;
     var modal = document.getElementById('fm-details-modal');
     if (modal) modal.classList.remove('is-active');
+  }
+
+  // ============================================================
+  // Delete Submission Action & Confirmation
+  // ============================================================
+  function promptDeleteSubmission(submissionId) {
+    var sub = state.submissions.find(function (s) {
+      return s.vey_filesubmissionid === submissionId;
+    });
+    if (!sub) return;
+
+    state.pendingDeleteSubmissionId = submissionId;
+    var modal = document.getElementById('fm-delete-modal');
+    var msgEl = document.getElementById('fm-delete-modal-msg');
+    var confirmBtn = document.getElementById('fm-delete-confirm-btn');
+
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete Submission';
+    }
+
+    if (msgEl) {
+      var name = esc(sub.vey_submissionreference || sub.vey_filename || 'this submission');
+      var filename = sub.vey_filename ? ' (<code>' + esc(sub.vey_filename) + '</code>)' : '';
+      msgEl.innerHTML = 'Are you sure you want to delete the file submission for <strong>' + name + '</strong>' + filename + '? This action permanently removes the record from Dataverse.';
+    }
+
+    if (modal) {
+      modal.classList.add('is-active');
+    }
+  }
+
+  function closeDeleteModal() {
+    state.pendingDeleteSubmissionId = null;
+    var modal = document.getElementById('fm-delete-modal');
+    if (modal) {
+      modal.classList.remove('is-active');
+    }
+  }
+
+  function confirmDeleteSubmission() {
+    var submissionId = state.pendingDeleteSubmissionId;
+    if (!submissionId) return;
+
+    var sub = state.submissions.find(function (s) {
+      return s.vey_filesubmissionid === submissionId;
+    });
+    var label = (sub && (sub.vey_submissionreference || sub.vey_filename)) || 'Submission';
+
+    var confirmBtn = document.getElementById('fm-delete-confirm-btn');
+    if (confirmBtn) {
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<span class="glyphicon glyphicon-refresh fm-spin" aria-hidden="true"></span> Deleting\u2026';
+    }
+
+    apiRequest('DELETE', 'vey_filesubmissions(' + submissionId + ')')
+      .then(function () {
+        closeDeleteModal();
+        if (state.currentInspectedSubmissionId === submissionId) {
+          closeModal();
+        }
+
+        // Optimistically remove from state
+        state.submissions = (state.submissions || []).filter(function (s) {
+          return s.vey_filesubmissionid !== submissionId;
+        });
+        if (state.knownStatuses && state.knownStatuses[submissionId]) {
+          delete state.knownStatuses[submissionId];
+        }
+
+        renderSubmissionsTable();
+        checkAndStartPolling();
+
+        showToast('Submission Deleted', 'Submission "' + label + '" has been removed.', 'success');
+        showStatus('Submission "' + label + '" was deleted successfully.', 'success');
+      })
+      .catch(function (err) {
+        console.error('Delete failed:', err);
+        if (confirmBtn) {
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete Submission';
+        }
+        showToast('Delete Failed', err.message || 'Could not delete submission.', 'error');
+        showStatus('Failed to delete submission: ' + (err.message || err), 'error');
+      });
   }
 
   // ============================================================
@@ -1486,9 +1676,31 @@
     var modalCloseX = document.querySelector('.js-modal-close-x');
     if (modalCloseX) modalCloseX.addEventListener('click', closeModal);
 
+    // Delete confirmation modal bindings
+    var delConfirmBtn = document.getElementById('fm-delete-confirm-btn');
+    if (delConfirmBtn) delConfirmBtn.addEventListener('click', confirmDeleteSubmission);
+
+    var delCancelBtn = document.getElementById('fm-delete-cancel-btn');
+    if (delCancelBtn) delCancelBtn.addEventListener('click', closeDeleteModal);
+
+    var delCloseX = document.querySelector('.js-delete-modal-close');
+    if (delCloseX) delCloseX.addEventListener('click', closeDeleteModal);
+
+    var delModal = document.getElementById('fm-delete-modal');
+    if (delModal) {
+      delModal.addEventListener('click', function (e) {
+        if (e.target === delModal) closeDeleteModal();
+      });
+    }
+
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' || e.keyCode === 27) {
-        closeModal();
+        var deleteModal = document.getElementById('fm-delete-modal');
+        if (deleteModal && deleteModal.classList.contains('is-active')) {
+          closeDeleteModal();
+        } else {
+          closeModal();
+        }
       }
     });
 
@@ -1512,6 +1724,14 @@
 
     if (tbody) {
       tbody.addEventListener('click', function (e) {
+        var delBtn = e.target.closest && e.target.closest('.js-delete-btn');
+        if (delBtn) {
+          e.stopPropagation();
+          var delId = delBtn.getAttribute('data-id');
+          if (delId) promptDeleteSubmission(delId);
+          return;
+        }
+
         var row = e.target.closest && e.target.closest('tr');
         if (row) {
           var id = row.getAttribute('data-id');
@@ -1523,7 +1743,9 @@
     // Initialize MSAL, dynamic contracts, and load submissions
     initMsal();
     loadContracts();
-    loadCurrentUserAndOrg().then(loadSubmissions);
+    loadCurrentUserAndOrg()
+      .then(loadContacts)
+      .then(loadSubmissions);
 
     // Pause/resume polling based on browser tab visibility
     document.addEventListener('visibilitychange', function () {

@@ -2,7 +2,7 @@ adx_append: true
 adx_appendto: true
 adx_contactrelationship: vey_filesubmission_SubmittedBy_contact
 adx_create: true
-adx_delete: false
+adx_delete: true
 adx_entitylogicalname: vey_filesubmission
 adx_entityname: Submissions - Contact Scoped
 adx_entitypermission_webrole:

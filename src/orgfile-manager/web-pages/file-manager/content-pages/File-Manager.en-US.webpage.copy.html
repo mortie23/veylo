@@ -129,13 +129,14 @@
                   <th scope="col">Schema</th>
                   <th scope="col">Size</th>
                   <th scope="col">Reporting Period</th>
-                  <th scope="col">Submitted</th>
+                  <th scope="col">Submitted By</th>
+                  <th scope="col">Date Submitted</th>
                   <th scope="col">Status</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
               <tbody id="fm-submissions-tbody">
-                <tr><td colspan="8" class="text-center" style="padding: 24px;">Loading submissions&hellip;</td></tr>
+                <tr><td colspan="9" class="text-center" style="padding: 24px;">Loading submissions&hellip;</td></tr>
               </tbody>
             </table>
           </div>
@@ -329,6 +330,10 @@
           <div id="fm-modal-period">-</div>
         </div>
         <div class="fm-meta-item">
+          <label>Submitted By</label>
+          <div id="fm-modal-submittedby">-</div>
+        </div>
+        <div class="fm-meta-item">
           <label>Submitted At</label>
           <div id="fm-modal-createdon">-</div>
         </div>
@@ -411,12 +416,46 @@
     </div>
 
     <div class="custom-modal-footer">
+      <button id="fm-modal-delete-btn" class="au-btn au-btn--sm fm-btn--delete" type="button">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete
+      </button>
       <button id="fm-modal-download-btn" class="au-btn au-btn--primary" type="button">
         <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download File
       </button>
       <button id="fm-modal-close-btn" class="au-btn au-btn--secondary" type="button">Close</button>
     </div>
 
+  </div>
+</div>
+
+<!-- ============================================================
+     Delete Confirmation Modal
+     ============================================================ -->
+<div class="custom-modal-overlay" id="fm-delete-modal" role="dialog" aria-modal="true" aria-labelledby="fm-delete-modal-title">
+  <div class="custom-modal-dialog">
+    <div class="custom-modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h4 id="fm-delete-modal-title" style="color: #991b1b; display: flex; align-items: center; gap: 8px;">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+        Delete File Submission
+      </h4>
+      <button type="button" class="fm-toast__close js-delete-modal-close" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="custom-modal-body">
+      <p id="fm-delete-modal-msg" class="au-body">
+        Are you sure you want to delete this file submission?
+      </p>
+      <div class="au-callout au-callout--alt" style="margin-top: 14px; margin-bottom: 0;">
+        <p style="margin: 0; font-size: 0.88rem; color: #4b5563;">
+          <strong>Cloud Storage Notice:</strong> This action permanently deletes the submission record from Dataverse. The uploaded file in Azure Blob Storage will remain preserved.
+        </p>
+      </div>
+    </div>
+    <div class="custom-modal-footer">
+      <button id="fm-delete-confirm-btn" class="au-btn au-btn--sm fm-btn--delete-confirm" type="button">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> Delete Submission
+      </button>
+      <button id="fm-delete-cancel-btn" class="au-btn au-btn--secondary au-btn--sm js-delete-modal-close" type="button">Cancel</button>
+    </div>
   </div>
 </div>
 

@@ -652,3 +652,46 @@
   font-size: 0.92rem;
 }
 
+/* ============================================================
+   Table Actions & Delete Button Styles
+   ============================================================ */
+.fm-table-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.fm-btn--delete {
+  color: #d60000 !important;
+  border: 1px solid #fca5a5 !important;
+  background-color: #fffafb !important;
+  font-weight: 500;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.4;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.fm-btn--delete:hover, .fm-btn--delete:focus {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  border-color: #ef4444 !important;
+}
+
+.fm-btn--delete-confirm {
+  background-color: #d60000 !important;
+  color: #ffffff !important;
+  border: 1px solid #b30000 !important;
+  font-weight: 600;
+}
+
+.fm-btn--delete-confirm:hover, .fm-btn--delete-confirm:focus {
+  background-color: #b30000 !important;
+  color: #ffffff !important;
+}
+
+

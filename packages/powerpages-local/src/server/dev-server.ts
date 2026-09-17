@@ -170,6 +170,11 @@ export function createDevServer(config: ResolvedConfig): DevServer {
 
     // --- Mock Web API Stubbing ---
     if (urlPath.startsWith('/_api/')) {
+      if (req.method === 'DELETE') {
+        res.writeHead(204);
+        res.end();
+        return;
+      }
       const entity = urlPath.replace('/_api/', '').split('?')[0].replace(/\/$/, '');
       let mockData: any = { value: [] };
       if (entity === 'contacts') {
