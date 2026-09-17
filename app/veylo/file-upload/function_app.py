@@ -103,6 +103,147 @@ def get_contracts(req: func.HttpRequest) -> func.HttpResponse:
 
 
 # ---------------------------------------------------------------------------
+# Endpoint 0B: Contract Manager Web UI Proxy (Reverse Proxy to Cloud Run)
+# ---------------------------------------------------------------------------
+def _forward_contracts_request(req: func.HttpRequest, path: str = "") -> func.HttpResponse:
+    """
+    Proxies HTTP requests to GCP Cloud Run Contract Manager web application.
+    Preserves cookies, rewrites HTML links/forms/assets, and rewrites HTTP redirects
+    so the corporate browser remains entirely within *.azurewebsites.net.
+    """
+    cloud_run_base = os.environ.get("VEYLO_CONTRACTS_SERVICE_URL", "").rstrip("/")
+    if not cloud_run_base:
+        return func.HttpResponse(
+            "Configuration Error: VEYLO_CONTRACTS_SERVICE_URL is not set.",
+            status_code=500
+        )
+
+    clean_path = path.lstrip("/")
+    target_url = f"{cloud_run_base}/{clean_path}" if clean_path else f"{cloud_run_base}/"
+
+    # Preserve query string
+    if "?" in req.url:
+        query_string = req.url.split("?", 1)[1]
+        if query_string:
+            target_url = f"{target_url}?{query_string}"
+
+    # Filter out hop-by-hop headers
+    excluded_request_headers = {
+        "host",
+        "content-length",
+        "transfer-encoding",
+        "connection",
+    }
+    forward_headers = {
+        k: v for k, v in req.headers.items()
+        if k.lower() not in excluded_request_headers
+    }
+
+    azure_host = req.headers.get("host", "localhost")
+    forward_headers["X-Forwarded-Host"] = azure_host
+    forward_headers["X-Forwarded-Proto"] = "https"
+    forward_headers["X-Forwarded-Prefix"] = "/api/contracts-ui"
+
+    body = None
+    if req.method in ("POST", "PUT", "PATCH"):
+        try:
+            body = req.get_body()
+        except Exception:
+            body = None
+
+    try:
+        res = requests.request(
+            method=req.method,
+            url=target_url,
+            headers=forward_headers,
+            data=body,
+            allow_redirects=False,
+            timeout=30,
+        )
+    except requests.RequestException as e:
+        logging.exception(f"Failed to proxy request to Cloud Run: {e}")
+        return func.HttpResponse(
+            f"Gateway Error: Could not connect to Contract Manager backend: {str(e)}",
+            status_code=502
+        )
+
+    # Response headers
+    excluded_response_headers = {
+        "transfer-encoding",
+        "content-encoding",
+        "connection",
+        "content-length",
+    }
+    response_headers = {
+        k: v for k, v in res.headers.items()
+        if k.lower() not in excluded_response_headers
+    }
+
+    # Rewrite redirect Location header
+    location_key = next((k for k in res.headers if k.lower() == "location"), None)
+    if location_key:
+        loc = res.headers[location_key]
+        # Any redirect pointing back to any run.app host (http or https) -> rewrite to /api/contracts-ui
+        if re.search(r"^https?://[^/]*run\.app", loc):
+            response_headers["Location"] = re.sub(r"^https?://[^/]*run\.app", "/api/contracts-ui", loc)
+        elif loc.startswith(cloud_run_base):
+            relative = loc[len(cloud_run_base):]
+            response_headers["Location"] = f"/api/contracts-ui{relative}"
+        elif loc.startswith("/") and not loc.startswith("//"):
+            response_headers["Location"] = f"/api/contracts-ui{loc}"
+        else:
+            response_headers["Location"] = loc
+        if location_key != "Location" and location_key in response_headers:
+            del response_headers[location_key]
+
+    # Clean up empty domain attribute from cookies if present
+    if "Set-Cookie" in response_headers:
+        response_headers["Set-Cookie"] = re.sub(r';\s*domain=\s*;?', '', response_headers["Set-Cookie"], flags=re.IGNORECASE)
+
+    content_type = res.headers.get("content-type", "")
+    content = res.content
+
+    # Rewrite HTML links and asset paths to keep browser on /api/contracts-ui
+    if "text/html" in content_type:
+        try:
+            html = res.text
+            # Rewrite any absolute run.app URLs to /api/contracts-ui
+            html = re.sub(r'https?://[^/]*run\.app', '/api/contracts-ui', html)
+            html = re.sub(
+                r'(href|src|action)=["\']/(?!/|api/contracts-ui/)([^"\']*)["\']',
+                r'\1="/api/contracts-ui/\2"',
+                html
+            )
+            html = re.sub(
+                r'url\(["\']?/(?!/|api/contracts-ui/)([^"\'\)]*)["\']?\)',
+                r'url("/api/contracts-ui/\1")',
+                html
+            )
+            content = html.encode("utf-8")
+        except Exception as e:
+            logging.warning(f"HTML link rewriting error: {e}")
+            content = res.content
+
+    return func.HttpResponse(
+        body=content,
+        status_code=res.status_code,
+        headers=response_headers,
+        mimetype=content_type.split(";")[0].strip() if content_type else None,
+    )
+
+
+@app.route(route="contracts-ui", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"])
+def contracts_ui_root(req: func.HttpRequest) -> func.HttpResponse:
+    return _forward_contracts_request(req, path="")
+
+
+@app.route(route="contracts-ui/{*path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"])
+def contracts_ui_subpath(req: func.HttpRequest) -> func.HttpResponse:
+    path = req.route_params.get("path", "")
+    return _forward_contracts_request(req, path=path)
+
+
+# ---------------------------------------------------------------------------
 # Endpoint 1: Request Upload Ticket (Write SAS + Draft Record)
 # ---------------------------------------------------------------------------
 @app.route(route="upload-request", methods=["POST"])

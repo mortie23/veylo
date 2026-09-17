@@ -3,7 +3,15 @@ import pytest
 from unittest.mock import patch, MagicMock
 import azure.functions as func
 
-from function_app import request_upload, complete_upload, download_file, get_contracts, _CONTRACTS_CACHE
+from function_app import (
+    request_upload,
+    complete_upload,
+    download_file,
+    get_contracts,
+    contracts_ui_root,
+    contracts_ui_subpath,
+    _CONTRACTS_CACHE,
+)
 
 
 @pytest.fixture
@@ -329,4 +337,140 @@ def test_upload_request_idor_contact_id_prevention(mock_create, mock_sas, mock_v
     assert resp.status_code == 200
     # The authenticated user's contact_id must take precedence
     assert mock_create.call_args[1]["submitted_by_contact_id"] == "contact-guid-5678"
+
+
+@patch("function_app.requests.request")
+def test_proxy_contracts_ui_root_html_rewriting(mock_request, monkeypatch):
+    monkeypatch.setenv("VEYLO_CONTRACTS_SERVICE_URL", "https://mock-contracts.run.app")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.headers = {
+        "content-type": "text/html; charset=utf-8",
+        "Set-Cookie": "session=test-session-cookie; Path=/",
+    }
+    raw_html = (
+        '<html><head><link rel="stylesheet" href="/static/css/contracts.css"></head>'
+        '<body><a href="/contracts/create">New</a><form action="/contracts/create" method="POST"></form>'
+        '<script src="https://cdn.jsdelivr.net/npm/bootstrap.js"></script></body></html>'
+    )
+    mock_resp.text = raw_html
+    mock_resp.content = raw_html.encode("utf-8")
+    mock_request.return_value = mock_resp
+
+    req = func.HttpRequest(
+        method="GET",
+        url="http://localhost:7071/api/contracts-ui",
+        headers={"cookie": "session=client-session"},
+        body=b"",
+    )
+    resp = contracts_ui_root(req)
+
+    assert resp.status_code == 200
+    body = resp.get_body().decode("utf-8")
+    assert 'href="/api/contracts-ui/static/css/contracts.css"' in body
+    assert 'href="/api/contracts-ui/contracts/create"' in body
+    assert 'action="/api/contracts-ui/contracts/create"' in body
+    assert 'src="https://cdn.jsdelivr.net/npm/bootstrap.js"' in body
+    assert resp.headers.get("Set-Cookie") == "session=test-session-cookie; Path=/"
+
+
+@patch("function_app.requests.request")
+def test_proxy_contracts_ui_redirect_rewriting(mock_request, monkeypatch):
+    monkeypatch.setenv("VEYLO_CONTRACTS_SERVICE_URL", "https://mock-contracts.run.app")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 302
+    mock_resp.headers = {
+        "Location": "/auth/login",
+        "Set-Cookie": "session=state-session; Path=/",
+    }
+    mock_resp.text = ""
+    mock_resp.content = b""
+    mock_request.return_value = mock_resp
+
+    req = func.HttpRequest(
+        method="GET",
+        url="http://localhost:7071/api/contracts-ui",
+        headers={},
+        body=b"",
+    )
+    resp = contracts_ui_root(req)
+
+    assert resp.status_code == 302
+    assert resp.headers.get("Location") == "/api/contracts-ui/auth/login"
+
+
+@patch("function_app.requests.request")
+def test_proxy_contracts_ui_http_run_app_redirect(mock_request, monkeypatch):
+    monkeypatch.setenv("VEYLO_CONTRACTS_SERVICE_URL", "https://mock-contracts.run.app")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 302
+    mock_resp.headers = {
+        "Location": "http://mock-contracts.run.app/",
+        "Set-Cookie": "session=post-login-session; domain=; Path=/",
+    }
+    mock_resp.text = ""
+    mock_resp.content = b""
+    mock_request.return_value = mock_resp
+
+    req = func.HttpRequest(
+        method="GET",
+        url="http://localhost:7071/api/contracts-ui/auth/callback?code=abc",
+        headers={},
+        body=b"",
+        route_params={"path": "auth/callback"},
+    )
+    resp = contracts_ui_subpath(req)
+
+    assert resp.status_code == 302
+    assert resp.headers.get("Location") == "/api/contracts-ui/"
+    assert "domain=" not in resp.headers.get("Set-Cookie", "")
+
+
+@patch("function_app.requests.request")
+def test_proxy_contracts_ui_external_redirect(mock_request, monkeypatch):
+    monkeypatch.setenv("VEYLO_CONTRACTS_SERVICE_URL", "https://mock-contracts.run.app")
+
+    mock_resp = MagicMock()
+    mock_resp.status_code = 302
+    external_url = "https://login.microsoftonline.com/tenant-id/oauth2/v2.0/authorize?client_id=123"
+    mock_resp.headers = {
+        "Location": external_url,
+    }
+    mock_resp.text = ""
+    mock_resp.content = b""
+    mock_request.return_value = mock_resp
+
+    req = func.HttpRequest(
+        method="GET",
+        url="http://localhost:7071/api/contracts-ui/auth/login",
+        headers={},
+        body=b"",
+        route_params={"path": "auth/login"},
+    )
+    resp = contracts_ui_subpath(req)
+
+    assert resp.status_code == 302
+    assert resp.headers.get("Location") == external_url
+
+
+@patch("function_app.requests.request")
+def test_proxy_contracts_ui_gateway_error(mock_request, monkeypatch):
+    import requests
+    monkeypatch.setenv("VEYLO_CONTRACTS_SERVICE_URL", "https://mock-contracts.run.app")
+    mock_request.side_effect = requests.RequestException("Connection refused")
+
+    req = func.HttpRequest(
+        method="GET",
+        url="http://localhost:7071/api/contracts-ui",
+        headers={},
+        body=b"",
+    )
+    resp = contracts_ui_root(req)
+
+    assert resp.status_code == 502
+    assert b"Gateway Error" in resp.get_body()
+
 

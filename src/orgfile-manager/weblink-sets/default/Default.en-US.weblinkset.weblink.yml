@@ -39,8 +39,8 @@
   adx_openinnewwindow: true
   adx_publishingstateid: 8be00a48-c2ad-46bd-81c6-44fb1d885bef
   adx_robotsfollowlink: true
-  adx_externalurl: https://run-xyz-dev-veylo-contracts-0-251731083825.australia-southeast1.run.app
-  adx_url: https://run-xyz-dev-veylo-contracts-0-251731083825.australia-southeast1.run.app
+  adx_externalurl: https://func-vey-portal-dev-up-01.azurewebsites.net/api/contracts-ui
+  adx_url: https://func-vey-portal-dev-up-01.azurewebsites.net/api/contracts-ui
   adx_weblinkid: e5f6a7b8-9012-3456-789a-bcdef0123456
   adx_weblinksetid: 32b7220d-8cd4-498c-9f09-4331c3b1cfa8
 
